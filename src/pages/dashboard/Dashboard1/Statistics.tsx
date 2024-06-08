@@ -8,45 +8,43 @@ const Statistics = () => {
   return (
     <>
       <Row>
-        <Col md={6} xl={3}>
+        <Col md={8} xl={4}>
           <StatisticsWidget
             variant="primary"
             counterOptions={{
               prefix: "$",
             }}
-            description="Total Revenue"
+            description="Total Sales"
             stats="58947"
-            icon="fe-heart"
+            icon="fe-shopping-cart"
+            
           />
         </Col>
-        <Col md={6} xl={3}>
+        <Col md={8} xl={4}>
           <StatisticsWidget
             variant="success"
-            description="Today's Sales"
+            description="Total Commission"
             stats="127"
-            icon="fe-shopping-cart"
+            icon="bi-cash"
           />
         </Col>
-        <Col md={6} xl={3}>
+        <Col md={8} xl={4}>
           <StatisticsWidget
             variant="info"
-            description="Conversion"
+            description="Pending Orders"
             stats="0.58"
-            counterOptions={{
-              suffix: "%",
-              decimals: 2,
-            }}
-            icon="fe-bar-chart-line-"
+            
+            icon="bi-receipt-cutoff"
           />
         </Col>
-        <Col md={6} xl={3}>
+        {/* <Col md={6} xl={3}>
           <StatisticsWidget
             variant="warning"
             description="Today's Visits"
             stats="78412"
             icon="fe-eye"
           />
-        </Col>
+        </Col> */}
       </Row>
     </>
   );

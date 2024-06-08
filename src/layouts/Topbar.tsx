@@ -351,31 +351,31 @@ const Topbar = ({
               <i className="mdi mdi-menu" />
             </button>
 
-            <div className="dropdown d-none d-xl-block">
+            {/* <div className="dropdown d-none d-xl-block">
               <CreateNew otherOptions={otherOptions} />
             </div>
 
             <div className="dropdown dropdown-mega d-none d-xl-block">
               <MegaMenu subMenus={MegaMenuOptions} />
-            </div>
+            </div> */}
           </div>
 
           <ul className="topbar-menu d-flex align-items-center">
-            <li className="app-search dropdown d-none d-lg-block">
+            {/* <li className="app-search dropdown d-none d-lg-block">
               <TopbarSearch items={SearchResults} />
-            </li>
+            </li> */}
             {/* <li className="dropdown d-inline-block d-lg-none">
               <SearchDropdown />
             </li> */}
             <li className="dropdown d-none d-lg-inline-block">
               <MaximizeScreen />
             </li>
-            <li className="dropdown d-none d-lg-inline-block topbar-dropdown">
+            {/* <li className="dropdown d-none d-lg-inline-block topbar-dropdown">
               <AppsDropdown />
             </li>
             <li className="dropdown d-none d-lg-inline-block topbar-dropdown">
               <LanguageDropdown />
-            </li>
+            </li> */}
             <li className="dropdown notification-list">
               <NotificationDropdown notifications={Notifications} />
             </li>

@@ -37,6 +37,9 @@ const Dashboard3 = React.lazy(() => import("../pages/dashboard/Dashboard3/"));
 const Dashboard4 = React.lazy(() => import("../pages/dashboard/Dashboard4/"));
 
 // apps
+const AllOrders = React.lazy(() => import("../pages/apps/Order/index"));
+const AllProducts = React.lazy(() => import("../pages/apps/Product/index"));
+const Commission = React.lazy(() => import("../pages/apps/Commission/index"));
 const CalendarApp = React.lazy(() => import("../pages/apps/Calendar/"));
 const Projects = React.lazy(() => import("../pages/apps/Projects/"));
 const ProjectDetail = React.lazy(
@@ -215,9 +218,9 @@ export interface RoutesProps {
 // dashboards
 const dashboardRoutes: RoutesProps = {
   path: "/dashboard",
-  name: "Dashboards",
+  name: "Dashboard",
   icon: "airplay",
-  header: "Navigation",
+  element: <Dashboard1 />,
   children: [
     {
       path: "/",
@@ -252,6 +255,15 @@ const dashboardRoutes: RoutesProps = {
   ],
 };
 
+const dashboard1Routes: RoutesProps = {
+  path: "/apps/dashboard",
+  name: "Dashboard",
+  route: PrivateRoute,
+  roles: ["Admin"],
+  icon: "airplay",
+  element: <Dashboard1 />,
+};
+
 const calendarAppRoutes: RoutesProps = {
   path: "/apps/calendar",
   name: "Calendar",
@@ -259,12 +271,37 @@ const calendarAppRoutes: RoutesProps = {
   roles: ["Admin"],
   icon: "calendar",
   element: <CalendarApp />,
-  header: "Apps",
 };
 
+const orderAppRoutes: RoutesProps = {
+  path: "/apps/orders",
+  name: "Orders",
+  route: PrivateRoute,
+  roles: ["Admin"],
+  icon: "layers",
+  element: <AllOrders />,
+};
+
+const productAppRoutes: RoutesProps = {
+  path: "/apps/products",
+  name: "Products",
+  route: PrivateRoute,
+  roles: ["Admin"],
+  icon: "shopping-cart",
+  element: <AllProducts />,
+};
+
+const commissionAppRoutes: RoutesProps = {
+  path: "/apps/commission",
+  name: "Commission",
+  route: PrivateRoute,
+  roles: ["Admin"],
+  icon: "award",
+  element: <Commission />,
+};
 const chatAppRoutes = {
   path: "/apps/chat",
-  name: "Chat",
+  name: "Messaging",
   route: PrivateRoute,
   roles: ["Admin"],
   icon: "message-square",
@@ -539,6 +576,9 @@ const fileAppRoutes = {
 
 const appRoutes = [
   calendarAppRoutes,
+  orderAppRoutes,
+  productAppRoutes,
+  commissionAppRoutes,
   chatAppRoutes,
   ecommerceAppRoutes,
   crmAppRoutes,
@@ -1113,8 +1153,10 @@ const flattenRoutes = (routes: RoutesProps[]) => {
 
 // All routes
 const authProtectedRoutes = [
+
   dashboardRoutes,
   ...appRoutes,
+  dashboard1Routes,
   extrapagesRoutes,
   uiRoutes,
 ];

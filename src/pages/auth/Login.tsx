@@ -135,7 +135,7 @@ const Login = () => {
 
       <AuthLayout
         helpText={t(
-          "Enter your email address and password to access admin panel."
+          "Enter your email address and password to access reseller portal."
         )}
         bottomLinks={<BottomLink />}
       >
