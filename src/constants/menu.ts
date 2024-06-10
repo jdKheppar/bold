@@ -48,7 +48,7 @@ const MENU_ITEMS: MenuItemTypes[] = [
   //     },
   //   ],
   // },
-  { key: "apps", label: "Apps", isTitle: true },
+  // { key: "apps", label: "Apps", isTitle: true },
   {
     key: "apps-dashboard",
     label: "Dashboard",
@@ -84,6 +84,13 @@ const MENU_ITEMS: MenuItemTypes[] = [
     isTitle: false,
     icon: "message-square",
     url: "/apps/chat",
+  },
+  {
+    key: "apps-charts",
+    label: "Reports",
+    isTitle: false,
+    icon: "bar-chart-2",
+    url: "/apps/charts",
   },
   // {
   //   key: "apps-calendar",
@@ -773,7 +780,7 @@ const MENU_ITEMS: MenuItemTypes[] = [
   //     },
   //   ],
   // },
-  // {
+  //{
   //   key: "maps",
   //   label: "Maps",
   //   isTitle: false,

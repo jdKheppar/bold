@@ -35,12 +35,12 @@ const BottomLink = () => {
             {t("Forgot your password?")}
           </Link>
         </p>
-        <p className="text-white-50">
+        {/* <p className="text-white-50">
           {t("Don't have an account?")}{" "}
           <Link to={"/auth/register"} className="text-white ms-1">
             <b>{t("Sign Up")}</b>
           </Link>
-        </p>
+        </p> */}
       </Col>
     </Row>
   );

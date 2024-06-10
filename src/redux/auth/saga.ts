@@ -40,12 +40,22 @@ function* login({
 }: UserData): SagaIterator {
   try {
     const response = yield call(loginApi, { username, password });
-    const user = response.data;
-    // NOTE - You can change this according to response format from your api
-    api.setLoggedInUser(user);
-    setAuthorization(user["token"]);
-    yield put(authApiResponseSuccess(AuthActionTypes.LOGIN_USER, user));
+    if (response) {
+      console.log(response);
+      const user = response.data;
+      // NOTE - You can change this according to response format from your api
+      api.setLoggedInUser(user);
+      setAuthorization(user["token"]);
+      yield put(authApiResponseSuccess(AuthActionTypes.LOGIN_USER, user));
+    }
+    else {
+      yield put(authApiResponseError(AuthActionTypes.LOGIN_USER, "Something Went Wrong"));
+      api.setLoggedInUser(null);
+      setAuthorization(null);
+    }
+
   } catch (error: any) {
+    console.log("Iam real error", error);
     yield put(authApiResponseError(AuthActionTypes.LOGIN_USER, error));
     api.setLoggedInUser(null);
     setAuthorization(null);

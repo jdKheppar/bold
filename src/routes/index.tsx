@@ -307,6 +307,14 @@ const chatAppRoutes = {
   icon: "message-square",
   element: <ChatApp />,
 };
+const chartsAppRoutes = {
+  path: "/apps/charts",
+  name: "Reports",
+  route: PrivateRoute,
+  roles: ["Admin"],
+  icon: "bar-chart-2",
+  element: <ApexChart />,
+};
 
 const ecommerceAppRoutes = {
   path: "/apps/ecommerce",
@@ -580,6 +588,7 @@ const appRoutes = [
   productAppRoutes,
   commissionAppRoutes,
   chatAppRoutes,
+  chartsAppRoutes,
   ecommerceAppRoutes,
   crmAppRoutes,
   emailAppRoutes,
@@ -1034,12 +1043,12 @@ const authRoutes: RoutesProps[] = [
     element: <SignInSignUp />,
     route: Route,
   },
-  {
-    path: "/auth/lock-screen",
-    name: "Lock Screen",
-    element: <LockScreen />,
-    route: Route,
-  },
+  // {
+  //   path: "/auth/lock-screen",
+  //   name: "Lock Screen",
+  //   element: <LockScreen />,
+  //   route: Route,
+  // },
   {
     path: "/auth/logout",
     name: "Logout",

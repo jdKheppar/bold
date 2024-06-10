@@ -20,9 +20,9 @@ const ApexChart = () => {
       <PageTitle
         breadCrumbItems={[
           { label: "Charts", path: "/features/charts/apex" },
-          { label: "Apex Charts", path: "/features/charts/apex", active: true },
+          { label: "Ubold Charts", path: "/features/charts/apex", active: true },
         ]}
-        title={"Apex Charts"}
+        title={"Reports and Analytics"}
       />
 
       <Row>
@@ -35,7 +35,7 @@ const ApexChart = () => {
         </Col>
       </Row>
 
-      <Row>
+      {/* <Row>
         <Col xl={6}>
           <SplineAreaChart />
         </Col>
@@ -69,7 +69,7 @@ const ApexChart = () => {
         <Col>
           <MixedChart />
         </Col>
-      </Row>
+      </Row> */}
     </React.Fragment>
   );
 };

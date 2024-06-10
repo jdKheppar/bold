@@ -4,7 +4,7 @@ import OrdersList from './Orders/Orders'
 export default function Orders() {
     return (
         <>
-            <Products />
+            {/* <Products /> */}
             <OrdersList />
         </>
     )

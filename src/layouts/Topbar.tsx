@@ -88,20 +88,20 @@ const Notifications: NotificationItem[] = [
 // get the profilemenu
 const ProfileMenus = [
   {
-    label: "My Account",
+    label: "My Profile",
     icon: "fe-user",
     redirectTo: "#",
   },
   {
-    label: "Settings",
+    label: "Account Settings",
     icon: "fe-settings",
     redirectTo: "#",
   },
-  {
-    label: "Lock Screen",
-    icon: "fe-lock",
-    redirectTo: "/auth/lock-screen",
-  },
+  // {
+  //   label: "Lock Screen",
+  //   icon: "fe-lock",
+  //   redirectTo: "/auth/lock-screen",
+  // },
   {
     label: "Logout",
     icon: "fe-log-out",
@@ -387,14 +387,14 @@ const Topbar = ({
                 userTitle={"Founder"}
               />
             </li>
-            <li>
+            {/* <li>
               <button
                 className="nav-link dropdown-toggle right-bar-toggle waves-effect waves-light btn btn-link shadow-none"
                 onClick={handleRightSideBar}
               >
                 <i className="fe-settings noti-icon font-22"></i>
               </button>
-            </li>
+            </li> */}
           </ul>
         </div>
       </div>

@@ -27,20 +27,16 @@ const UserBox = () => {
   // get the profilemenu
   const ProfileMenus = [
     {
-      label: "My Account",
+      label: "My Profile",
       icon: "fe-user",
       redirectTo: "#",
     },
     {
-      label: "Settings",
+      label: "Account Settings",
       icon: "fe-settings",
       redirectTo: "#",
     },
-    {
-      label: "Lock Screen",
-      icon: "fe-lock",
-      redirectTo: "/auth/lock-screen",
-    },
+
     {
       label: "Logout",
       icon: "fe-log-out",

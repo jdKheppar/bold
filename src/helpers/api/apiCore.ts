@@ -67,8 +67,8 @@ class APICore {
     if (params) {
       var queryString = params
         ? Object.keys(params)
-            .map((key) => key + "=" + params[key])
-            .join("&")
+          .map((key) => key + "=" + params[key])
+          .join("&")
         : "";
       response = axios.get(`${url}?${queryString}`, params);
     } else {
@@ -82,8 +82,8 @@ class APICore {
     if (params) {
       var queryString = params
         ? Object.keys(params)
-            .map((key) => key + "=" + params[key])
-            .join("&")
+          .map((key) => key + "=" + params[key])
+          .join("&")
         : "";
       response = axios.get(`${url}?${queryString}`, { responseType: "blob" });
     } else {
@@ -98,8 +98,8 @@ class APICore {
     if (params) {
       queryString = params
         ? Object.keys(params)
-            .map((key) => key + "=" + params[key])
-            .join("&")
+          .map((key) => key + "=" + params[key])
+          .join("&")
         : "";
     }
 
@@ -112,8 +112,10 @@ class APICore {
   /**
    * post given data to url
    */
-  create = (url: string, data: any) => {
-    return axios.post(url, data);
+  create = async (url: string, data: any) => {
+    let responseA = await axios.post(config.API_URL + url, data);
+    console.log(responseA)
+    return responseA;
   };
 
   /**
