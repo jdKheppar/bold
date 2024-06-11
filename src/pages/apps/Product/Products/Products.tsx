@@ -73,20 +73,6 @@ const ProductsList = () => {
                                     </form>
                                 </Col>
 
-                                {/* <Col className="col-auto">
-                                    <div className="text-lg-end my-1 my-lg-0">
-                                        <Button className="btn btn-success waves-effect waves-light me-1">
-                                            <i className="mdi mdi-cog"></i>
-                                        </Button>
-
-                                        <Link
-                                            to="#"
-                                            className="btn btn-danger waves-effect waves-light"
-                                        >
-                                            <i className="mdi mdi-plus-circle me-1"></i> Add New
-                                        </Link>
-                                    </div>
-                                </Col> */}
                             </Row>
                         </Card.Body>
                     </Card>
@@ -123,7 +109,7 @@ const ProductsList = () => {
                                             <div className="col">
                                                 <h5 className="font-16 mt-0 sp-line-1">
                                                     <Link
-                                                        to="/apps/ecommerce/product-details"
+                                                        to="/apps/productDetails"
                                                         className="text-dark"
                                                     >
                                                         {product.name}

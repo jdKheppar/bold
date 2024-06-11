@@ -2,7 +2,7 @@ import React from "react";
 
 import AllRoutes from "./routes/Routes";
 
-// import { configureFakeBackend } from "./helpers";
+import { configureFakeBackend } from "./helpers";
 
 
 // For Default import Default.scss
@@ -29,7 +29,7 @@ import './assets/scss/Landing.scss';
 import "./assets/scss/Icons.scss";
 
 // configure fake backend
-//configureFakeBackend();
+configureFakeBackend();
 
 const App = () => {
   return (

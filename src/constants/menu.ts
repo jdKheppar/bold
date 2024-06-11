@@ -92,6 +92,21 @@ const MENU_ITEMS: MenuItemTypes[] = [
     icon: "bar-chart-2",
     url: "/apps/charts",
   },
+  { key: "ProfileManagement", label: "Profile Management", isTitle: true },
+  {
+    key: "apps-profile",
+    label: "Profile",
+    isTitle: false,
+    icon: "user",
+    url: "/apps/profile",
+  },
+  {
+    key: "apps-settings",
+    label: "Account Settings",
+    isTitle: false,
+    icon: "settings",
+    url: "/apps/settings",
+  },
   // {
   //   key: "apps-calendar",
   //   label: "Calendar",

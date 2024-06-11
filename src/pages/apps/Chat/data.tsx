@@ -36,7 +36,7 @@ export interface ChatMessage {
 const users: ChatUser[] = [
   {
     id: 1,
-    name: "Brandon Smith",
+    name: "Admin",
     avatar: avatar2,
     lastMessage: "How are you today?",
     totalUnread: 3,

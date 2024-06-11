@@ -40,6 +40,10 @@ const Dashboard4 = React.lazy(() => import("../pages/dashboard/Dashboard4/"));
 const AllOrders = React.lazy(() => import("../pages/apps/Order/index"));
 const AllProducts = React.lazy(() => import("../pages/apps/Product/index"));
 const Commission = React.lazy(() => import("../pages/apps/Commission/index"));
+const Profile = React.lazy(()=> import("../pages/apps/Profile/Profile"));
+const Settings = React.lazy(()=> import("../pages/apps/Settings/Settings"))
+const AppProductDetails = React.lazy(()=> import("../pages/apps/Product/Products/ProductDetails/ProductDetails"));
+const AppShoppingCart = React.lazy(()=> import("../pages/apps/Product/Products/Shopping Cart/Cart"));
 const CalendarApp = React.lazy(() => import("../pages/apps/Calendar/"));
 const Projects = React.lazy(() => import("../pages/apps/Projects/"));
 const ProjectDetail = React.lazy(
@@ -315,7 +319,36 @@ const chartsAppRoutes = {
   icon: "bar-chart-2",
   element: <ApexChart />,
 };
-
+const profileAppRoutes = {
+  path: "/apps/profile",
+  name: "Profile",
+  route: PrivateRoute,
+  roles: ["Admin"],
+  icon: "user",
+  element: <Profile />,
+};
+const settingsAppRoutes = {
+  path: "/apps/settings",
+  name: "Settings",
+  route: PrivateRoute,
+  roles: ["Admin"],
+  icon: "settings",
+  element: <Settings />,
+};
+const productDetailsAppRoutes = {
+  path: "/apps/productDetails",
+  name: "Product Details",
+  route: PrivateRoute,
+  roles: ["Admin"],
+  element: <AppProductDetails/>,
+};
+const cartAppRoutes = {
+  path: "/apps/shoppingcart",
+  name: "Shopping Cart",
+  route: PrivateRoute,
+  roles: ["Admin"],
+  element: <AppShoppingCart/>,
+};
 const ecommerceAppRoutes = {
   path: "/apps/ecommerce",
   name: "eCommerce",
@@ -589,6 +622,10 @@ const appRoutes = [
   commissionAppRoutes,
   chatAppRoutes,
   chartsAppRoutes,
+  settingsAppRoutes,
+  productDetailsAppRoutes,
+  profileAppRoutes,
+  cartAppRoutes,
   ecommerceAppRoutes,
   crmAppRoutes,
   emailAppRoutes,

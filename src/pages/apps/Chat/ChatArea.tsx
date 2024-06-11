@@ -19,9 +19,11 @@ import { FormInput } from "../../../components/";
 import Loader from "../../../components/Loader";
 
 // default data
-import { messages, ChatMessage, ChatUser } from "./data";
+import { users, messages, ChatMessage, ChatUser } from "./data";
 
 import avatar1 from "../../../assets/images/users/user-1.jpg";
+
+
 
 const UserMessage = ({
   message,
@@ -94,10 +96,10 @@ interface ChatAreaProps {
 }
 
 // ChatArea
-const ChatArea = ({ selectedUser }: ChatAreaProps) => {
+const ChatArea = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [userMessages, setUserMessages] = useState<ChatMessage[]>([]);
-
+  const [selectedUser, setSelectedUser] = useState<ChatUser>(users[0]);
   const [toUser] = useState<ChatUser>({
     id: 9,
     name: "Geneva M",
@@ -209,61 +211,11 @@ const ChatArea = ({ selectedUser }: ChatAreaProps) => {
                       {selectedUser.name}
                     </Link>
                   </h5>
-                  <p className="mt-1 mb-0 text-muted font-12">
-                    <small className="mdi mdi-circle text-success"></small>{" "}
-                    Online
-                  </p>
+                 
                 </div>
               </div>
             </Col>
-            <Col className="col-auto">
-              <div id="tooltips-container">
-                <OverlayTrigger
-                  placement="top"
-                  overlay={<Tooltip id="">Voice Call</Tooltip>}
-                >
-                  <Link
-                    to="#"
-                    className="text-reset font-19 py-1 px-2 d-inline-block"
-                  >
-                    <i className="fe-phone-call"></i>
-                  </Link>
-                </OverlayTrigger>
-                <OverlayTrigger
-                  placement="top"
-                  overlay={<Tooltip id="">Video Call</Tooltip>}
-                >
-                  <Link
-                    to="#"
-                    className="text-reset font-19 py-1 px-2 d-inline-block"
-                  >
-                    <i className="fe-video"></i>
-                  </Link>
-                </OverlayTrigger>
-                <OverlayTrigger
-                  placement="top"
-                  overlay={<Tooltip id="">Add Users</Tooltip>}
-                >
-                  <Link
-                    to="#"
-                    className="text-reset font-19 py-1 px-2 d-inline-block"
-                  >
-                    <i className="fe-user-plus"></i>
-                  </Link>
-                </OverlayTrigger>
-                <OverlayTrigger
-                  placement="top"
-                  overlay={<Tooltip id="">Delete Chat</Tooltip>}
-                >
-                  <Link
-                    to="#"
-                    className="text-reset font-19 py-1 px-2 d-inline-block"
-                  >
-                    <i className="fe-trash-2"></i>
-                  </Link>
-                </OverlayTrigger>
-              </div>
-            </Col>
+            
           </Row>
         </Card.Body>
         <Card.Body>
@@ -300,7 +252,7 @@ const ChatArea = ({ selectedUser }: ChatAreaProps) => {
                         type="text"
                         name="newMessage"
                         className="border-0"
-                        placeholder="Enter your text"
+                        placeholder="Enter your message here"
                         register={register}
                         key="newMessage"
                         errors={errors}
@@ -309,9 +261,7 @@ const ChatArea = ({ selectedUser }: ChatAreaProps) => {
                     </div>
                     <div className="col-sm-auto">
                       <div className="btn-group">
-                        <Link to="#" className="btn btn-light">
-                          <i className="fe-paperclip"></i>
-                        </Link>
+                       
                         <button
                           type="submit"
                           className="btn btn-success chat-send w-100"
