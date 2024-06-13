@@ -63,6 +63,7 @@ class APICore {
    * Fetches data from given url
    */
   get = (url: string, params: any) => {
+    alert("I am not being called");
     let response;
     if (params) {
       var queryString = params
@@ -78,6 +79,9 @@ class APICore {
   };
 
   getFile = (url: string, params: any) => {
+    
+    alert("I am not being called");
+
     let response;
     if (params) {
       var queryString = params
@@ -112,10 +116,14 @@ class APICore {
   /**
    * post given data to url
    */
-  create = async (url: string, data: any) => {
-    let responseA = await axios.post(config.API_URL + url, data);
-    console.log(responseA)
-    return responseA;
+  create =  (url: string, data: any) => {
+   
+    // Construct the URL with query parameters
+    //const params = new URLSearchParams(data).toString();
+    //const fullUrl = `${config.API_URL}${url}?${params}`;
+    //let response = await axios.post(fullUrl);
+    //return response;
+    return axios.post(url,data);
   };
 
   /**

@@ -1,5 +1,6 @@
 import { all, fork, put, takeEvery, call } from "redux-saga/effects";
 import { SagaIterator } from "@redux-saga/core";
+import axios from "axios";
 
 // apicore
 import { APICore, setAuthorization } from "../../helpers/api/apiCore";
@@ -28,6 +29,23 @@ interface UserData {
   type: string;
 }
 
+const hitBackend = async (data:any) => {
+ 
+  const params = new URLSearchParams(data).toString();
+  const fullUrl = `https://reseller.whitexdigital.com/api/login?${params}`;
+  // Configure Axios to follow redirects
+
+  // Log the full URL
+  console.log(fullUrl);
+  try {
+    let response = await axios.post(fullUrl);
+    console.log(response);
+    return response;
+  } catch (error) {
+    console.error("API call error:", error);
+    throw error;
+  }
+}
 const api = new APICore();
 
 /**
@@ -35,24 +53,34 @@ const api = new APICore();
  * @param {*} payload - username and password
  */
 function* login({
-  payload: { username, password },
-  type,
+  payload: { email, password },
 }: UserData): SagaIterator {
   try {
-    const response = yield call(loginApi, { username, password });
+
+    const response = yield call(loginApi, { email, password });
+    console.log(response);
+    let data = {
+      email,
+      password
+    }
+    //const response = hitBackend(data);
+    //const response = yield call(hitBackend, data);
     if (response) {
-      console.log(response);
-      const user = response.data;
-      // NOTE - You can change this according to response format from your api
-      api.setLoggedInUser(user);
-      setAuthorization(user["token"]);
-      yield put(authApiResponseSuccess(AuthActionTypes.LOGIN_USER, user));
+       if (response.status === 200) {
+        alert("202");
+        console.log(response);
+        const user = response.data;
+       
+        api.setLoggedInUser(user);
+        setAuthorization(user["jwt_token"]);
+        yield put(authApiResponseSuccess(AuthActionTypes.LOGIN_USER, user));
+      }
+
     }
-    else {
-      yield put(authApiResponseError(AuthActionTypes.LOGIN_USER, "Something Went Wrong"));
-      api.setLoggedInUser(null);
-      setAuthorization(null);
-    }
+    console.log(response);
+    yield put(authApiResponseError(AuthActionTypes.LOGIN_USER, "Something Went Wrong"));
+    api.setLoggedInUser(null);
+    setAuthorization(null);
 
   } catch (error: any) {
     console.log("Iam real error", error);

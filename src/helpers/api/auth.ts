@@ -1,10 +1,7 @@
 import { APICore } from "./apiCore";
 
 const api = new APICore();
-//const baseUrl = "https://reseller.whitexdigital.com/api";
-// account
-function login(params: { username: string; password: string }) {
-  //const loginUrl = "https://reseller.whitexdigital.com/api/login/";
+function login(params: { email: string; password: string }) {
   const baseUrl = "/login/";
   return api.create(`${baseUrl}`, params);
 }

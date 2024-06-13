@@ -19,7 +19,7 @@ import { VerticalForm, FormInput } from "../../components/";
 import AuthLayout from "./AuthLayout";
 
 interface UserData {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -35,12 +35,7 @@ const BottomLink = () => {
             {t("Forgot your password?")}
           </Link>
         </p>
-        {/* <p className="text-white-50">
-          {t("Don't have an account?")}{" "}
-          <Link to={"/auth/register"} className="text-white ms-1">
-            <b>{t("Sign Up")}</b>
-          </Link>
-        </p> */}
+
       </Col>
     </Row>
   );
@@ -69,16 +64,18 @@ const Login = () => {
   */
   const schemaResolver = yupResolver(
     yup.object().shape({
-      username: yup.string().required(t("Please enter Username")),
+      email: yup.string().required(t("Please enter email")),
       password: yup.string().required(t("Please enter Password")),
     })
   );
+  
 
   /*
   handle form submission
   */
   const onSubmit = (formData: UserData) => {
-    dispatch(loginUser(formData["username"], formData["password"]));
+    //hitBackend();
+    dispatch(loginUser(formData["email"], formData["password"]));
   };
 
   const location = useLocation();
@@ -105,13 +102,13 @@ const Login = () => {
         <VerticalForm<UserData>
           onSubmit={onSubmit}
           resolver={schemaResolver}
-          defaultValues={{ username: "test", password: "test" }}
+          defaultValues={{ email: "asdasd@asd.asd", password: "asdasd@asd.asd" }}
         >
           <FormInput
-            label={t("Username")}
-            type="text"
-            name="username"
-            placeholder="Enter your Username"
+            label={t("Email")}
+            type="email"
+            name="email"
+            placeholder="Enter your email "
             containerClass={"mb-3"}
           />
           <FormInput
@@ -129,7 +126,7 @@ const Login = () => {
           </div>
         </VerticalForm>
 
-        
+
       </AuthLayout>
     </>
   );
