@@ -29,10 +29,27 @@ interface UserData {
   type: string;
 }
 
-const hitBackend = async (data:any) => {
- 
+const realLogin = async (data: any) => {
+
   const params = new URLSearchParams(data).toString();
   const fullUrl = `https://reseller.whitexdigital.com/api/login?${params}`;
+  // Configure Axios to follow redirects
+
+  // Log the full URL
+  console.log(fullUrl);
+  try {
+    let response = await axios.post(fullUrl);
+    console.log(response);
+    return response;
+  } catch (error) {
+    console.error("API call error:", error);
+    throw error;
+  }
+}
+
+const realLogout = async () => {
+
+  const fullUrl = "https://reseller.whitexdigital.com/api/logout";
   // Configure Axios to follow redirects
 
   // Log the full URL
@@ -57,30 +74,39 @@ function* login({
 }: UserData): SagaIterator {
   try {
 
-    const response = yield call(loginApi, { email, password });
-    console.log(response);
+    //const response = yield call(loginApi, { email, password });
+
     let data = {
       email,
       password
     }
     //const response = hitBackend(data);
-    //const response = yield call(hitBackend, data);
+    const response = yield call(realLogin, data);
     if (response) {
-       if (response.status === 200) {
-        alert("202");
-        console.log(response);
-        const user = response.data;
-       
-        api.setLoggedInUser(user);
-        setAuthorization(user["jwt_token"]);
-        yield put(authApiResponseSuccess(AuthActionTypes.LOGIN_USER, user));
+      if (response.status === 200) {
+        let user = response.data.user;
+        let newUser = {
+          id: user.id,
+          usernmae: user.name,
+          role: "Admin",
+          token: response.data.token
+        }
+
+        console.log(newUser);
+
+        api.setLoggedInUser(newUser);
+        setAuthorization(response.data.token);
+        yield put(authApiResponseSuccess(AuthActionTypes.LOGIN_USER, newUser));
       }
 
     }
-    console.log(response);
-    yield put(authApiResponseError(AuthActionTypes.LOGIN_USER, "Something Went Wrong"));
-    api.setLoggedInUser(null);
-    setAuthorization(null);
+    else {
+      yield put(authApiResponseError(AuthActionTypes.LOGIN_USER, "Something Went Wrong"));
+      api.setLoggedInUser(null);
+      setAuthorization(null);
+    }
+
+
 
   } catch (error: any) {
     console.log("Iam real error", error);
@@ -95,7 +121,9 @@ function* login({
  */
 function* logout(): SagaIterator {
   try {
-    yield call(logoutApi);
+    console.log(axios.defaults.headers.common["Authorization"]);
+    let response = yield call(realLogout);
+    console.log(response);
     api.setLoggedInUser(null);
     setAuthorization(null);
     yield put(authApiResponseSuccess(AuthActionTypes.LOGOUT_USER, {}));

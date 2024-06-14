@@ -295,6 +295,13 @@ const productAppRoutes: RoutesProps = {
   element: <AllProducts />,
 };
 
+const productDetailsAppRoutes = {
+  path: "/apps/products/:id",
+  name: "Product Details",
+  route: PrivateRoute,
+  roles: ["Admin"],
+  element: <AppProductDetails/>,
+};
 const commissionAppRoutes: RoutesProps = {
   path: "/apps/commission",
   name: "Commission",
@@ -335,13 +342,7 @@ const settingsAppRoutes = {
   icon: "settings",
   element: <Settings />,
 };
-const productDetailsAppRoutes = {
-  path: "/apps/productDetails",
-  name: "Product Details",
-  route: PrivateRoute,
-  roles: ["Admin"],
-  element: <AppProductDetails/>,
-};
+
 const cartAppRoutes = {
   path: "/apps/shoppingcart",
   name: "Shopping Cart",

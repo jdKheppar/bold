@@ -49,9 +49,17 @@ const AUTH_SESSION_KEY = "ubold_user";
  * Sets the default authorization
  * @param {*} token
  */
+// const setAuthorization = (token: string | null) => {
+//   if (token) axios.defaults.headers.common["Authorization"] = "JWT " + token;
+//   else delete axios.defaults.headers.common["Authorization"];
+// };
 const setAuthorization = (token: string | null) => {
-  if (token) axios.defaults.headers.common["Authorization"] = "JWT " + token;
-  else delete axios.defaults.headers.common["Authorization"];
+  if (token) {
+    // For a simple token, you might use "Bearer" or another prefix
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  } else {
+    delete axios.defaults.headers.common["Authorization"];
+  }
 };
 
 const getUserFromCookie = () => {
@@ -79,7 +87,7 @@ class APICore {
   };
 
   getFile = (url: string, params: any) => {
-    
+
     alert("I am not being called");
 
     let response;
@@ -116,14 +124,14 @@ class APICore {
   /**
    * post given data to url
    */
-  create =  (url: string, data: any) => {
-   
+  create = (url: string, data: any) => {
+
     // Construct the URL with query parameters
     //const params = new URLSearchParams(data).toString();
     //const fullUrl = `${config.API_URL}${url}?${params}`;
     //let response = await axios.post(fullUrl);
     //return response;
-    return axios.post(url,data);
+    return axios.post(url, data);
   };
 
   /**
@@ -183,21 +191,34 @@ class APICore {
     return axios.patch(url, formData, config);
   };
 
+  // isUserAuthenticated = () => {
+  //   const user = this.getLoggedInUser();
+
+  //   if (!user) {
+  //     return false;
+  //   }
+  //   const decoded: any = jwtDecode(user.token);
+  //   const currentTime = Date.now() / 1000;
+  //   if (decoded.exp < currentTime) {
+  //     console.warn("access token expired");
+  //     return false;
+  //   } else {
+  //     return true;
+  //   }
+  // };
+
   isUserAuthenticated = () => {
     const user = this.getLoggedInUser();
 
-    if (!user) {
+    if (!user || !user.token) {
       return false;
     }
-    const decoded: any = jwtDecode(user.token);
-    const currentTime = Date.now() / 1000;
-    if (decoded.exp < currentTime) {
-      console.warn("access token expired");
-      return false;
-    } else {
-      return true;
-    }
+
+    // No need to decode the token and check expiration since it's not a JWT
+    // Simply check if the token exists
+    return true;
   };
+
 
   setLoggedInUser = (session: any) => {
     if (session)

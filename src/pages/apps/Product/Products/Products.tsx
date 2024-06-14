@@ -1,30 +1,56 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Row, Col, Card, Button } from "react-bootstrap";
+import axios from "axios";
 
 // components
-
-// dummy data
-import { products as data, ProductItemTypes } from "../data";
 import PageTitle from "../../../../components/PageTitle";
+
+
+interface ProductItemTypes {
+    id: number;
+    title: string;
+    image: string;
+    rating: number;
+    price: number;
+    wholesale_price: number;
+    current_stock: number;
+  }
 
 // main component
 const ProductsList = () => {
-    const [products, setProducts] = useState<Array<ProductItemTypes>>(data);
+    const [products, setProducts] = useState<Array<ProductItemTypes>>([]);
 
     /*
      * search product by name
      */
     const searchProduct = (value: string) => {
-        if (value === "") setProducts(data);
+        let initialProducts = products;
+        if (value === "") setProducts(initialProducts);
         else {
-            var modifiedProducts = data;
+            var modifiedProducts = products;
             modifiedProducts = modifiedProducts.filter((item) =>
-                item.name.toLowerCase().includes(value)
+                item.title.toLowerCase().includes(value)
             );
             setProducts(modifiedProducts);
         }
     };
+    const getProducts = async () => {
+
+        const fullUrl = "https://reseller.whitexdigital.com/api/products";
+        try {
+            let response = await axios.get(fullUrl);
+            setProducts(response.data.data);
+            console.log(response);
+            return response;
+        } catch (error) {
+            console.error("API call error:", error);
+            throw error;
+        }
+    }
+    useEffect(() => {
+        getProducts();
+    }, []);
 
     return (
         <React.Fragment>
@@ -112,7 +138,7 @@ const ProductsList = () => {
                                                         to="/apps/productDetails"
                                                         className="text-dark"
                                                     >
-                                                        {product.name}
+                                                        {product.title}
                                                     </Link>
                                                 </h5>
                                                 <div className="text-warning mb-2 font-13">
@@ -126,13 +152,20 @@ const ProductsList = () => {
                                                     {" "}
                                                     <span className="text-muted">
                                                         {" "}
-                                                        Stocks : {product.quantity} pcs
+                                                        Stocks : {product.current_stock} pcs
                                                     </span>
                                                 </h5>
                                             </div>
                                             <div className="col-auto">
+                                                <div className="text-dark"> Market Price</div>
+                                               
                                                 <div className="product-price-tag">
                                                     ${product.price}
+                                                </div>
+                                                <div className="text-dark">Wholesale Price</div>
+                                                
+                                                <div className="product-price-tag">
+                                                    ${product.wholesale_price}
                                                 </div>
                                             </div>
                                         </div>

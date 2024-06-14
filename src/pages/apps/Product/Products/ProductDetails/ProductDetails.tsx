@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Row, Col, Card, ProgressBar, Tab, Nav } from "react-bootstrap";
+import axios from "axios";
 
+import { useParams } from 'react-router-dom';
 // components
 
 
@@ -123,6 +125,7 @@ const Stocks = () => {
 };
 
 const ProductDetails = () => {
+  const { id } = useParams();
   const [product] = useState<Product>({
     brand: "Jack & Jones",
     name: "Jack & Jones Men's T-shirt (Blue)",
@@ -142,9 +145,28 @@ const ProductDetails = () => {
     ],
   });
 
+  const [productDetails, setProductDetails] = useState<Array<Product>>([]);
+
   const [discountPrice] = useState<number>(
     Math.round(product.price - (product.price * product.discount) / 100)
   );
+
+  const getProductDetails = async () => {
+
+    const fullUrl = `https://reseller.whitexdigital.com/api/product_detail/${id}`;
+    try {
+        let response = await axios.get(fullUrl);
+        setProductDetails(response.data.data);
+        console.log(response);
+        return response;
+    } catch (error) {
+        console.error("API call error:", error);
+        throw error;
+    }
+}
+useEffect(() => {
+    getProductDetails();
+}, []);
 
   return (
     <>
