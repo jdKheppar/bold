@@ -115,16 +115,16 @@ const ProductEdit = () => {
                   label="New Password"
                   containerClass={"mb-3"}
                   register={register}
-                  key="reference"
+                  key="newPass"
                   errors={errors}
                   control={control}
                 />
                 <FormInput
-                  name="reference"
+                  name="cnfrmNewPass"
                   label="Confirm New Password"
                   containerClass={"mb-3"}
                   register={register}
-                  key="confirmNewPass"
+                  key="cnfrmNewPass"
                   errors={errors}
                   control={control}
                 />

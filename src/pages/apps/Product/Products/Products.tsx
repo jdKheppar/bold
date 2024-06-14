@@ -135,7 +135,7 @@ const ProductsList = () => {
                                             <div className="col">
                                                 <h5 className="font-16 mt-0 sp-line-1">
                                                     <Link
-                                                        to="/apps/productDetails"
+                                                        to={`/apps/products/${product.id}`}
                                                         className="text-dark"
                                                     >
                                                         {product.title}
