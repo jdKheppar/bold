@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Row, Col, Card, Dropdown } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Row, Col, Card, Dropdown, Button } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import PageTitle from "../../../../../components/PageTitle";
+
 
 interface ProductItemTypes {
   id: number;
@@ -20,6 +21,7 @@ interface Client {
 }
 
 const Cart: React.FC = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState<ProductItemTypes[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
@@ -88,6 +90,31 @@ const Cart: React.FC = () => {
     } catch (error) {
       console.error("API call error:", error);
       throw error;
+    }
+  };
+  const handleCheckout = async () => {
+    if (!selectedClientId) {
+      alert("Please select a client");
+      return;
+    }
+
+    const orderData = {
+      products: products.map((product) => ({
+        id: product.id,
+        quantity: product.current_stock,
+        custom_price: product.custom_price,
+      })),
+      clientID: selectedClientId,
+    };
+
+    try {
+      const response = await axios.post("https://reseller.whitexdigital.com/api/store_order", orderData);
+      console.log(response);
+      alert("Order placed successfully!");
+      navigate("/apps/orders"); // Redirect to orders page or any other page
+    } catch (error) {
+      console.error("Checkout error:", error);
+      alert("There was an error placing the order. Please try again.");
     }
   };
 
@@ -238,10 +265,10 @@ const Cart: React.FC = () => {
                   </a>
                 </Col>
                 <Col sm={6}>
-                  <div className="text-sm-end">
-                    <Link to="/apps/ecommerce/checkout" className="btn btn-danger">
-                      <i className="mdi mdi-cart-plus me-1"></i> Checkout{" "}
-                    </Link>
+                  <div className="text-sm-end" onClick={handleCheckout}>
+                    <Button className="btn btn-danger" type="button">
+                      <i className="mdi mdi-cart-plus me-1" ></i> Place Order{" "}
+                    </Button>
                   </div>
                 </Col>
               </Row>
