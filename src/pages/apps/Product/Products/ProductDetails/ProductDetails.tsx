@@ -137,11 +137,20 @@ const ProductDetails = () => {
                       {productDetails.special_discount}% Off
                     </h6>
                     <h4 className="mb-4">
-                      Price :{" "}
+                      Market Price :{" "}
                       <span className="text-muted me-2">
+
                         <del>${productDetails.price} USD</del>
                       </span>{" "}
                       <b>${productDetails.discount_price} USD</b>
+                    </h4>
+                    <h4 className="mb-4">
+                      Wholesale Price :{" "}
+                      <span className="text-muted me-2">
+
+                        ${productDetails.wholesale_price} USD
+                      </span>{" "}
+
                     </h4>
 
                     <h4>
