@@ -1,132 +1,100 @@
-import React, { useState } from "react";
-import { Row, Col, Card } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Row, Col, Card, Dropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
-
-// components
-
-import { cartItems, CartItemTypes } from "./../../data";
+import axios from "axios";
 import PageTitle from "../../../../../components/PageTitle";
 
-interface CartSummaryTypes {
-  gross_total?: number;
-  discount?: number;
-  shipping_charge?: number;
-  tax?: number;
-  net_total?: number;
+interface ProductItemTypes {
+  id: number;
+  title: string;
+  image: string;
+  rating: number;
+  price: number;
+  wholesale_price: number;
+  current_stock: number;
+  custom_price: number;
+}
+interface Client {
+  id: number;
+  name: string;
 }
 
-// summary
-const CartSummary = (props: { summary: CartSummaryTypes }) => {
-  const summary = props.summary || {};
+const Cart: React.FC = () => {
+  const [products, setProducts] = useState<ProductItemTypes[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
 
-  return (
-    <>
-      <div className="border p-3 mt-4 mt-lg-0 rounded">
-        <h4 className="header-title mb-3">Order Summary</h4>
-
-        <div className="table-responsive">
-          <table className="table mb-0">
-            <tbody>
-              <tr>
-                <td>Grand Total :</td>
-                <td>${summary.gross_total!.toFixed(2)}</td>
-              </tr>
-              <tr>
-                <td>Discount : </td>
-                <td>-${summary.discount!.toFixed(2)}</td>
-              </tr>
-              <tr>
-                <td>Shipping Charge :</td>
-                <td>${summary.shipping_charge!.toFixed(2)}</td>
-              </tr>
-              <tr>
-                <td>Estimated Tax : </td>
-                <td>${summary.tax!.toFixed(2)}</td>
-              </tr>
-              <tr>
-                <th>Total :</th>
-                <th>${summary.net_total!.toFixed(2)}</th>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div className="alert alert-warning mt-3" role="alert">
-        Use coupon code <strong>UBTF25</strong> and get 25% discount!
-      </div>
-
-      <div className="input-group mt-3">
-        <input
-          type="text"
-          className="form-control form-control-light"
-          placeholder="Coupon code"
-          aria-label="Recipient's username"
-        />
-        <div className="input-group-append">
-          <button className="btn btn-light" type="button">
-            Apply
-          </button>
-        </div>
-      </div>
-    </>
-  );
-};
-
-// Cart
-const Cart = () => {
-  const [items, setItems] = useState<CartItemTypes[]>(cartItems);
-
-  const [summary, setSummary] = useState<CartSummaryTypes>({
-    gross_total: 1571.19,
-    discount: 157.11,
-    shipping_charge: 25,
-    tax: 19.22,
-    net_total: 1458.3,
-  });
-
-  /**
-   * On quantity changed
-   */
-  const onQtyChange = (e: any, item: CartItemTypes) => {
-    var localItems = [...items];
-    var idx = localItems.findIndex((i) => i.id === item.id);
-    var newQty = e.target.value;
-    var newTotal = localItems[idx].price * newQty;
-    localItems[idx] = { ...item, qty: newQty, total: newTotal };
-    _adjustCart(localItems);
+  const handleSelect = (clientId: number) => {
+    setSelectedClientId(clientId);
   };
 
-  /**
-   * Removes item from cart
-   */
-  const removeItem = (e: any, item: CartItemTypes) => {
-    e.preventDefault();
-    var localItems = items.filter((i) => i.id !== item.id);
-    _adjustCart(localItems);
-  };
-
-  /**
-   * Adjust the cart
-   */
-  const _adjustCart = (localItems: CartItemTypes[]) => {
-    // calculate gross and other total
-    var newGrossTotal = 0;
-    for (const item of localItems) {
-      newGrossTotal += item.total;
+  const fetchClients = async () => {
+    const fullUrl = "https://reseller.whitexdigital.com/api/client";
+    try {
+      const response = await axios.get(fullUrl);
+      console.log(response);
+      setClients(response.data.data);
+    } catch (error) {
+      console.error("API call error:", error);
+      throw error;
     }
-    var newNetTotel =
-      newGrossTotal -
-      summary.discount! +
-      summary.shipping_charge! +
-      summary.tax!;
-    setItems(localItems);
-    setSummary({
-      ...summary,
-      gross_total: newGrossTotal,
-      net_total: newNetTotel,
-    });
   };
+
+  const removeProduct = (productId: number) => {
+    const updatedProducts = products.filter((product) => product.id !== productId);
+    setProducts(updatedProducts);
+
+    const storedCartItems = JSON.parse(localStorage.getItem("cartItems") || "[]");
+    const updatedCartItems = storedCartItems.filter((id: number) => id !== productId);
+    localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
+  };
+
+  const onCustomPriceChange = (e: React.ChangeEvent<HTMLInputElement>, productId: number) => {
+    const newCustomPrice = parseFloat(e.target.value);
+    setProducts((prevProducts) =>
+      prevProducts.map((product) =>
+        product.id === productId ? { ...product, custom_price: newCustomPrice } : product
+      )
+    );
+  };
+
+  const onQuantityChange = (e: React.ChangeEvent<HTMLInputElement>, productId: number) => {
+    const newQuantity = parseInt(e.target.value, 10);
+    setProducts((prevProducts) =>
+      prevProducts.map((product) =>
+        product.id === productId ? { ...product, current_stock: newQuantity } : product
+      )
+    );
+  };
+
+  const calculateTotalPrice = () => {
+    return products.reduce((total, product) => total + product.price, 0);
+  };
+
+  const calculateTotalCustomPrice = () => {
+    return products.reduce((total, product) => total + product.custom_price, 0);
+  };
+
+  const getProducts = async () => {
+    const fullUrl = "https://reseller.whitexdigital.com/api/products";
+    try {
+      const response = await axios.get(fullUrl);
+      const allProducts = response.data.data;
+      const storedCartItems = JSON.parse(localStorage.getItem("cartItems") || "[]");
+      const filteredProducts = allProducts.filter((product: ProductItemTypes) =>
+        storedCartItems.includes(product.id)
+      );
+      setProducts(filteredProducts);
+    } catch (error) {
+      console.error("API call error:", error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    getProducts();
+    fetchClients();
+  }, []);
 
   return (
     <>
@@ -147,117 +115,134 @@ const Cart = () => {
           <Card>
             <Card.Body>
               <Row>
-                <Col lg={8}>
-                  <div className="table-responsive">
-                    <table className="table table-borderless table-centered mb-0">
-                      <thead className="table-light">
-                        <tr>
-                          <th>Product</th>
-                          <th>Price</th>
-                          <th>Quantity</th>
-                          <th>Total</th>
-                          <th style={{ width: "50px" }}></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {(items || []).map((item, idx) => {
-                          return (
-                            <tr key={idx}>
+                <Col lg={12}>
+                  {products.length === 0 ? (
+                    <p>No items in the cart</p>
+                  ) : (
+                    <div className="table-responsive">
+                      <table className="table table-borderless table-centered mb-0">
+                        <thead className="table-light">
+                          <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Custom Price</th>
+                            <th>Quantity</th>
+                            <th style={{ width: "50px" }}></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {products.map((item) => (
+                            <tr key={item.id}>
                               <td>
                                 <img
                                   src={item.image}
-                                  alt={item.name}
+                                  alt={item.title}
                                   title="contact-img"
                                   className="rounded me-3"
                                   height="48"
+                                  width="48"
                                 />
-
                                 <p className="m-0 d-inline-block align-middle font-16">
                                   <Link
                                     to="/apps/ecommerce/product-details"
                                     className="text-body"
                                   >
-                                    {item.name}
+                                    {item.title}
                                   </Link>
-                                  <br />
-                                  <small className="me-2">
-                                    <b>Size:</b> {item.size}{" "}
-                                  </small>
-                                  <small>
-                                    <b>Color:</b> {item.color}{" "}
-                                  </small>
                                 </p>
                               </td>
-                              <td>${item.price.toFixed(2)}</td>
+                              <td>${item.price}</td>
                               <td>
                                 <input
                                   type="number"
                                   min="1"
-                                  value={item.qty}
+                                  value={item.custom_price}
                                   className="form-control"
-                                  placeholder="Qty"
+                                  placeholder="Custom Price"
                                   style={{ width: "90px" }}
-                                  onChange={(e: any) => {
-                                    onQtyChange(e, item);
-                                  }}
+                                  onChange={(e) => onCustomPriceChange(e, item.id)}
                                 />
                               </td>
-                              <td>${item.total.toFixed(2)}</td>
+                              <td>
+                                <input
+                                  type="number"
+                                  min="1"
+                                  value={item.current_stock}
+                                  className="form-control"
+                                  placeholder="Quantity"
+                                  style={{ width: "90px" }}
+                                  onChange={(e) => onQuantityChange(e, item.id)}
+                                />
+                              </td>
                               <td>
                                 <Link
                                   to="#"
                                   className="action-icon"
-                                  onClick={(e: any) => {
-                                    removeItem(e, item);
-                                  }}
+                                  onClick={() => removeProduct(item.id)}
                                 >
-                                  {" "}
                                   <i className="mdi mdi-delete"></i>
                                 </Link>
                               </td>
                             </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
 
-                  <div className="mt-3">
-                    <label className="form-label" htmlFor="example-textarea">
-                      Add a Note:
-                    </label>
-                    <textarea
-                      className="form-control"
-                      id="example-textarea"
-                      rows={3}
-                      placeholder="Write some note.."
-                    ></textarea>
+                  <div className="border p-3 mt-4 mt-lg-0 rounded">
+                    <h4 className="header-title mb-3">Order Summary</h4>
+                    <div className="table-responsive">
+                      <table className="table mb-0">
+                        <tbody>
+                          <tr>
+                            <td>Total Price :</td>
+                            <td>${calculateTotalPrice()}</td>
+                          </tr>
+                          <tr>
+                            <td>Total Custom Price :</td>
+                            <td>${calculateTotalCustomPrice()}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <Dropdown>
+                      <Dropdown.Toggle variant="light" id="dropdown-basic">
+                        {selectedClientId
+                          ? clients.find((client) => client.id === selectedClientId)?.name
+                          : "Select Client"}{" "}
+                        <i className="mdi mdi-chevron-down"></i>
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+                        {clients.map((client) => (
+                          <Dropdown.Item
+                            key={client.id}
+                            onClick={() => handleSelect(client.id)}
+                          >
+                            {client.name}
+                          </Dropdown.Item>
+                        ))}
+                      </Dropdown.Menu>
+                    </Dropdown>
                   </div>
-
-                  <Row className="mt-4">
-                    <Col sm={6}>
-                      <a
-                        href="/apps/ecommerce/products"
-                        className="btn text-muted d-none d-sm-inline-block btn-link fw-semibold"
-                      >
-                        <i className="mdi mdi-arrow-left"></i> Continue Shopping{" "}
-                      </a>
-                    </Col>
-                    <Col sm={6}>
-                      <div className="text-sm-end">
-                        <Link
-                          to="/apps/ecommerce/checkout"
-                          className="btn btn-danger"
-                        >
-                          <i className="mdi mdi-cart-plus me-1"></i> Checkout{" "}
-                        </Link>
-                      </div>
-                    </Col>
-                  </Row>
                 </Col>
+              </Row>
 
-                <Col lg={4}>
-                  <CartSummary summary={summary} />
+              <Row className="mt-4">
+                <Col sm={12}>
+                  <a
+                    href="apps/products"
+                    className="btn text-muted d-none d-sm-inline-block btn-link fw-semibold"
+                  >
+                    <i className="mdi mdi-arrow-left"></i> Continue Shopping{" "}
+                  </a>
+                </Col>
+                <Col sm={6}>
+                  <div className="text-sm-end">
+                    <Link to="/apps/ecommerce/checkout" className="btn btn-danger">
+                      <i className="mdi mdi-cart-plus me-1"></i> Checkout{" "}
+                    </Link>
+                  </div>
                 </Col>
               </Row>
             </Card.Body>

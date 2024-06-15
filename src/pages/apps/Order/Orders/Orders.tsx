@@ -143,14 +143,14 @@ const columns = [
     accessor: "order_date",
     Cell: OrderDateColumn,
   },
-  
- 
+
+
   {
     Header: "Order Status",
     accessor: "order_status",
     Cell: StatusColumn,
   },
- 
+
 ];
 
 // get pagelist to display
@@ -181,8 +181,8 @@ const Orders = () => {
       OrderStatusGroup === "All"
         ? orders
         : [...orders].filter((o) =>
-            o.payment_status?.includes(OrderStatusGroup)
-          );
+          o.payment_status?.includes(OrderStatusGroup)
+        );
     setOrderList(updatedData);
   };
 
@@ -228,14 +228,7 @@ const Orders = () => {
                   </form>
                 </Col>
 
-                <Col lg={4}>
-                  <div className="text-lg-end mt-xl-0 mt-2">
-                    <Button className="btn btn-danger mb-2 me-2">
-                      <i className="mdi mdi-basket me-1"></i> Add New Order
-                    </Button>
-                    <Button className="btn btn-light mb-2">Export</Button>
-                  </div>
-                </Col>
+
               </Row>
 
               <Table
@@ -246,7 +239,7 @@ const Orders = () => {
                 sizePerPageList={sizePerPageList}
                 isSortable={true}
                 pagination={true}
-               
+
                 theadClass="table-light"
                 searchBoxClass="mb-2"
               />

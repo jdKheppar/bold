@@ -68,7 +68,7 @@ const Login = () => {
       password: yup.string().required(t("Please enter Password")),
     })
   );
-  
+
 
   /*
   handle form submission
@@ -80,8 +80,8 @@ const Login = () => {
 
   const location = useLocation();
   //
-  // const redirectUrl = location.state && location.state.from ? location.state.from.pathname : '/';
-  const redirectUrl = location?.search?.slice(6) || "/";
+  // const redirectUrl = location.state && location.state.from ? location.state.from.pathname : '/apps/dashboard';
+  const redirectUrl = location?.search?.slice(6) || "/apps/dashboard";
 
   return (
     <>

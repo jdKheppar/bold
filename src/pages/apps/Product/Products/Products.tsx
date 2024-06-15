@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Row, Col, Card, Button } from "react-bootstrap";
 import axios from "axios";
-
+import "./Products.css";
 // components
 import PageTitle from "../../../../components/PageTitle";
 
@@ -15,7 +15,7 @@ interface ProductItemTypes {
     price: number;
     wholesale_price: number;
     current_stock: number;
-  }
+}
 
 // main component
 const ProductsList = () => {
@@ -42,7 +42,6 @@ const ProductsList = () => {
             let response = await axios.get(fullUrl);
             setProducts(response.data.data);
             console.log(response);
-            return response;
         } catch (error) {
             console.error("API call error:", error);
             throw error;
@@ -126,8 +125,8 @@ const ProductsList = () => {
                                         </Link>
                                     </div>
 
-                                    <div className="bg-light">
-                                        <img src={product.image} alt="" className="img-fluid" />
+                                    <div className="bg-light product-image-container">
+                                        <img src={product.image} alt="" className="product-image" />
                                     </div>
 
                                     <div className="product-info">
@@ -158,12 +157,12 @@ const ProductsList = () => {
                                             </div>
                                             <div className="col-auto">
                                                 <div className="text-dark"> Market Price</div>
-                                               
+
                                                 <div className="product-price-tag">
                                                     ${product.price}
                                                 </div>
                                                 <div className="text-dark">Wholesale Price</div>
-                                                
+
                                                 <div className="product-price-tag">
                                                     ${product.wholesale_price}
                                                 </div>

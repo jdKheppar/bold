@@ -1,20 +1,38 @@
-import React from "react";
-import { Card, Dropdown } from "react-bootstrap";
+import React, { useEffect, useState } from "react"; import { Card, Dropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import classNames from "classnames";
+import axios from "axios";
 
-interface UsersBalancesProps {
-  balances: {
-    id: number;
-    avatar: string;
-    name: string;
-    currency: string;
-    balance: number;
-    orders: number;
-  }[];
+interface ProductItemTypes {
+  id: number;
+  title: string;
+  image: string;
+  rating: number;
+  price: number;
+  wholesale_price: number;
+  current_stock: number;
 }
 
-const UsersBalances = ({ balances }: UsersBalancesProps) => {
+const RecentProducts = () => {
+  const [products, setProducts] = useState<Array<ProductItemTypes>>([]);
+
+
+
+  const getProducts = async () => {
+
+    const fullUrl = "https://reseller.whitexdigital.com/api/products";
+    try {
+      let response = await axios.get(fullUrl);
+      setProducts(response.data.data);
+      console.log(response);
+    } catch (error) {
+      console.error("API call error:", error);
+      throw error;
+    }
+  }
+  useEffect(() => {
+    getProducts();
+  }, []);
   return (
     <>
       <Card>
@@ -38,16 +56,16 @@ const UsersBalances = ({ balances }: UsersBalancesProps) => {
                   <th colSpan={2}>Product Img</th>
                   <th>Price</th>
                   <th>Wholesale Price</th>
-                  <th>Retail Price</th>
+                  <th>Stocks</th>
                 </tr>
               </thead>
               <tbody>
-                {(balances || []).map((item, i) => {
+                {(products || []).map((item, i) => {
                   return (
                     <tr key={i}>
                       <td style={{ width: "36px" }}>
                         <img
-                          src={item.avatar}
+                          src={item.image}
                           alt="contact-img"
                           title="contact-img"
                           className="rounded-circle avatar-sm"
@@ -55,7 +73,7 @@ const UsersBalances = ({ balances }: UsersBalancesProps) => {
                       </td>
 
                       <td>
-                        <h5 className="m-0 fw-normal">{item.name}</h5>
+                        <h5 className="m-0 fw-normal">{item.title}</h5>
                         {/* <p className="mb-0 text-muted">
                           <small>Member Since 2017</small>
                         </p> */}
@@ -63,19 +81,19 @@ const UsersBalances = ({ balances }: UsersBalancesProps) => {
 
                       <td>
                         <i
-                          // className={classNames("mdi", "text-primary", {
-                          //   "mdi-currency-btc": item.currency === "BTC",
-                          //   "mdi-currency-eth": item.currency === "ETH",
-                          //   "mdi-currency-eur": item.currency === "EUR",
-                          //   "mdi-currency-cny": item.currency === "CNY",
-                          // })}
+                        // className={classNames("mdi", "text-primary", {
+                        //   "mdi-currency-btc": item.currency === "BTC",
+                        //   "mdi-currency-eth": item.currency === "ETH",
+                        //   "mdi-currency-eur": item.currency === "EUR",
+                        //   "mdi-currency-cny": item.currency === "CNY",
+                        // })}
                         ></i>{" "}
-                        {item.currency}
+                        {item.price}
                       </td>
 
-                      <td>{item.balance} BTC</td>
+                      <td>{item.wholesale_price} </td>
 
-                      <td>{item.orders} BTC</td>
+                      <td>{item.current_stock}</td>
 
                       {/* <td>
                         <Link to="#" className="btn btn-xs btn-light">
@@ -97,4 +115,4 @@ const UsersBalances = ({ balances }: UsersBalancesProps) => {
   );
 };
 
-export default UsersBalances;
+export default RecentProducts;

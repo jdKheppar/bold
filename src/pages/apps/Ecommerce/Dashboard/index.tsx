@@ -11,7 +11,7 @@ import Transactions from "./Transactions";
 import ProductsDetails from "./ProductsDetails";
 
 // dummy data
-import { transactions, products } from "./data";
+import { transactions } from "./data";
 
 const Dashboard = () => {
   return (
@@ -80,7 +80,7 @@ const Dashboard = () => {
           <Transactions transactions={transactions} />
         </Col>
         <Col xl={6}>
-          <ProductsDetails products={products} />
+          <ProductsDetails />
         </Col>
       </Row>
     </>

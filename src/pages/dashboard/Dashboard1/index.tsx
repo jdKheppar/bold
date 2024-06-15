@@ -7,10 +7,10 @@ import HyperDatepicker from "../../../components/Datepicker";
 import Statistics from "./Statistics";
 import RevenueChart from "./RevenueChart";
 import SalesAnalyticsChart from "./SalesAnalyticsChart";
-import UsersBalances from "./UsersBalances";
 import RevenueHistory from "./RevenueHistory";
 
-import { balances, revenueHistory } from "./data";
+import { revenueHistory } from "./data";
+import RecentProducts from "./RecentProducts";
 
 const Dashboard1 = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -48,7 +48,7 @@ const Dashboard1 = () => {
 
       <Row>
         <Col xl={6}>
-          <UsersBalances balances={balances} />
+          <RecentProducts />
         </Col>
         <Col xl={6}>
           <RevenueHistory revenueHistory={revenueHistory} />
