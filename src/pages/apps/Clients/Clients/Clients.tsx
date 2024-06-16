@@ -1,203 +1,275 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Row, Col, Card, Button, Modal, Table } from "react-bootstrap";
 import classNames from "classnames";
 import { withSwal } from "react-sweetalert2";
 
-
-
-// dummy data
-import { sellers } from "./data";
 import PageTitle from "../../../../components/PageTitle";
+import axios from "axios";
+import { ClientDTO } from "../../../../DTOs/ClientDTO";
 
-
-
-interface TableRecords {
-  id: number;
-  firstName: string;
-  lastName: string;
-  userName: string;
+// Reusable ClientForm Component
+interface ClientFormProps {
+  client: ClientDTO;
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSubmit: () => void;
+  modalType: "Add" | "Edit";
+  closeModal: () => void;
 }
 
-// dummy records
-const records: TableRecords[] = [
-  { id: 1, firstName: "Mark", lastName: "Otto", userName: "@mdo" },
-  { id: 2, firstName: "Jacob", lastName: "Thornton", userName: "@fat" },
-  { id: 3, firstName: "Dave", lastName: "G", userName: "@dave" },
-  { id: 4, firstName: "Nik", lastName: "N", userName: "@nikn" },
-  { id: 5, firstName: "Shreyu", lastName: "Navadiya", userName: "@sn" },
-];
+const ClientForm: React.FC<ClientFormProps> = ({
+  client,
+  handleInputChange,
+  handleSubmit,
+  modalType,
+  closeModal,
+}) => {
+  return (
+    <>
+      <Modal.Header closeButton>
+        <h4 className="modal-title">{modalType} Client Information</h4>
+      </Modal.Header>
+      <Modal.Body className="p-4">
+        <div className="row">
+          <div className="col-md-6">
+            <div className="mb-3">
+              <label htmlFor="name" className="form-label">
+                Name
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="name"
+                placeholder="John"
+                required
+                value={client.name}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+          <div className="col-md-6">
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label">
+                Email
+              </label>
+              <input
+                type="email"
+                className="form-control"
+                id="email"
+                placeholder="john@doe.com"
+                required
+                value={client.email}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-12">
+            <div className="">
+              <label htmlFor="contact" className="form-label">
+                Contact
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="contact"
+                placeholder="Enter contact"
+                required
+                value={client.contact}
+                onChange={handleInputChange}
+              ></input>
+            </div>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-12">
+            <div className="mb-3">
+              <label htmlFor="address" className="form-label">
+                Address
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="address"
+                placeholder="Address"
+                required
+                value={client.address}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+        </div>
+      </Modal.Body>
+      <Modal.Footer>
+        <button type="button" className="btn btn-secondary waves-effect" onClick={closeModal}>
+          Close
+        </button>
+        <button
+          type="button"
+          className="btn btn-info waves-effect waves-light"
+          onClick={() => {
+            handleSubmit();
+            closeModal();
+          }}
+        >
+          Save changes
+        </button>
+      </Modal.Footer>
+    </>
+  );
+};
 
-
-const ResponsiveTable = withSwal((props: any) => {
+// Main Clients Component
+const Clients = withSwal((props: any) => {
   const { swal } = props;
-  return (
-    <Card>
-      <Card.Body>
-        <h4 className="header-title">Client Details</h4>
-        <p className="text-muted font-14 mb-4">
-          Across every breakpoint, use <code>responsive</code> attribute to
-          create responsive tables
-        </p>
-
-        <Table className="mb-0" responsive>
-          <thead>
-            <tr>
-              <th>Client ID</th>
-              <th>Name</th>
-              <th>Address</th>
-              <th>Contact</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(records || []).map((record, index) => {
-              return (
-                <tr key={index}>
-                  <th scope="row">{record.id}</th>
-                  <td>{record.firstName}</td>
-                  <td>{record.lastName}</td>
-                  <td>{record.userName}</td>
-                  <td>
-                    <i
-                      className="bi bi-trash ms-2 cursor-pointer"
-                      id="sa-warning"
-                      onClick={() =>
-                        swal
-                          .fire({
-                            title: "Are you sure?",
-                            text: "You won't be able to revert this!",
-                            icon: "warning",
-                            showCancelButton: true,
-                            confirmButtonColor: "#28bb4b",
-                            cancelButtonColor: "#f34e4e",
-                            confirmButtonText: "Yes, delete it!",
-                          })
-                          .then(function (result: { value: any }) {
-                            if (result.value) {
-                              swal.fire(
-                                "Deleted!",
-                                "Your file has been deleted.",
-                                "success"
-                              );
-                            }
-                          })
-                      }
-                    >
-
-                    </i>
-                    <i className="bi bi-pencil-square ms-2 cursor-pointer"></i>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
-      </Card.Body>
-    </Card>
-  );
-});
-
-
-/* name column render */
-const NameColumn = ({ row }: { row: any }) => {
-  return (
-    <>
-      <div className="table-user">
-        <img src={row.original.image} alt="" className="me-2 rounded-circle" />
-        <Link to="#" className="text-body fw-semibold">
-          {row.original.name}
-        </Link>
-      </div>
-    </>
-  );
-};
-
-/* ratings column render */
-const RatingsColumn = ({ row }: { row: any }) => {
-  const variant =
-    row.original.ratings >= 3.0 && row.original.ratings <= 5.0
-      ? "text-warning"
-      : "text-danger";
-  return (
-    <>
-      <i className={classNames("mdi", "mdi-star", variant)}></i>{" "}
-      {row.original.ratings}
-    </>
-  );
-};
-
-/* action column render */
-const ActionColumn = () => {
-  return (
-    <>
-      <Link to="#" className="action-icon">
-        {" "}
-        <i className="mdi mdi-square-edit-outline"></i>
-      </Link>
-      <Link to="#" className="action-icon">
-        {" "}
-        <i className="mdi mdi-delete"></i>
-      </Link>
-    </>
-  );
-};
-
-// get all columns
-const columns = [
-  {
-    Header: "Name",
-    accessor: "name",
-    sort: true,
-    Cell: NameColumn,
-  },
-  {
-    Header: "Address",
-    accessor: "store",
-    sort: true,
-  },
-
-  {
-    Header: "Contact",
-    accessor: "products",
-    sort: true,
-  },
-  {
-    Header: "Email",
-    accessor: "balance",
-    sort: true,
-  },
-
-  {
-    Header: "Action",
-    accessor: "action",
-    sort: false,
-    Cell: ActionColumn,
-  },
-];
-
-// get pagelist to display
-const sizePerPageList = [
-  {
-    text: "10",
-    value: 10,
-  },
-  {
-    text: "25",
-    value: 25,
-  },
-  {
-    text: "All",
-    value: sellers.length,
-  },
-];
-
-// main component
-const Clients = () => {
+  const [clients, setClients] = useState<ClientDTO[]>([]);
+  const [client, setClient] = useState<ClientDTO>({
+    id: 0,
+    name: "",
+    email: "",
+    contact: "",
+    address: "",
+  });
   const [responsiveModal, setResponsiveModal] = useState<boolean>(false);
+  const [editClientModal, setEditClientModal] = useState<boolean>(false);
+
   const toggleResponsiveModal = () => {
     setResponsiveModal(!responsiveModal);
   };
+
+  const openEditClientModal = (record: ClientDTO) => {
+    setClient(record);
+    setEditClientModal(true);
+  };
+
+  const closeEditClientModal = () => {
+    setEditClientModal(false);
+    setClient({
+      id: 0,
+      name: "",
+      email: "",
+      contact: "",
+      address: "",
+    });
+  };
+
+  const fetchClients = async () => {
+    const fullUrl = "https://reseller.whitexdigital.com/api/client";
+    try {
+      const response = await axios.get(fullUrl);
+      console.log(response);
+      setClients(response.data.data);
+    } catch (error) {
+      console.error("API call error:", error);
+      swal.fire({
+        title: "Error",
+        text: "Something went wrong",
+        icon: "error",
+      });
+      throw error;
+    }
+  };
+
+  const editClient = async () => {
+    let newObj = {
+      name: client.name,
+      email: client.email,
+      contact: client.contact,
+      address: client.address,
+    };
+    const params = new URLSearchParams(newObj).toString();
+
+    const fullUrl = `https://reseller.whitexdigital.com/api/client/${client.id}?${params}`;
+    try {
+      const response = await axios.put(fullUrl);
+      fetchClients();
+      closeEditClientModal();
+      swal.fire({
+        title: "Success!",
+        text: "Client updated successfully!",
+        icon: "success",
+      });
+    } catch (error) {
+      console.error("API call error:", error);
+      swal.fire({
+        title: "Error",
+        text: "Something went wrong",
+        icon: "error",
+      });
+      throw error;
+    }
+  };
+
+  const addClient = async () => {
+    let newObj = {
+      name: client.name,
+      email: client.email,
+      contact: client.contact,
+      address: client.address,
+    };
+    const params = new URLSearchParams(newObj).toString();
+
+    const fullUrl = `https://reseller.whitexdigital.com/api/client?${params}`;
+    try {
+      const response = await axios.post(fullUrl);
+      closeEditClientModal();
+      swal.fire({
+        title: "Success!",
+        text: "Client added successfully!",
+        icon: "success",
+      });
+      fetchClients();
+    } catch (error) {
+      console.error("API call error:", error);
+      swal.fire({
+        title: "Error",
+        text: "Something went wrong",
+        icon: "error",
+      });
+      throw error;
+    }
+  };
+
+  const deleteClient = async (clientID: number) => {
+    const fullUrl = `https://reseller.whitexdigital.com/api/client/${clientID}`;
+
+    swal
+      .fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#28bb4b",
+        cancelButtonColor: "#f34e4e",
+        confirmButtonText: "Yes, delete it!",
+      })
+      .then(async function (result: { value: any }) {
+        if (result.value) {
+          try {
+            await axios.delete(fullUrl);
+            swal.fire("Deleted!", "Your file has been deleted.", "success");
+            fetchClients();
+          } catch (error) {
+            console.log(error);
+            swal.fire("Oops!", "Something went wrong", "error");
+          }
+        }
+      });
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setClient((prevClient) => ({
+      ...prevClient,
+      [id]: value,
+    }));
+  };
+
+  useEffect(() => {
+    fetchClients();
+  }, []);
+
   return (
     <>
       <PageTitle
@@ -213,117 +285,80 @@ const Clients = () => {
           <Card>
             <Card.Body>
               <Row>
-
                 <Col sm={12}>
                   <div className="button-list">
-                    <Button
-                      variant="danger"
-                      className="mb-2"
-                      onClick={toggleResponsiveModal}
-                    >
+                    <Button variant="danger" className="mb-2" onClick={toggleResponsiveModal}>
                       <i className="mdi mdi-plus-circle me-2"></i> Add Client
                     </Button>
-
                   </div>
 
                   <Modal show={responsiveModal} onHide={toggleResponsiveModal}>
-                    <Modal.Header closeButton>
-                      <h4 className="modal-title">Add Client Information</h4>
-                    </Modal.Header>
-                    <Modal.Body className="p-4">
-                      <div className="row">
-                        <div className="col-md-6">
-                          <div className="mb-3">
-                            <label htmlFor="field-1" className="form-label">
-                              Name
-                            </label>
-                            <input
-                              type="text"
-                              className="form-control"
-                              id="field-1"
-                              placeholder="John"
-                              required
-                            />
-                          </div>
-                        </div>
-                        <div className="col-md-6">
-                          <div className="mb-3">
-                            <label htmlFor="field-2" className="form-label">
-                              Email
-                            </label>
-                            <input
-                              type="text"
-                              className="form-control"
-                              id="field-2"
-                              placeholder="john@doe.com"
-                              required
-                            />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-md-12">
-                          <div className="">
-                            <label htmlFor="field-7" className="form-label">
-                              Contact
-                            </label>
-                            <input
-                              className="form-control"
-                              id="field-7"
-                              placeholder="Enter contact"
-                              required
-                            ></input>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-md-12">
-                          <div className="mb-3">
-                            <label htmlFor="field-3" className="form-label">
-                              Address
-                            </label>
-                            <input
-                              type="text"
-                              className="form-control"
-                              id="field-3"
-                              placeholder="Address"
-                              required
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-
-                    </Modal.Body>
-
-                    <Modal.Footer>
-                      <button
-                        type="button"
-                        className="btn btn-secondary waves-effect"
-                        onClick={toggleResponsiveModal}
-                      >
-                        Close
-                      </button>
-                      <button
-                        type="submit"
-                        className="btn btn-info waves-effect waves-light"
-                      >
-                        Save changes
-                      </button>
-                    </Modal.Footer>
+                    <ClientForm
+                      client={client}
+                      handleInputChange={handleInputChange}
+                      handleSubmit={addClient}
+                      modalType="Add"
+                      closeModal={toggleResponsiveModal}
+                    />
                   </Modal>
                 </Col>
-
-
               </Row>
 
-              <ResponsiveTable />
+              <Card>
+                <Card.Body>
+                  <h4 className="header-title mt-0 mb-1">Clients</h4>
+                  <Table hover responsive className={classNames("table-centered", "table-nowrap", "mb-0")}>
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Address</th>
+                        <th>Contact</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {clients.map((record, index) => (
+                        <tr key={index}>
+                          <th scope="row">{record.id}</th>
+                          <td>{record.name}</td>
+                          <td>{record.email}</td>
+                          <td>{record.address}</td>
+                          <td>{record.contact}</td>
+                          <td>
+                            <i
+                              className="bi bi-trash ms-2 cursor-pointer"
+                              id="sa-warning"
+                              onClick={() => deleteClient(record.id)}
+                            ></i>
+                            <i
+                              className="bi bi-pencil-square ms-2 cursor-pointer"
+                              onClick={() => openEditClientModal(record)}
+                            ></i>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+
+                  <Modal show={editClientModal} onHide={closeEditClientModal}>
+                    <ClientForm
+                      client={client}
+                      handleInputChange={handleInputChange}
+                      handleSubmit={editClient}
+                      modalType="Edit"
+                      closeModal={closeEditClientModal}
+                    />
+                  </Modal>
+                </Card.Body>
+              </Card>
             </Card.Body>
           </Card>
         </Col>
       </Row>
     </>
   );
-};
+});
 
 export default Clients;

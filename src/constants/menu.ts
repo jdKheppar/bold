@@ -57,6 +57,13 @@ const MENU_ITEMS: MenuItemTypes[] = [
     url: "/apps/commission",
   },
   {
+    key: "apps-payout",
+    label: "Payout",
+    isTitle: false,
+    icon: "activity",
+    url: "/apps/payout",
+  },
+  {
     key: "apps-chat",
     label: "Messaging",
     isTitle: false,

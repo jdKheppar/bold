@@ -5,10 +5,9 @@ import classNames from "classnames";
 
 // components
 
-
-import PageTitle from "../../../../components/PageTitle";
-import { OrdersDTO } from "../../../../DTOs/OrderDTO";
 import axios from "axios";
+import { CommissionDTO } from "../../../DTOs/Commission";
+import PageTitle from "../../../components/PageTitle";
 
 // get all columns
 const columns = [
@@ -55,7 +54,7 @@ const sizePerPageList = [
 
 // main component
 const Orders = () => {
-  const [orders, setOrders] = useState<OrdersDTO[]>([]);
+  const [commissions, setCommissions] = useState<CommissionDTO[]>([]);
 
   // // change order status group
   // const changeOrderStatusGroup = (OrderStatusGroup: string) => {
@@ -73,10 +72,10 @@ const Orders = () => {
     alert("We can't exchange right now");
   }
   const fetchOrders = async () => {
-    const fullUrl = "https://reseller.whitexdigital.com/api/orders";
+    const fullUrl = "https://reseller.whitexdigital.com/api/commissions";
     try {
       const response = await axios.get(fullUrl);
-      setOrders(response.data);
+      setCommissions(response.data);
     } catch (error) {
       console.error("API call error:", error);
       // swal.fire({
@@ -137,7 +136,7 @@ const Orders = () => {
 
               </Row>
               {
-                orders &&
+                commissions &&
                 <Card>
                   <Card.Body>
                     <h4 className="header-title mt-0 mb-1">Clients</h4>
@@ -145,31 +144,20 @@ const Orders = () => {
                       <thead>
                         <tr>
                           <th>Order ID</th>
-                          <th>Customer Name</th>
+                          <th>Sale Amount</th>
                           <th>Total Amount</th>
                           <th>Order Date</th>
                           <th>Order Status</th>
-                          <th>Action</th>
+
                         </tr>
                       </thead>
                       <tbody>
-                        {orders.map((record, index) => (
+                        {commissions.map((record, index) => (
                           <tr key={index}>
-                            <th scope="row">{record.id}</th>
-                            <td>{record.customer_name}</td>
-                            <td>{record.total_amount}</td>
+                            <th scope="row">{record.order_id}</th>
+                            <td>{record.sale_amount}</td>
+                            <td>{record.commission_amount}</td>
                             <td>{record.order_date}</td>
-                            <td>{record.status}</td>
-
-                            <td>
-                              <i className="bi bi-arrow-left-right"></i>
-                              <i
-                                className="bi bi-x-circle ms-2 cursor-pointer"
-                                id="sa-warning"
-                                onClick={() => exchangeOrder(record.id)}
-                              ></i>
-
-                            </td>
                           </tr>
                         ))}
                       </tbody>

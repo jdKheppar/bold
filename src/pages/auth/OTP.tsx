@@ -1,23 +1,26 @@
 import React, { useEffect } from "react";
 import { Button, Alert, Row, Col } from "react-bootstrap";
-import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
+import { Navigate, Link, useLocation } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useTranslation } from "react-i18next";
 import classNames from "classnames";
-import { withSwal } from "react-sweetalert2";
 
+// actions
+import { resetAuth, loginUser } from "../../redux/actions";
 
+// store
+import { RootState, AppDispatch } from "../../redux/store";
 
 // components
-import { VerticalForm, FormInput } from "../../components/";
+import { VerticalForm, FormInput } from "../../components";
 
 import AuthLayout from "./AuthLayout";
-import axios from "axios";
 
 interface UserData {
   email: string;
-  password: string;
+  otp: string;
 }
 
 /* bottom links */
@@ -39,49 +42,39 @@ const BottomLink = () => {
 };
 
 
-const Login = withSwal((props: any) => {
+const OTP = () => {
   const { t } = useTranslation();
-  const { swal } = props;
-  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { user, userLoggedIn, loading, error } = useSelector(
+    (state: RootState) => ({
+      user: state.Auth.user,
+      loading: state.Auth.loading,
+      error: state.Auth.error,
+      userLoggedIn: state.Auth.userLoggedIn,
+    })
+  );
+
+  useEffect(() => {
+    dispatch(resetAuth());
+  }, [dispatch]);
+
   /*
   form validation schema
   */
   const schemaResolver = yupResolver(
     yup.object().shape({
       email: yup.string().required(t("Please enter email")),
-      password: yup.string().required(t("Please enter Password")),
+      otp: yup.string().required(t("Please enter OTP")),
     })
   );
 
-  const getOTP = async (data: any) => {
 
-    const params = new URLSearchParams(data).toString();
-    const fullUrl = `https://reseller.whitexdigital.com/api/login?${params}`;
-    // Configure Axios to follow redirects
-
-    // Log the full URL
-    console.log(fullUrl);
-    try {
-      let response = await axios.post(fullUrl);
-      if (response.status === 200) {
-        swal.fire({
-          title: "Success!",
-          text: "OTP sent successfully!",
-          icon: "success",
-        });
-        navigate("/auth/verifyOTP");
-      }
-    } catch (error) {
-      console.error("API call error:", error);
-      throw error;
-    }
-  }
   /*
   handle form submission
   */
   const onSubmit = (formData: UserData) => {
-    getOTP(formData);
-
+    dispatch(loginUser(formData["email"], formData["otp"]));
   };
 
   const location = useLocation();
@@ -91,18 +84,23 @@ const Login = withSwal((props: any) => {
 
   return (
     <>
+      {(userLoggedIn || user) && <Navigate to={redirectUrl}></Navigate>}
+
       <AuthLayout
         helpText={t(
-          "Enter your email address and password to get OTP on your email."
+          "Enter your email address and OTP to access Reseller Dashboard."
         )}
         bottomLinks={<BottomLink />}
       >
-
+        {error && (
+          <Alert variant="danger" className="my-2">
+            {error}
+          </Alert>
+        )}
 
         <VerticalForm<UserData>
           onSubmit={onSubmit}
           resolver={schemaResolver}
-          defaultValues={{ email: "asdasd@asd.asd", password: "asdasd@asd.asd" }}
         >
           <FormInput
             label={t("Email")}
@@ -112,16 +110,16 @@ const Login = withSwal((props: any) => {
             containerClass={"mb-3"}
           />
           <FormInput
-            label={t("Password")}
-            type="password"
-            name="password"
-            placeholder="Enter your password"
+            label={t("OTP")}
+            type="text"
+            name="otp"
+            placeholder="Enter OTP"
             containerClass={"mb-3"}
           ></FormInput>
 
           <div className="text-center d-grid">
-            <Button variant="primary" type="submit" >
-              {t("Get OTP")}
+            <Button variant="primary" type="submit" disabled={loading}>
+              {t("Log In")}
             </Button>
           </div>
         </VerticalForm>
@@ -130,6 +128,6 @@ const Login = withSwal((props: any) => {
       </AuthLayout>
     </>
   );
-});
+};
 
-export default Login;
+export default OTP;

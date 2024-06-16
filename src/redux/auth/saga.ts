@@ -25,6 +25,7 @@ interface UserData {
     password: string;
     fullname: string;
     email: string;
+    otp: string;
   };
   type: string;
 }
@@ -32,7 +33,7 @@ interface UserData {
 const realLogin = async (data: any) => {
 
   const params = new URLSearchParams(data).toString();
-  const fullUrl = `https://reseller.whitexdigital.com/api/login?${params}`;
+  const fullUrl = `https://reseller.whitexdigital.com/api/verify_otp?${params}`;
   // Configure Axios to follow redirects
 
   // Log the full URL
@@ -70,7 +71,7 @@ const api = new APICore();
  * @param {*} payload - username and password
  */
 function* login({
-  payload: { email, password },
+  payload: { email, otp },
 }: UserData): SagaIterator {
   try {
 
@@ -78,8 +79,9 @@ function* login({
 
     let data = {
       email,
-      password
+      otp
     }
+
     //const response = hitBackend(data);
     const response = yield call(realLogin, data);
     if (response) {

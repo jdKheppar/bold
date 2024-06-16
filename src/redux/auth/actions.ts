@@ -3,14 +3,14 @@ import { AuthActionTypes } from "./constants";
 
 export interface AuthActionType {
   type:
-    | AuthActionTypes.API_RESPONSE_SUCCESS
-    | AuthActionTypes.API_RESPONSE_ERROR
-    | AuthActionTypes.FORGOT_PASSWORD
-    | AuthActionTypes.FORGOT_PASSWORD_CHANGE
-    | AuthActionTypes.LOGIN_USER
-    | AuthActionTypes.LOGOUT_USER
-    | AuthActionTypes.RESET
-    | AuthActionTypes.SIGNUP_USER;
+  | AuthActionTypes.API_RESPONSE_SUCCESS
+  | AuthActionTypes.API_RESPONSE_ERROR
+  | AuthActionTypes.FORGOT_PASSWORD
+  | AuthActionTypes.FORGOT_PASSWORD_CHANGE
+  | AuthActionTypes.LOGIN_USER
+  | AuthActionTypes.LOGOUT_USER
+  | AuthActionTypes.RESET
+  | AuthActionTypes.SIGNUP_USER;
   payload: {} | string;
 }
 
@@ -43,10 +43,10 @@ export const authApiResponseError = (
 
 export const loginUser = (
   email: string,
-  password: string
+  otp: string
 ): AuthActionType => ({
   type: AuthActionTypes.LOGIN_USER,
-  payload: { email, password },
+  payload: { email, otp },
 });
 
 export const logoutUser = (): AuthActionType => ({

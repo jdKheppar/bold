@@ -9,6 +9,7 @@ import PrivateRoute from "./PrivateRoute";
 
 // auth
 const Login = React.lazy(() => import("../pages/auth/Login"));
+const OTP = React.lazy(() => import("../pages/auth/OTP"));
 const Logout = React.lazy(() => import("../pages/auth/Logout"));
 const Confirm = React.lazy(() => import("../pages/auth/Confirm"));
 const ForgetPassword = React.lazy(() => import("../pages/auth/ForgetPassword"));
@@ -30,6 +31,7 @@ const AllClients = React.lazy(() => import("../pages/apps/Clients/index"));
 
 const AllProducts = React.lazy(() => import("../pages/apps/Product/index"));
 const Commission = React.lazy(() => import("../pages/apps/Commission/index"));
+const Payout = React.lazy(() => import("../pages/apps/Payout/Payout"));
 const Profile = React.lazy(() => import("../pages/apps/Profile/Profile"));
 const Settings = React.lazy(() => import("../pages/apps/Settings/Settings"))
 const AppProductDetails = React.lazy(() => import("../pages/apps/Product/Products/ProductDetails/ProductDetails"));
@@ -145,6 +147,14 @@ const commissionAppRoutes: RoutesProps = {
   icon: "award",
   element: <Commission />,
 };
+const payoutAppRoutes: RoutesProps = {
+  path: "/apps/payout",
+  name: "Payout",
+  route: PrivateRoute,
+  roles: ["Admin"],
+  icon: "activity",
+  element: <Payout />,
+};
 const chatAppRoutes = {
   path: "/apps/chat",
   name: "Messaging",
@@ -195,6 +205,7 @@ const appRoutes = [
   orderAppRoutes,
   productAppRoutes,
   commissionAppRoutes,
+  payoutAppRoutes,
   chatAppRoutes,
   chartsAppRoutes,
   settingsAppRoutes,
@@ -212,6 +223,12 @@ const authRoutes: RoutesProps[] = [
     path: "/auth/login",
     name: "Login",
     element: <Login />,
+    route: Route,
+  },
+  {
+    path: "/auth/verifyOTP",
+    name: "OTP",
+    element: <OTP />,
     route: Route,
   },
   {

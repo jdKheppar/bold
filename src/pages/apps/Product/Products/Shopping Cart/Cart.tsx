@@ -3,27 +3,16 @@ import { Row, Col, Card, Dropdown, Button } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import PageTitle from "../../../../../components/PageTitle";
+import { withSwal } from "react-sweetalert2";
+import { ProductItemTypes } from "../../../../../DTOs/ProductItemTypes";
+import { ClientDTO } from "../../../../../DTOs/ClientDTO";
 
 
-interface ProductItemTypes {
-  id: number;
-  title: string;
-  image: string;
-  rating: number;
-  price: number;
-  wholesale_price: number;
-  current_stock: number;
-  custom_price: number;
-}
-interface Client {
-  id: number;
-  name: string;
-}
-
-const Cart: React.FC = () => {
+const Cart: React.FC = withSwal((props: any) => {
+  const { swal } = props;
   const navigate = useNavigate();
   const [products, setProducts] = useState<ProductItemTypes[]>([]);
-  const [clients, setClients] = useState<Client[]>([]);
+  const [clients, setClients] = useState<ClientDTO[]>([]);
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
 
   const handleSelect = (clientId: number) => {
@@ -93,10 +82,23 @@ const Cart: React.FC = () => {
     }
   };
   const handleCheckout = async () => {
-    if (!selectedClientId) {
-      alert("Please select a client");
+    if (products.length === 0) {
+      swal.fire({
+        title: "Items?",
+        text: "There is no item in the cart",
+        icon: "question",
+      })
       return;
     }
+    if (!selectedClientId) {
+      swal.fire({
+        title: "Client?",
+        text: "Please select client to continue",
+        icon: "question",
+      })
+      return;
+    }
+
 
     const orderData = {
       products: products.map((product) => ({
@@ -109,12 +111,21 @@ const Cart: React.FC = () => {
 
     try {
       const response = await axios.post("https://reseller.whitexdigital.com/api/store_order", orderData);
-      console.log(response);
-      alert("Order placed successfully!");
+      localStorage.removeItem("cartItems");
+      swal.fire({
+        title: "Success!",
+        text: "Your order placed successfull!",
+        icon: "success",
+      })
       navigate("/apps/orders"); // Redirect to orders page or any other page
     } catch (error) {
+      swal.fire({
+        title: "Error",
+        text: "Something went wrong",
+        icon: "error",
+      })
       console.error("Checkout error:", error);
-      alert("There was an error placing the order. Please try again.");
+      //alert("There was an error placing the order. Please try again.");
     }
   };
 
@@ -233,8 +244,8 @@ const Cart: React.FC = () => {
                         </tbody>
                       </table>
                     </div>
-                    <Dropdown>
-                      <Dropdown.Toggle variant="light" id="dropdown-basic">
+                    <Dropdown className="mt-4">
+                      <Dropdown.Toggle variant="danger" id="dropdown-basic">
                         {selectedClientId
                           ? clients.find((client) => client.id === selectedClientId)?.name
                           : "Select Client"}{" "}
@@ -278,6 +289,6 @@ const Cart: React.FC = () => {
       </Row>
     </>
   );
-};
+});
 
 export default Cart;
