@@ -1,10 +1,8 @@
-import React, { useEffect } from "react";
-import { Button, Alert, Row, Col } from "react-bootstrap";
-import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
+import { Button, Row, Col } from "react-bootstrap";
+import {  Link,  useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useTranslation } from "react-i18next";
-import classNames from "classnames";
 import { withSwal } from "react-sweetalert2";
 
 
@@ -78,6 +76,11 @@ const Login = withSwal((props: any) => {
       }
     } catch (error) {
       console.error("API call error:", error);
+      swal.fire({
+        title: "Error!",
+        text: "Something Went Wrong!",
+        icon: "error",
+      });
       throw error;
     }
   }
@@ -89,10 +92,6 @@ const Login = withSwal((props: any) => {
 
   };
 
-  const location = useLocation();
-  //
-  // const redirectUrl = location.state && location.state.from ? location.state.from.pathname : '/apps/dashboard';
-  const redirectUrl = location?.search?.slice(6) || "/apps/dashboard";
 
   return (
     <>
@@ -102,7 +101,7 @@ const Login = withSwal((props: any) => {
         )}
         bottomLinks={<BottomLink />}
       >
-
+        
         <VerticalForm<UserData>
           onSubmit={onSubmit}
           resolver={schemaResolver}
