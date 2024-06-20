@@ -1,11 +1,12 @@
-import React, { useEffect } from "react";
+import  { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Navigate, Link } from "react-router-dom";
+import { Navigate, Link, useNavigate } from "react-router-dom";
 import { Button, Alert, Row, Col } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import classNames from "classnames";
+import { withSwal } from "react-sweetalert2";
+import axios from "axios";
 
 //actions
 import { resetAuth, signupUser } from "../../redux/actions";
@@ -18,7 +19,7 @@ import { VerticalForm, FormInput } from "../../components/";
 import AuthLayout from "./AuthLayout";
 
 interface UserData {
-  fullname: string;
+  name: string;
   email: string;
   password: string;
 }
@@ -41,52 +42,10 @@ const BottomLink = () => {
   );
 };
 
-/* social links */
-const SocialLinks = () => {
-  const socialLinks = [
-    {
-      variant: "primary",
-      icon: "facebook",
-    },
-    {
-      variant: "danger",
-      icon: "google",
-    },
-    {
-      variant: "info",
-      icon: "twitter",
-    },
-    {
-      variant: "secondary",
-      icon: "github",
-    },
-  ];
-  return (
-    <>
-      <ul className="social-list list-inline mt-3 mb-0">
-        {(socialLinks || []).map((item, index) => {
-          return (
-            <li key={index} className="list-inline-item">
-              <Link
-                to="#"
-                className={classNames(
-                  "social-list-item",
-                  "border-" + item.variant,
-                  "text-" + item.variant
-                )}
-              >
-                <i className={classNames("mdi", "mdi-" + item.icon)}></i>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </>
-  );
-};
-
-const Register = () => {
+const Register = withSwal ((props: any) => {
   const { t } = useTranslation();
+  const { swal } = props;
+  const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
   const { loading, userSignUp, error } = useSelector((state: RootState) => ({
@@ -104,7 +63,7 @@ const Register = () => {
    */
   const schemaResolver = yupResolver(
     yup.object().shape({
-      fullname: yup.string().required(t("Please enter Fullname")),
+      name: yup.string().required(t("Please enter Fullname")),
       email: yup
         .string()
         .required("Please enter Email")
@@ -112,14 +71,40 @@ const Register = () => {
       password: yup.string().required(t("Please enter Password")),
     })
   );
+  const getOTP = async (data: any) => {
+
+    const params = new URLSearchParams(data).toString();
+    const fullUrl = `https://reseller.whitexdigital.com/api/register?${params}`;
+    // Configure Axios to follow redirects
+
+    // Log the full URL
+    console.log(fullUrl);
+    try {
+      let response = await axios.post(fullUrl);
+      if (response.status === 200) {
+        swal.fire({
+          title: "Success!",
+          text: "OTP sent successfully!",
+          icon: "success",
+        });
+        navigate("/auth/verifyOTPR");
+      }
+    } catch (error) {
+      console.error("API call error:", error);
+      swal.fire({
+        title: "Error!",
+        text: "Something Went Wrong!",
+        icon: "error",
+      });
+      throw error;
+    }
+  }
 
   /*
    * handle form submission
    */
   const onSubmit = (formData: UserData) => {
-    dispatch(
-      signupUser(formData["fullname"], formData["email"], formData["password"])
-    );
+    getOTP(formData);
   };
 
   return (
@@ -146,7 +131,7 @@ const Register = () => {
           <FormInput
             label={t("Full Name")}
             type="text"
-            name="fullname"
+            name="name"
             placeholder={t("Enter your name")}
             containerClass={"mb-3"}
           />
@@ -163,28 +148,19 @@ const Register = () => {
             name="password"
             placeholder={t("Enter your password")}
             containerClass={"mb-3"}
-          />
-          <FormInput
-            label={t("I accept Terms and Conditions")}
-            type="checkbox"
-            name="checkboxsignup"
-            containerClass={"mb-3"}
-          />
+          />         
 
           <div className="text-center d-grid">
             <Button variant="success" type="submit" disabled={loading}>
-              {t("Sign Up")}
+              {t("Get OTP")}
             </Button>
           </div>
         </VerticalForm>
 
-        <div className="text-center">
-          <h5 className="mt-3 text-muted">{t("Sign up using")}</h5>
-          <SocialLinks />
-        </div>
+        
       </AuthLayout>
     </>
   );
-};
+});
 
 export default Register;

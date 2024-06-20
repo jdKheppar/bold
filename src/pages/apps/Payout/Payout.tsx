@@ -5,49 +5,12 @@ import classNames from "classnames";
 import axios from "axios";
 import PageTitle from "../../../components/PageTitle";
 import { PayoutDTO } from "../../../DTOs/Payout";
+import { withSwal } from "react-sweetalert2";
 
-// get all columns
-const columns = [
-    {
-        Header: "Order ID",
-        accessor: "id",
-    },
-    {
-        Header: "Customer Name",
-        accessor: "customer_name",
-    },
-    {
-        Header: "Total Amount",
-        accessor: "total_amount",
-    },
-    {
-        Header: "Order Date",
-        accessor: "order_date",
-    },
-    {
-        Header: "Order Status",
-        accessor: "status",
-    },
-];
-
-// get pagelist to display
-const sizePerPageList = [
-    {
-        text: "10",
-        value: 10,
-    },
-    {
-        text: "20",
-        value: 20,
-    },
-    {
-        text: "50",
-        value: 50,
-    },
-];
 
 // main component
-const Orders = () => {
+const Orders = withSwal((props: any) => {
+    const { swal } = props;
     const [payouts, setPayouts] = useState<PayoutDTO[]>([]);
     const [total, setTotal] = useState<number>(-1);
     const [payoutAmount, setPayoutAmount] = useState<number>(0);
@@ -56,10 +19,19 @@ const Orders = () => {
         const fullUrl = `https://reseller.whitexdigital.com/api/request_payouts?amount=${amount}`;
         try {
             const response = await axios.post(fullUrl);
-            alert("Payout requested successfully.");
+           
+            swal.fire({
+                title: "Success!",
+                text: "Payout requested successfully!",
+                icon: "success",
+              });
         } catch (error) {
             console.error("API call error:", error);
-            alert("Failed to request payout. Please try again.");
+            swal.fire({
+                title: "Error!",
+                text: "Something Went Wrong!",
+                icon: "error",
+              });
         }
     }
 
@@ -70,6 +42,11 @@ const Orders = () => {
             setPayouts(response.data.payouts);
             setTotal(response.data.total);
         } catch (error) {
+            swal.fire({
+                title: "Error!",
+                text: "Something Went Wrong!",
+                icon: "error",
+              });
             console.error("API call error:", error);
         }
     };
@@ -152,6 +129,6 @@ const Orders = () => {
             </Row>
         </>
     );
-};
+});
 
 export default Orders;

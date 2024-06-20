@@ -71,7 +71,6 @@ class APICore {
    * Fetches data from given url
    */
   get = (url: string, params: any) => {
-    alert("I am not being called");
     let response;
     if (params) {
       var queryString = params
@@ -88,7 +87,6 @@ class APICore {
 
   getFile = (url: string, params: any) => {
 
-    alert("I am not being called");
 
     let response;
     if (params) {

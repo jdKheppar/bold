@@ -3,6 +3,7 @@ import { Route, Navigate, RouteProps } from "react-router-dom";
 
 // components
 import PrivateRoute from "./PrivateRoute";
+
 // import Root from './Root';
 
 // lazy load all the views
@@ -10,6 +11,7 @@ import PrivateRoute from "./PrivateRoute";
 // auth
 const Login = React.lazy(() => import("../pages/auth/Login"));
 const OTP = React.lazy(() => import("../pages/auth/OTP"));
+const OTPR = React.lazy(()=> import("../pages/auth/OTPR"))
 const Logout = React.lazy(() => import("../pages/auth/Logout"));
 const Confirm = React.lazy(() => import("../pages/auth/Confirm"));
 const ForgetPassword = React.lazy(() => import("../pages/auth/ForgetPassword"));
@@ -229,6 +231,12 @@ const authRoutes: RoutesProps[] = [
     path: "/auth/verifyOTP",
     name: "OTP",
     element: <OTP />,
+    route: Route,
+  },
+  {
+    path: "/auth/verifyOTPR",
+    name: "OTP",
+    element: <OTPR />,
     route: Route,
   },
   {

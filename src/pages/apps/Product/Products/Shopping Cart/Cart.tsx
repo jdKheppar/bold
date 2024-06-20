@@ -125,7 +125,6 @@ const Cart: React.FC = withSwal((props: any) => {
         icon: "error",
       })
       console.error("Checkout error:", error);
-      //alert("There was an error placing the order. Please try again.");
     }
   };
 
