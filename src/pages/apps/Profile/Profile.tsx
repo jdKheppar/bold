@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Row, Col, Card, Form } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import Select from "react-select";
-import { Editor } from "react-draft-wysiwyg";
+
 
 // styles
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
@@ -15,44 +14,16 @@ import FileUploader from "../../../components/FileUploader";
 import { FormInput } from "../../../components";
 
 const Profile = () => {
-  const [editorState, setEditorState] = useState<any>();
-  const categories = [
-    {
-      label: "Shopping",
-      options: [
-        { value: "SH1", label: "Shopping 1" },
-        { value: "SH2", label: "Shopping 2" },
-        { value: "SH3", label: "Shopping 3" },
-      ],
-    },
-    {
-      label: "CRM",
-      options: [
-        { value: "CRM1", label: "Crm 1" },
-        { value: "CRM2", label: "Crm 2" },
-        { value: "CRM3", label: "Crm 3" },
-        { value: "CRM4", label: "Crm 4" },
-      ],
-    },
-    {
-      label: "eCommerce",
-      options: [
-        { value: "E1", label: "eCommerce 1" },
-        { value: "E2", label: "eCommerce 2" },
-        { value: "E3", label: "eCommerce 3" },
-        { value: "E4", label: "eCommerce 4" },
-      ],
-    },
-  ];
+ 
   /*
    * form validation schema
    */
   const schemaResolver = yupResolver(
     yup.object().shape({
       name: yup.string().required("Please enter Project Name"),
-      reference: yup.string().required("Please enter Project Name"),
-      summary: yup.string().required("Please enter Project Name"),
-      price: yup.string().required("Please enter Project Name"),
+      contactInfo: yup.string().required("Please enter Contact Number"),
+      shippingAddress: yup.string().required("Please enter your shipping address"),
+      BusinessDetails: yup.string().required("Please enter BusinessDetails"),
       comment: yup.string().required("Please enter Project Name"),
       metatitle: yup.string().required("Please enter Project Name"),
       metakeywords: yup.string().required("Please enter Project Name"),
@@ -71,13 +42,7 @@ const Profile = () => {
     formState: { errors },
   } = methods;
 
-  /**
-   * On editor body change
-   */
-  const onEditorStateChange = (editorStates: any) => {
-    setEditorState(editorStates);
-  };
-
+ 
   return (
     <>
       <PageTitle
@@ -121,7 +86,7 @@ const Profile = () => {
                   control={control}
                 />
                 <FormInput
-                  name="shipping address"
+                  name="shippingAddress"
                   label="Shipping Address"
                   placeholder="Enter your shipping address here"
                   containerClass={"mb-3"}

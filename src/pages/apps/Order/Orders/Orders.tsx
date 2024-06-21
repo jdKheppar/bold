@@ -1,89 +1,43 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Row, Col, Card, Button, Table } from "react-bootstrap";
 import classNames from "classnames";
-
-// components
-
-
 import PageTitle from "../../../../components/PageTitle";
 import { OrdersDTO } from "../../../../DTOs/OrderDTO";
 import axios from "axios";
-
-// get all columns
-const columns = [
-  {
-    Header: "Order ID",
-    accessor: "id",
-  },
-  {
-    Header: "Customer Name",
-    accessor: "customer_name",
-  },
-  {
-    Header: "Total Amount",
-    accessor: "total_amount",
-  },
-  {
-    Header: "Order Date",
-    accessor: "order_date",
-  },
-
-
-  {
-    Header: "Order Status",
-    accessor: "status",
-  },
-
-];
-
-// get pagelist to display
-const sizePerPageList = [
-  {
-    text: "10",
-    value: 10,
-  },
-  {
-    text: "20",
-    value: 20,
-  },
-  {
-    text: "50",
-    value: 50,
-  },
-];
+import { useNavigate } from "react-router-dom";
+import { withSwal } from "react-sweetalert2";
 
 // main component
-const Orders = () => {
+const Orders = withSwal((props: any) => {
+  const { swal } = props;
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<OrdersDTO[]>([]);
+  const [filteredOrders, setFilteredOrders] = useState<OrdersDTO[]>([]);
+  const [selectedStatus, setSelectedStatus] = useState<string>("All");
 
-  // // change order status group
-  // const changeOrderStatusGroup = (OrderStatusGroup: string) => {
-  //   let updatedData = [...orders];
-  //   //  filter
-  //   updatedData =
-  //     OrderStatusGroup === "All"
-  //       ? orders
-  //       : [...orders].filter((o) =>
-  //         o.payment_status?.includes(OrderStatusGroup)
-  //       );
-  //   setOrderList(updatedData);
-  // };
-  function exchangeOrder(id: Number) {
-    alert("We can't exchange right now");
-  }
+  const exchangeOrder = (id: Number) => {
+    localStorage.setItem("ExchangeOrderID",id.toString());
+    swal.fire({
+      title: "Place now",
+      text: "Place your updated order now",
+      icon: "success",
+    });
+    navigate("/apps/products");
+  };
+
   const fetchOrders = async () => {
     const fullUrl = "https://reseller.whitexdigital.com/api/orders";
     try {
       const response = await axios.get(fullUrl);
       setOrders(response.data);
+      setFilteredOrders(response.data);
     } catch (error) {
       console.error("API call error:", error);
-      // swal.fire({
-      //   title: "Error",
-      //   text: "Something went wrong",
-      //   icon: "error",
-      // });
+      swal.fire({
+        title: "Error",
+        text: "Something went wrong",
+        icon: "error",
+      });
     }
   };
 
@@ -91,6 +45,16 @@ const Orders = () => {
     fetchOrders();
   }, []);
 
+  const handleStatusChange = (e: any) => {
+    const status = e.target.value;
+    setSelectedStatus(status);
+    if (status === "All") {
+      setFilteredOrders(orders);
+    } else {
+      const filtered = orders.filter((order) => order.status === status);
+      setFilteredOrders(filtered);
+    }
+  };
 
   return (
     <>
@@ -117,15 +81,12 @@ const Orders = () => {
                         <select
                           className="form-select"
                           id="status-select"
-                        // onChange={(e: any) =>
-                        //   changeOrderStatusGroup(e.target.value)
-                        // }
+                          onChange={handleStatusChange}
+                          value={selectedStatus}
                         >
                           <option value="All">All</option>
                           <option value="Paid">Paid</option>
-                          <option value="Authorization">
-                            Awaiting Authorization
-                          </option>
+                          <option value="Authorization">Awaiting Authorization</option>
                           <option value="Failed">Payment failed</option>
                           <option value="Unpaid">Unpaid</option>
                         </select>
@@ -133,11 +94,8 @@ const Orders = () => {
                     </div>
                   </form>
                 </Col>
-
-
               </Row>
-              {
-                orders &&
+              {filteredOrders && (
                 <Card>
                   <Card.Body>
                     <h4 className="header-title mt-0 mb-1">Clients</h4>
@@ -153,14 +111,13 @@ const Orders = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {orders.map((record, index) => (
+                        {filteredOrders.map((record, index) => (
                           <tr key={index}>
                             <th scope="row">{record.id}</th>
                             <td>{record.customer_name}</td>
                             <td>{record.total_amount}</td>
                             <td>{record.order_date}</td>
                             <td>{record.status}</td>
-
                             <td>
                               <i className="bi bi-arrow-left-right"></i>
                               <i
@@ -168,26 +125,20 @@ const Orders = () => {
                                 id="sa-warning"
                                 onClick={() => exchangeOrder(record.id)}
                               ></i>
-
                             </td>
                           </tr>
                         ))}
                       </tbody>
                     </Table>
-
-
                   </Card.Body>
                 </Card>
-              }
-
+              )}
             </Card.Body>
           </Card>
         </Col>
       </Row>
     </>
   );
-};
+});
 
 export default Orders;
-
-// export {}

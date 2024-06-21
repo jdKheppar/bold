@@ -1,28 +1,12 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Row, Col } from "react-bootstrap";
-
-// components
-import HyperDatepicker from "../../../components/Datepicker";
-
 import Statistics from "./Statistics";
-import RevenueChart from "./RevenueChart";
-import SalesAnalyticsChart from "./SalesAnalyticsChart";
-import RevenueHistory from "./RevenueHistory";
 
-import { revenueHistory } from "./data";
+
 import RecentProducts from "./RecentProducts";
+import RecentOrders from "./RecentOrders";
 
 const Dashboard1 = () => {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-
-  /*
-   * handle date change
-   */
-  const onDateChange = (date: Date) => {
-    if (date) {
-      setSelectedDate(date);
-    }
-  };
 
   return (
     <>
@@ -36,22 +20,12 @@ const Dashboard1 = () => {
       </Row>
 
       <Statistics />
-
-      {/* <Row>
-        <Col lg={4}>
-          <RevenueChart />
-        </Col>
-        <Col lg={8}>
-          <SalesAnalyticsChart />
-        </Col>
-      </Row> */}
-
       <Row>
         <Col xl={6}>
           <RecentProducts />
         </Col>
         <Col xl={6}>
-          <RevenueHistory revenueHistory={revenueHistory} />
+          <RecentOrders/>
         </Col>
       </Row>
     </>

@@ -64,6 +64,7 @@ interface Product {
 const ProductDetails = withSwal((props: any) => {
   const { swal } = props;
   const { id } = useParams();
+  const exchangeOrderID = localStorage.getItem("ExchangeOrderID");
   const [productDetails, setProductDetails] = useState<Product | null>(null);
   const [cartItems, setCartItems] = useState<number[]>([]);
   const addToCart = () => {
@@ -171,7 +172,7 @@ const ProductDetails = withSwal((props: any) => {
         ]}
         title={"Product Detail"}
       />
-
+      {exchangeOrderID && <p>Your exchange order ID is{exchangeOrderID}</p>}
       <Row>
         <Col>
           <Card>
