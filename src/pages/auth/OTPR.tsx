@@ -1,5 +1,5 @@
 import { Button, Alert, Row, Col } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useTranslation } from "react-i18next";
@@ -32,15 +32,15 @@ const BottomLink = () => {
 };
 
 
-const OTPR = withSwal ((props: any) => {
+const OTPR = withSwal((props: any) => {
   const { t } = useTranslation();
- 
+  const { email } = useParams();
   const { swal } = props;
   const navigate = useNavigate();
 
 
 
- 
+
   /*
   form validation schema
   */
@@ -56,7 +56,7 @@ const OTPR = withSwal ((props: any) => {
     const params = new URLSearchParams(data).toString();
     const fullUrl = `https://reseller.whitexdigital.com/api/verify_otp?${params}`;
     // Configure Axios to follow redirects
-  
+
     // Log the full URL
     console.log(fullUrl);
     try {
@@ -71,7 +71,7 @@ const OTPR = withSwal ((props: any) => {
           });
           navigate("/auth/login");
         }
-  
+
       }
       else {
         swal.fire({
@@ -94,14 +94,14 @@ const OTPR = withSwal ((props: any) => {
   handle form submission
   */
   const onSubmit = (formData: UserData) => {
-    let data={
+    let data = {
       email: formData["email"],
       otp: formData["otp"]
     }
     verifyOTP(data);
   };
 
-  
+
 
   return (
     <>
@@ -115,13 +115,15 @@ const OTPR = withSwal ((props: any) => {
         <VerticalForm<UserData>
           onSubmit={onSubmit}
           resolver={schemaResolver}
+          defaultValues={{ email: email || "" }}
         >
           <FormInput
-            label={t("Email")}
+
             type="email"
             name="email"
-            placeholder="Enter your email "
+
             containerClass={"mb-3"}
+            style={{ display: "none" }}
           />
           <FormInput
             label={t("OTP")}

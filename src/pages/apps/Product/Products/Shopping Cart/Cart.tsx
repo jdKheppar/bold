@@ -11,6 +11,10 @@ import { ClientDTO } from "../../../../../DTOs/ClientDTO";
 const Cart: React.FC = withSwal((props: any) => {
   const { swal } = props;
   const navigate = useNavigate();
+
+  let exchangeOrderItem = localStorage.getItem("ExchangeOrderID");
+
+  const [titleText, setTitleText] = useState("");
   const [products, setProducts] = useState<ProductItemTypes[]>([]);
   const [clients, setClients] = useState<ClientDTO[]>([]);
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
@@ -18,12 +22,11 @@ const Cart: React.FC = withSwal((props: any) => {
   const handleSelect = (clientId: number) => {
     setSelectedClientId(clientId);
   };
-
+  let exchangeOrderItme = localStorage.getItem("ExchangeOrderID");
   const fetchClients = async () => {
     const fullUrl = "https://reseller.whitexdigital.com/api/client";
     try {
       const response = await axios.get(fullUrl);
-      console.log(response);
       setClients(response.data.data);
     } catch (error) {
       console.error("API call error:", error);
@@ -99,7 +102,7 @@ const Cart: React.FC = withSwal((props: any) => {
       return;
     }
 
-
+    let prev_order_id = exchangeOrderItem ? exchangeOrderItem : "";
     const orderData = {
       products: products.map((product) => ({
         id: product.id,
@@ -107,14 +110,18 @@ const Cart: React.FC = withSwal((props: any) => {
         custom_price: product.custom_price,
       })),
       clientID: selectedClientId,
+      prev_OrderID: prev_order_id
     };
 
     try {
       const response = await axios.post("https://reseller.whitexdigital.com/api/store_order", orderData);
       localStorage.removeItem("cartItems");
+      let successMessage = exchangeOrderItem ? "Order updated successfully" : "Order placed successfully";
+
+      localStorage.removeItem("ExchangeOrderID");
       swal.fire({
         title: "Success!",
-        text: "Your order placed successfull!",
+        text: successMessage,
         icon: "success",
       })
       navigate("/apps/orders"); // Redirect to orders page or any other page
@@ -131,6 +138,13 @@ const Cart: React.FC = withSwal((props: any) => {
   useEffect(() => {
     getProducts();
     fetchClients();
+
+    if (exchangeOrderItem) {
+      setTitleText(`Shopping Cart (Place Exchange Order)`);
+    }
+    else {
+      setTitleText("Shopping Cart");
+    }
   }, []);
 
   return (
@@ -268,7 +282,7 @@ const Cart: React.FC = withSwal((props: any) => {
               <Row className="mt-4">
                 <Col sm={12}>
                   <a
-                    href="apps/products"
+                    href="/apps/products"
                     className="btn text-muted d-none d-sm-inline-block btn-link fw-semibold"
                   >
                     <i className="mdi mdi-arrow-left"></i> Continue Shopping{" "}

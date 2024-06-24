@@ -16,7 +16,7 @@ const Orders = withSwal((props: any) => {
   const [selectedStatus, setSelectedStatus] = useState<string>("All");
 
   const exchangeOrder = (id: Number) => {
-    localStorage.setItem("ExchangeOrderID",id.toString());
+    localStorage.setItem("ExchangeOrderID", id.toString());
     swal.fire({
       title: "Place now",
       text: "Place your updated order now",
@@ -108,6 +108,7 @@ const Orders = withSwal((props: any) => {
                           <th>Order Date</th>
                           <th>Order Status</th>
                           <th>Action</th>
+                          <th>Invoice</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -119,12 +120,19 @@ const Orders = withSwal((props: any) => {
                             <td>{record.order_date}</td>
                             <td>{record.status}</td>
                             <td>
-                              <i className="bi bi-arrow-left-right"></i>
+                              <i className="bi bi-arrow-left-right"
+                                onClick={() => exchangeOrder(record.id)}></i>
                               <i
                                 className="bi bi-x-circle ms-2 cursor-pointer"
                                 id="sa-warning"
-                                onClick={() => exchangeOrder(record.id)}
+
                               ></i>
+                            </td>
+                            <td>
+                              <a href={record.file} download target="_blank">
+                                <i className="bi bi-download"></i>
+
+                              </a>
                             </td>
                           </tr>
                         ))}

@@ -11,7 +11,7 @@ import PrivateRoute from "./PrivateRoute";
 // auth
 const Login = React.lazy(() => import("../pages/auth/Login"));
 const OTP = React.lazy(() => import("../pages/auth/OTP"));
-const OTPR = React.lazy(()=> import("../pages/auth/OTPR"))
+const OTPR = React.lazy(() => import("../pages/auth/OTPR"))
 const Logout = React.lazy(() => import("../pages/auth/Logout"));
 const Confirm = React.lazy(() => import("../pages/auth/Confirm"));
 const ForgetPassword = React.lazy(() => import("../pages/auth/ForgetPassword"));
@@ -38,8 +38,6 @@ const Profile = React.lazy(() => import("../pages/apps/Profile/Profile"));
 const Settings = React.lazy(() => import("../pages/apps/Settings/Settings"))
 const AppProductDetails = React.lazy(() => import("../pages/apps/Product/Products/ProductDetails/ProductDetails"));
 const AppShoppingCart = React.lazy(() => import("../pages/apps/Product/Products/Shopping Cart/Cart"));
-const CalendarApp = React.lazy(() => import("../pages/apps/Calendar/"));
-
 // - chat
 const ChatApp = React.lazy(() => import("../pages/apps/Chat/"));
 
@@ -100,14 +98,7 @@ const rootRoutes: RoutesProps = {
   element: <Dashboard1 />,
 };
 
-const calendarAppRoutes: RoutesProps = {
-  path: "/apps/calendar",
-  name: "Calendar",
-  route: PrivateRoute,
-  roles: ["Admin"],
-  icon: "calendar",
-  element: <CalendarApp />,
-};
+
 
 const orderAppRoutes: RoutesProps = {
   path: "/apps/orders",
@@ -203,7 +194,6 @@ const cartAppRoutes = {
 
 
 const appRoutes = [
-  calendarAppRoutes,
   orderAppRoutes,
   productAppRoutes,
   commissionAppRoutes,
@@ -228,13 +218,13 @@ const authRoutes: RoutesProps[] = [
     route: Route,
   },
   {
-    path: "/auth/verifyOTP",
+    path: "/auth/verifyOTP/:email",
     name: "OTP",
     element: <OTP />,
     route: Route,
   },
   {
-    path: "/auth/verifyOTPR",
+    path: "/auth/verifyOTPR/:email",
     name: "OTP",
     element: <OTPR />,
     route: Route,

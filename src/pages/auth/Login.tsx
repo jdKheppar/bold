@@ -1,23 +1,19 @@
 import { Button, Row, Col } from "react-bootstrap";
-import {  Link,  useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useTranslation } from "react-i18next";
 import { withSwal } from "react-sweetalert2";
-
-
-
-// components
 import { VerticalForm, FormInput } from "../../components/";
-
 import AuthLayout from "./AuthLayout";
 import axios from "axios";
+import { APICore, setAuthorization } from "../../helpers/api/apiCore";
 
 interface UserData {
   email: string;
   password: string;
 }
-
+const api = new APICore();
 /* bottom links */
 const BottomLink = () => {
   const { t } = useTranslation();
@@ -67,12 +63,43 @@ const Login = withSwal((props: any) => {
     try {
       let response = await axios.post(fullUrl);
       if (response.status === 200) {
+        if (response.data.otp_sent) {
+          swal.fire({
+            title: "Success!",
+            text: "OTP sent successfully!",
+            icon: "success",
+          });
+          navigate(`/auth/verifyOTP/${data.email}`);
+        }
+        else {
+          let user = response.data.user;
+          let newUser = {
+            id: user.id,
+            usernmae: user.name,
+            role: "Admin",
+            token: response.data.token
+          }
+
+          console.log(newUser);
+
+          api.setLoggedInUser(newUser);
+          setAuthorization(response.data.token);
+          navigate("/apps/dashboard");
+        }
+      }
+      else if (response.status === 401) {
         swal.fire({
-          title: "Success!",
-          text: "OTP sent successfully!",
-          icon: "success",
+          title: "Error!",
+          text: "Invalid Credentials!",
+          icon: "error",
         });
-        navigate("/auth/verifyOTP");
+      }
+      else {
+        swal.fire({
+          title: "Error!",
+          text: "Something Went Wrong!",
+          icon: "error",
+        });
       }
     } catch (error) {
       console.error("API call error:", error);
@@ -101,7 +128,7 @@ const Login = withSwal((props: any) => {
         )}
         bottomLinks={<BottomLink />}
       >
-        
+
         <VerticalForm<UserData>
           onSubmit={onSubmit}
           resolver={schemaResolver}

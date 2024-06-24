@@ -20,7 +20,8 @@ interface ProductItemTypes {
 // main component
 const ProductsList = () => {
     const [products, setProducts] = useState<Array<ProductItemTypes>>([]);
-
+    const [titleText, setTitleText] = useState("");
+    let exchangeOrderItem = localStorage.getItem("ExchangeOrderID");
     /*
      * search product by name
      */
@@ -41,7 +42,6 @@ const ProductsList = () => {
         try {
             let response = await axios.get(fullUrl);
             setProducts(response.data.data);
-            console.log(response);
         } catch (error) {
             console.error("API call error:", error);
             throw error;
@@ -49,6 +49,12 @@ const ProductsList = () => {
     }
     useEffect(() => {
         getProducts();
+        if (exchangeOrderItem) {
+            setTitleText(`Product Catalog (Select Items For Exchange Order)`);
+        }
+        else {
+            setTitleText("Product Catelog");
+        }
     }, []);
 
     return (
@@ -58,7 +64,7 @@ const ProductsList = () => {
                     { label: "Products", path: "" },
                     { label: "Products", path: "/apps/orders", active: true },
                 ]}
-                title={"Products Catalog"}
+                title={titleText}
             />
 
             <Row>

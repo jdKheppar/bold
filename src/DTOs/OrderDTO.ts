@@ -4,4 +4,5 @@ export interface OrdersDTO {
     total_amount: number;
     order_date: string;
     status: string;
+    file: string;
 }

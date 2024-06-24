@@ -30,7 +30,7 @@ interface UserData {
   type: string;
 }
 
-const realLogin = async (data: any) => {
+const verifyOTP = async (data: any) => {
 
   const params = new URLSearchParams(data).toString();
   const fullUrl = `https://reseller.whitexdigital.com/api/verify_otp?${params}`;
@@ -82,8 +82,7 @@ function* login({
       otp
     }
 
-    //const response = hitBackend(data);
-    const response = yield call(realLogin, data);
+    const response = yield call(verifyOTP, data);
     if (response) {
       if (response.status === 200) {
         let user = response.data.user;
@@ -93,9 +92,6 @@ function* login({
           role: "Admin",
           token: response.data.token
         }
-
-        console.log(newUser);
-
         api.setLoggedInUser(newUser);
         setAuthorization(response.data.token);
         yield put(authApiResponseSuccess(AuthActionTypes.LOGIN_USER, newUser));

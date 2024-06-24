@@ -64,7 +64,10 @@ interface Product {
 const ProductDetails = withSwal((props: any) => {
   const { swal } = props;
   const { id } = useParams();
-  const exchangeOrderID = localStorage.getItem("ExchangeOrderID");
+  let exchangeOrderItem = localStorage.getItem("ExchangeOrderID");
+
+  const [titleText, setTitleText] = useState("");
+
   const [productDetails, setProductDetails] = useState<Product | null>(null);
   const [cartItems, setCartItems] = useState<number[]>([]);
   const addToCart = () => {
@@ -110,7 +113,6 @@ const ProductDetails = withSwal((props: any) => {
     try {
       const response = await axios.get(fullUrl);
       setProductDetails(response.data.data);
-      console.log(response);
       return response;
     } catch (error) {
       console.error("API call error:", error);
@@ -126,6 +128,14 @@ const ProductDetails = withSwal((props: any) => {
     }
   }, [id]);
 
+  useEffect(() => {
+    if (exchangeOrderItem) {
+      setTitleText(`Product Detail (Select Item For Exchange Order)`);
+    }
+    else {
+      setTitleText("Product Detail");
+    }
+  })
   if (!productDetails) {
     return <div>Loading...</div>;
   }
@@ -170,9 +180,9 @@ const ProductDetails = withSwal((props: any) => {
             active: true,
           },
         ]}
-        title={"Product Detail"}
+        title={titleText}
       />
-      {exchangeOrderID && <p>Your exchange order ID is{exchangeOrderID}</p>}
+
       <Row>
         <Col>
           <Card>

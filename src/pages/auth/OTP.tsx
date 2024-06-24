@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Button, Alert, Row, Col } from "react-bootstrap";
-import { Navigate, Link, useLocation } from "react-router-dom";
+import { Navigate, Link, useLocation, useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -45,7 +45,7 @@ const BottomLink = () => {
 const OTP = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
-
+  const { email } = useParams();
   const { user, userLoggedIn, loading, error } = useSelector(
     (state: RootState) => ({
       user: state.Auth.user,
@@ -101,13 +101,15 @@ const OTP = () => {
         <VerticalForm<UserData>
           onSubmit={onSubmit}
           resolver={schemaResolver}
+          defaultValues={{ email: email || "" }}
         >
           <FormInput
-            label={t("Email")}
+
             type="email"
             name="email"
-            placeholder="Enter your email "
+
             containerClass={"mb-3"}
+            style={{ display: "none" }}
           />
           <FormInput
             label={t("OTP")}
