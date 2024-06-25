@@ -14,9 +14,10 @@ import { RootState, AppDispatch } from "../../redux/store";
 import { VerticalForm, FormInput } from "../../components/";
 
 import AuthLayout from "./AuthLayout";
+import axios from "axios";
 
 interface UserData {
-  username: string;
+  email: string;
 }
 
 /* bottom link */
@@ -63,12 +64,32 @@ const ForgetPassword = () => {
       username: yup.string().required(t("Please enter Username")),
     })
   );
+  const getResetPasswordLink = async (data: any) => {
 
+    const params = new URLSearchParams(data).toString();
+    const fullUrl = `https://reseller.whitexdigital.com/api/send_forgot_password?${params}`;
+    // Configure Axios to follow redirects
+
+    // Log the full URL
+
+    try {
+      let response = await axios.post(fullUrl);
+      if (response.status === 200) {}
+        
+      
+      
+    } 
+    catch (error) {
+      console.error("API call error:", error);
+     
+      throw error;
+    }
+  }
   /*
    * handle form submission
    */
   const onSubmit = (formData: UserData) => {
-    dispatch(forgotPassword(formData["username"]));
+    getResetPasswordLink(formData["email"])
   };
 
   return (
@@ -92,10 +113,10 @@ const ForgetPassword = () => {
         {!passwordReset && (
           <VerticalForm onSubmit={onSubmit} resolver={schemaResolver}>
             <FormInput
-              label={t("Username")}
-              type="text"
-              name="username"
-              placeholder={t("Enter your username")}
+              label={t("Email")}
+              type="email"
+              name="email"
+              placeholder={t("Enter your email")}
               containerClass={"mb-3"}
             />
 

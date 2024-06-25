@@ -14,7 +14,7 @@ import FileUploader from "../../../components/FileUploader";
 import { FormInput } from "../../../components";
 
 const Profile = () => {
- 
+
   /*
    * form validation schema
    */
@@ -42,7 +42,7 @@ const Profile = () => {
     formState: { errors },
   } = methods;
 
- 
+
   return (
     <>
       <PageTitle
@@ -57,7 +57,7 @@ const Profile = () => {
         title={"Update Profile"}
       />
 
-      <form onSubmit={handleSubmit(() => {})}>
+      <form onSubmit={handleSubmit(() => { })}>
         <Row>
           <Col lg={8}>
             <Card>
@@ -95,7 +95,7 @@ const Profile = () => {
                   errors={errors}
                   control={control}
                 />
-                  <FormInput
+                <FormInput
                   name="BusinessDetails"
                   label="Shipping Address"
                   placeholder="Enter your business details here"
@@ -105,24 +105,24 @@ const Profile = () => {
                   errors={errors}
                   control={control}
                 />
-              
+
               </Card.Body>
             </Card>
           </Col>
-          
+
         </Row>
 
         <Row>
           <Col lg={8}>
             <div className="text-right mb-3">
-             
+
               <button
                 type="submit"
                 className="btn w-sm btn-success waves-effect waves-light me-1"
               >
                 Update
               </button>
-             
+
             </div>
           </Col>
         </Row>

@@ -88,7 +88,7 @@ function* login({
         let user = response.data.user;
         let newUser = {
           id: user.id,
-          usernmae: user.name,
+          username: user.name,
           role: "Admin",
           token: response.data.token
         }

@@ -87,7 +87,7 @@ const Register = withSwal ((props: any) => {
           text: "OTP sent successfully!",
           icon: "success",
         });
-        navigate("/auth/verifyOTPR");
+        navigate(`/auth/verifyOTPR/${data.email}`);
       }
     } catch (error) {
       console.error("API call error:", error);

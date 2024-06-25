@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useEffect,useState} from "react";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 // import classNames from 'classnames';
@@ -90,18 +90,13 @@ const ProfileMenus = [
   {
     label: "My Profile",
     icon: "fe-user",
-    redirectTo: "#",
+    redirectTo: "/apps/profile",
   },
   {
     label: "Account Settings",
     icon: "fe-settings",
-    redirectTo: "#",
+    redirectTo: "/apps/settings",
   },
-  // {
-  //   label: "Lock Screen",
-  //   icon: "fe-lock",
-  //   redirectTo: "/auth/lock-screen",
-  // },
   {
     label: "Logout",
     icon: "fe-log-out",
@@ -109,98 +104,6 @@ const ProfileMenus = [
   },
 ];
 
-// dummy search results
-const SearchResults = [
-  {
-    id: 1,
-    title: "Analytics Report",
-    icon: "uil-notes",
-    redirectTo: "#",
-  },
-  {
-    id: 2,
-    title: "How can I help you?",
-    icon: "uil-life-ring",
-    redirectTo: "#",
-  },
-  {
-    id: 3,
-    icon: "uil-cog",
-    title: "User profile settings",
-    redirectTo: "#",
-  },
-];
-
-const otherOptions = [
-  {
-    id: 1,
-    label: "New Projects",
-    icon: "fe-briefcase",
-  },
-  {
-    id: 2,
-    label: "Create Users",
-    icon: "fe-user",
-  },
-  {
-    id: 3,
-    label: "Revenue Report",
-    icon: "fe-bar-chart-line-",
-  },
-  {
-    id: 4,
-    label: "Settings",
-    icon: "fe-settings",
-  },
-  {
-    id: 4,
-    label: "Help & Support",
-    icon: "fe-headphones",
-  },
-];
-
-// get mega-menu options
-const MegaMenuOptions = [
-  {
-    id: 1,
-    title: "UI Components",
-    menuItems: [
-      "Widgets",
-      "Nestable List",
-      "Range Sliders",
-      "Masonry Items",
-      "Sweet Alerts",
-      "Treeview Page",
-      "Tour Page",
-    ],
-  },
-  {
-    id: 2,
-    title: "Applications",
-    menuItems: [
-      "eCommerce Pages",
-      "CRM Pages",
-      "Email",
-      "Calendar",
-      "Team Contacts",
-      "Task Board",
-      "Email Templates",
-    ],
-  },
-  {
-    id: 3,
-    title: "Extra Pages",
-    menuItems: [
-      "Left Sidebar with User",
-      "Menu Collapsed",
-      "Small Left Sidebar",
-      "New Header Style",
-      "Search Result",
-      "Gallery Pages",
-      "Maintenance & Coming Soon",
-    ],
-  },
-];
 
 interface TopbarProps {
   hideLogo?: boolean;
@@ -217,7 +120,7 @@ const Topbar = ({
 }: TopbarProps) => {
   const dispatch = useDispatch<AppDispatch>();
   const { width } = useViewport();
-
+  const [profileUser, setProfileUser] = useState("");
   const navbarCssClasses: string = navCssClasses || "";
   const containerCssClasses: string = !hideLogo ? "container-fluid" : "";
 
@@ -292,7 +195,16 @@ const Topbar = ({
   const handleRightSideBar = () => {
     dispatch(showRightSidebar());
   };
-
+  const AUTH_SESSION_KEY = "ubold_user";
+  useEffect(()=>{
+    let userInfo = sessionStorage.getItem(AUTH_SESSION_KEY);
+    if (userInfo) {
+      const { username } = JSON.parse(userInfo);
+      console.log(userInfo);
+      setProfileUser(username);
+      
+    }
+  })
   /**
    * Toggles the left sidebar width
    */
@@ -383,7 +295,7 @@ const Topbar = ({
               <ProfileDropdown
                 profilePic={profilePic}
                 menuItems={ProfileMenus}
-                username={"Geneva"}
+                username={profileUser}
                 userTitle={"Founder"}
               />
             </li>
