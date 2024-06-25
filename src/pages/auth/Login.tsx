@@ -59,7 +59,7 @@ const Login = withSwal((props: any) => {
     // Configure Axios to follow redirects
 
     // Log the full URL
-    console.log(fullUrl);
+
     try {
       let response = await axios.post(fullUrl);
       if (response.status === 200) {
@@ -79,11 +79,15 @@ const Login = withSwal((props: any) => {
             role: "Admin",
             token: response.data.token
           }
-
-          console.log(newUser);
+          swal.fire({
+            title: "Success!",
+            text: "Logged In successfully!",
+            icon: "success",
+          });
 
           api.setLoggedInUser(newUser);
           setAuthorization(response.data.token);
+          console.log("Navigating to dashboard...");
           navigate("/apps/dashboard");
         }
       }
@@ -132,7 +136,7 @@ const Login = withSwal((props: any) => {
         <VerticalForm<UserData>
           onSubmit={onSubmit}
           resolver={schemaResolver}
-          defaultValues={{ email: "asdasd@asd.asd", password: "asdasd@asd.asd" }}
+          defaultValues={{ email: "mohammadjunaed858@gmail.com", password: "password" }}
         >
           <FormInput
             label={t("Email")}
@@ -151,7 +155,7 @@ const Login = withSwal((props: any) => {
 
           <div className="text-center d-grid">
             <Button variant="primary" type="submit" >
-              {t("Get OTP")}
+              {t("Login")}
             </Button>
           </div>
         </VerticalForm>
