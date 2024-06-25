@@ -8,9 +8,21 @@ import { VerticalForm, FormInput } from "../../components/";
 import AuthLayout from "./AuthLayout";
 import axios from "axios";
 import { APICore, setAuthorization } from "../../helpers/api/apiCore";
+import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+
+
+
+// actions
+import { loginUser } from "../../redux/actions";
+
+// store
+import { RootState, AppDispatch } from "../../redux/store";
+
 
 interface UserData {
   email: string;
+  otp: string;
   password: string;
 }
 const api = new APICore();
@@ -42,6 +54,8 @@ const Login = withSwal((props: any) => {
   const { t } = useTranslation();
   const { swal } = props;
   const navigate = useNavigate();
+  const [otpSent, setOTPSent] = useState(true);
+  const dispatch = useDispatch<AppDispatch>();
   /*
   form validation schema
   */
@@ -71,24 +85,11 @@ const Login = withSwal((props: any) => {
           });
           navigate(`/auth/verifyOTP/${data.email}`);
         }
-        else {
-          let user = response.data.user;
-          let newUser = {
-            id: user.id,
-            username: user.name,
-            role: "Admin",
-            token: response.data.token
-          }
-          swal.fire({
-            title: "Success!",
-            text: "Logged In successfully!",
-            icon: "success",
-          });
-
-          api.setLoggedInUser(newUser);
-          setAuthorization(response.data.token);
-          navigate("/apps/dashboard");
+        else{
+          setOTPSent(false);
+          return false;
         }
+        
       }
       else if (response.status === 401) {
         swal.fire({
@@ -117,9 +118,15 @@ const Login = withSwal((props: any) => {
   /*
   handle form submission
   */
-  const onSubmit = (formData: UserData) => {
-    getOTP(formData);
+  const onSubmit = async (formData: UserData) => {
+    const OTPSEND = await getOTP(formData);
+    
+    if(!otpSent){
+      console.log("I am going to dispatch this");
+      formData["otp"]="";
+      dispatch(loginUser(formData["email"], formData["otp"],formData["password"] ));
 
+    }
   };
 
 

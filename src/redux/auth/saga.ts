@@ -47,7 +47,24 @@ const verifyOTP = async (data: any) => {
     throw error;
   }
 }
+const DirectLogin = async (data: any) => {
 
+  const params = new URLSearchParams(data).toString();
+  const fullUrl = `https://reseller.whitexdigital.com/api/login?${params}`;
+  // Configure Axios to follow redirects
+
+  // Log the full URL
+
+  try {
+    let response = await axios.post(fullUrl);
+    return response;
+    
+  } catch (error) {
+    console.error("API call error:", error);
+    
+    throw error;
+  }
+}
 const realLogout = async () => {
 
   const fullUrl = "https://reseller.whitexdigital.com/api/logout";
@@ -71,38 +88,69 @@ const api = new APICore();
  * @param {*} payload - username and password
  */
 function* login({
-  payload: { email, otp },
+  payload: { email, otp, password },
 }: UserData): SagaIterator {
   try {
 
     //const response = yield call(loginApi, { email, password });
 
-    let data = {
-      email,
-      otp
-    }
-
-    const response = yield call(verifyOTP, data);
-    if (response) {
-      if (response.status === 200) {
-        let user = response.data.user;
-        let newUser = {
-          id: user.id,
-          username: user.name,
-          role: "Admin",
-          token: response.data.token
-        }
-        api.setLoggedInUser(newUser);
-        setAuthorization(response.data.token);
-        yield put(authApiResponseSuccess(AuthActionTypes.LOGIN_USER, newUser));
+    
+    if(otp==""){
+      let data = {
+        email,
+        password
       }
-
+      const response = yield call(DirectLogin, data);
+      if (response) {
+        if (response.status === 200) {
+          let user = response.data.user;
+          let newUser = {
+            id: user.id,
+            username: user.name,
+            role: "Admin",
+            token: response.data.token
+          }
+          api.setLoggedInUser(newUser);
+          setAuthorization(response.data.token);
+          yield put(authApiResponseSuccess(AuthActionTypes.LOGIN_USER, newUser));
+        }
+  
+      }
+      else {
+        yield put(authApiResponseError(AuthActionTypes.LOGIN_USER, "Something Went Wrong"));
+        api.setLoggedInUser(null);
+        setAuthorization(null);
+      }
     }
-    else {
-      yield put(authApiResponseError(AuthActionTypes.LOGIN_USER, "Something Went Wrong"));
-      api.setLoggedInUser(null);
-      setAuthorization(null);
+    
+    else if(email==""){
+      let data = {
+        email,
+        otp
+      }
+      const response = yield call(verifyOTP, data);
+      if (response) {
+        if (response.status === 200) {
+          let user = response.data.user;
+          let newUser = {
+            id: user.id,
+            username: user.name,
+            role: "Admin",
+            token: response.data.token
+          }
+          api.setLoggedInUser(newUser);
+          setAuthorization(response.data.token);
+          yield put(authApiResponseSuccess(AuthActionTypes.LOGIN_USER, newUser));
+        }
+  
+      }
+      else {
+        yield put(authApiResponseError(AuthActionTypes.LOGIN_USER, "Something Went Wrong"));
+        api.setLoggedInUser(null);
+        setAuthorization(null);
+      }
     }
+    
 
 
 
@@ -113,6 +161,7 @@ function* login({
     setAuthorization(null);
   }
 }
+
 
 /**
  * Logout the user
@@ -159,6 +208,7 @@ function* forgotPassword({ payload: { username } }: UserData): SagaIterator {
 export function* watchLoginUser() {
   yield takeEvery(AuthActionTypes.LOGIN_USER, login);
 }
+
 
 export function* watchLogout() {
   yield takeEvery(AuthActionTypes.LOGOUT_USER, logout);

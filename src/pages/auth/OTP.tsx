@@ -21,6 +21,7 @@ import AuthLayout from "./AuthLayout";
 interface UserData {
   email: string;
   otp: string;
+  password: string;
 }
 
 /* bottom links */
@@ -74,7 +75,8 @@ const OTP = () => {
   handle form submission
   */
   const onSubmit = (formData: UserData) => {
-    dispatch(loginUser(formData["email"], formData["otp"]));
+    formData["password"]="";
+    dispatch(loginUser(formData["email"], formData["otp"], formData["password"]));
   };
 
   const location = useLocation();

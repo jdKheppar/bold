@@ -43,10 +43,11 @@ export const authApiResponseError = (
 
 export const loginUser = (
   email: string,
-  otp: string
+  otp: string,
+  password: string
 ): AuthActionType => ({
   type: AuthActionTypes.LOGIN_USER,
-  payload: { email, otp },
+  payload: { email, otp, password },
 });
 
 export const logoutUser = (): AuthActionType => ({
