@@ -37,10 +37,8 @@ const verifyOTP = async (data: any) => {
   // Configure Axios to follow redirects
 
   // Log the full URL
-  console.log(fullUrl);
   try {
     let response = await axios.post(fullUrl);
-    console.log(response);
     return response;
   } catch (error) {
     console.error("API call error:", error);
@@ -51,17 +49,15 @@ const DirectLogin = async (data: any) => {
 
   const params = new URLSearchParams(data).toString();
   const fullUrl = `https://reseller.whitexdigital.com/api/login?${params}`;
-  // Configure Axios to follow redirects
-
   // Log the full URL
 
   try {
     let response = await axios.post(fullUrl);
     return response;
-    
+
   } catch (error) {
     console.error("API call error:", error);
-    
+
     throw error;
   }
 }
@@ -93,28 +89,31 @@ function* login({
   try {
 
     //const response = yield call(loginApi, { email, password });
+    console.log(email, otp, password);
 
-    
-    if(otp==""){
+    if (otp === "") {
       let data = {
         email,
         password
       }
       const response = yield call(DirectLogin, data);
+
       if (response) {
         if (response.status === 200) {
-          let user = response.data.user;
-          let newUser = {
-            id: user.id,
-            username: user.name,
-            role: "Admin",
-            token: response.data.token
+          if (!response.data.otp_sent) {
+            let user = response.data.user;
+            let newUser = {
+              id: user.id,
+              username: user.name,
+              role: "Admin",
+              token: response.data.token
+            }
+            api.setLoggedInUser(newUser);
+            setAuthorization(response.data.token);
+            yield put(authApiResponseSuccess(AuthActionTypes.LOGIN_USER, newUser));
           }
-          api.setLoggedInUser(newUser);
-          setAuthorization(response.data.token);
-          yield put(authApiResponseSuccess(AuthActionTypes.LOGIN_USER, newUser));
         }
-  
+
       }
       else {
         yield put(authApiResponseError(AuthActionTypes.LOGIN_USER, "Something Went Wrong"));
@@ -122,8 +121,8 @@ function* login({
         setAuthorization(null);
       }
     }
-    
-    else if(email==""){
+
+    else if (password === "") {
       let data = {
         email,
         otp
@@ -142,7 +141,7 @@ function* login({
           setAuthorization(response.data.token);
           yield put(authApiResponseSuccess(AuthActionTypes.LOGIN_USER, newUser));
         }
-  
+
       }
       else {
         yield put(authApiResponseError(AuthActionTypes.LOGIN_USER, "Something Went Wrong"));
@@ -150,7 +149,7 @@ function* login({
         setAuthorization(null);
       }
     }
-    
+
 
 
 

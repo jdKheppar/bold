@@ -19,19 +19,19 @@ const Orders = withSwal((props: any) => {
         const fullUrl = `https://reseller.whitexdigital.com/api/request_payouts?amount=${amount}`;
         try {
             const response = await axios.post(fullUrl);
-           
+
             swal.fire({
                 title: "Success!",
                 text: "Payout requested successfully!",
                 icon: "success",
-              });
+            });
         } catch (error) {
             console.error("API call error:", error);
             swal.fire({
                 title: "Error!",
                 text: "Something Went Wrong!",
                 icon: "error",
-              });
+            });
         }
     }
 
@@ -46,7 +46,7 @@ const Orders = withSwal((props: any) => {
                 title: "Error!",
                 text: "Something Went Wrong!",
                 icon: "error",
-              });
+            });
             console.error("API call error:", error);
         }
     };
@@ -106,6 +106,7 @@ const Orders = withSwal((props: any) => {
                                                     <th>ID</th>
                                                     <th>Amount Requested</th>
                                                     <th>Date</th>
+                                                    <th>Message</th>
                                                     <th>Status</th>
                                                 </tr>
                                             </thead>
@@ -115,6 +116,7 @@ const Orders = withSwal((props: any) => {
                                                         <th scope="row">{record.id}</th>
                                                         <td>{record.amount_requested}</td>
                                                         <td>{record.date}</td>
+                                                        <th>{record.message}</th>
                                                         <td>{record.status}</td>
                                                     </tr>
                                                 ))}

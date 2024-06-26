@@ -28,46 +28,15 @@ const columns = [
     accessor: "order_date",
   },
 
-
-  {
-    Header: "Order Status",
-    accessor: "status",
-  },
-
 ];
 
-// get pagelist to display
-const sizePerPageList = [
-  {
-    text: "10",
-    value: 10,
-  },
-  {
-    text: "20",
-    value: 20,
-  },
-  {
-    text: "50",
-    value: 50,
-  },
-];
+
 
 // main component
-const Orders = () => {
+const Commissions = () => {
   const [commissions, setCommissions] = useState<CommissionDTO[]>([]);
 
-  // // change order status group
-  // const changeOrderStatusGroup = (OrderStatusGroup: string) => {
-  //   let updatedData = [...orders];
-  //   //  filter
-  //   updatedData =
-  //     OrderStatusGroup === "All"
-  //       ? orders
-  //       : [...orders].filter((o) =>
-  //         o.payment_status?.includes(OrderStatusGroup)
-  //       );
-  //   setOrderList(updatedData);
-  // };
+
   function exchangeOrder(id: Number) {
     alert("We can't exchange right now");
   }
@@ -78,11 +47,6 @@ const Orders = () => {
       setCommissions(response.data);
     } catch (error) {
       console.error("API call error:", error);
-      // swal.fire({
-      //   title: "Error",
-      //   text: "Something went wrong",
-      //   icon: "error",
-      // });
     }
   };
 
@@ -95,51 +59,22 @@ const Orders = () => {
     <>
       <PageTitle
         breadCrumbItems={[
-          { label: "Ecommerce", path: "/apps/ecommerce/orders" },
-          { label: "Orders", path: "/apps/ecommerce/orders", active: true },
+          { label: "Dashboard", path: "/apps/commission" },
+          { label: "Commission", path: "/apps/commission", active: true },
         ]}
-        title={"Orders"}
+        title={"Commission"}
       />
 
       <Row>
         <Col>
           <Card>
             <Card.Body>
-              <Row className="align-items-center">
-                <Col lg={8}>
-                  <form className="row gy-2 gx-2 align-items-center justify-content-lg-start justify-content-between">
-                    <div className="col-auto">
-                      <div className="d-flex align-items-center w-auto">
-                        <label htmlFor="status-select" className="me-2">
-                          Status
-                        </label>
-                        <select
-                          className="form-select"
-                          id="status-select"
-                        // onChange={(e: any) =>
-                        //   changeOrderStatusGroup(e.target.value)
-                        // }
-                        >
-                          <option value="All">All</option>
-                          <option value="Paid">Paid</option>
-                          <option value="Authorization">
-                            Awaiting Authorization
-                          </option>
-                          <option value="Failed">Payment failed</option>
-                          <option value="Unpaid">Unpaid</option>
-                        </select>
-                      </div>
-                    </div>
-                  </form>
-                </Col>
 
-
-              </Row>
               {
                 commissions &&
                 <Card>
                   <Card.Body>
-                    <h4 className="header-title mt-0 mb-1">Clients</h4>
+                    <h4 className="header-title mt-0 mb-1">Commission</h4>
                     <Table hover responsive className={classNames("table-centered", "table-nowrap", "mb-0")}>
                       <thead>
                         <tr>
@@ -147,7 +82,6 @@ const Orders = () => {
                           <th>Sale Amount</th>
                           <th>Total Amount</th>
                           <th>Order Date</th>
-                          <th>Order Status</th>
 
                         </tr>
                       </thead>
@@ -176,6 +110,6 @@ const Orders = () => {
   );
 };
 
-export default Orders;
+export default Commissions;
 
 // export {}

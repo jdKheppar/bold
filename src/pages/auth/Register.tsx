@@ -1,4 +1,4 @@
-import  { useEffect } from "react";
+import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Navigate, Link, useNavigate } from "react-router-dom";
 import { Button, Alert, Row, Col } from "react-bootstrap";
@@ -22,6 +22,8 @@ interface UserData {
   name: string;
   email: string;
   password: string;
+  business: string;
+  contact: string;
 }
 
 /* bottom links */
@@ -42,7 +44,7 @@ const BottomLink = () => {
   );
 };
 
-const Register = withSwal ((props: any) => {
+const Register = withSwal((props: any) => {
   const { t } = useTranslation();
   const { swal } = props;
   const navigate = useNavigate();
@@ -69,6 +71,8 @@ const Register = withSwal ((props: any) => {
         .required("Please enter Email")
         .email("Please enter valid Email"),
       password: yup.string().required(t("Please enter Password")),
+      business: yup.string().required(t("Please enter Fullname")),
+      contact: yup.string().required(t("Please enter Fullname")),
     })
   );
   const getOTP = async (data: any) => {
@@ -148,8 +152,22 @@ const Register = withSwal ((props: any) => {
             name="password"
             placeholder={t("Enter your password")}
             containerClass={"mb-3"}
-          />         
+          />
 
+          <FormInput
+            label={t("Full Business Title")}
+            type="text"
+            name="business"
+            placeholder={t("Enter your business")}
+            containerClass={"mb-3"}
+          />
+          <FormInput
+            label={t("Full Contact Number")}
+            type="text"
+            name="contact"
+            placeholder={t("Enter your contact")}
+            containerClass={"mb-3"}
+          />
           <div className="text-center d-grid">
             <Button variant="success" type="submit" disabled={loading}>
               {t("Get OTP")}
@@ -157,7 +175,7 @@ const Register = withSwal ((props: any) => {
           </div>
         </VerticalForm>
 
-        
+
       </AuthLayout>
     </>
   );

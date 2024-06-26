@@ -1,7 +1,7 @@
 import React from 'react'
 import Statistics from './Statistics'
-import Earnings from './Earnings'
 import { Row, Col } from "react-bootstrap";
+import Commissions from './Commission';
 
 
 const Commission = () => {
@@ -13,7 +13,7 @@ const Commission = () => {
                 </Col>
             </Row>
             <Statistics />
-            <Earnings />
+            <Commissions />
 
         </>
     )

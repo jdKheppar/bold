@@ -1,5 +1,5 @@
 import { Button, Row, Col } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
+import { Navigate, Link, useNavigate, useLocation } from "react-router-dom";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useTranslation } from "react-i18next";
@@ -56,6 +56,14 @@ const Login = withSwal((props: any) => {
   const navigate = useNavigate();
   const [otpSent, setOTPSent] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
+  const { user, userLoggedIn, loading, error } = useSelector(
+    (state: RootState) => ({
+      user: state.Auth.user,
+      loading: state.Auth.loading,
+      error: state.Auth.error,
+      userLoggedIn: state.Auth.userLoggedIn,
+    })
+  );
   /*
   form validation schema
   */
@@ -85,11 +93,13 @@ const Login = withSwal((props: any) => {
           });
           navigate(`/auth/verifyOTP/${data.email}`);
         }
-        else{
+        else {
+          data["otp"] = "";
+          dispatch(loginUser(data["email"], data["otp"], data["password"]));
           setOTPSent(false);
           return false;
         }
-        
+
       }
       else if (response.status === 401) {
         swal.fire({
@@ -119,19 +129,23 @@ const Login = withSwal((props: any) => {
   handle form submission
   */
   const onSubmit = async (formData: UserData) => {
+
+
     const OTPSEND = await getOTP(formData);
-    
-    if(!otpSent){
+
+    if (!otpSent) {
       console.log("I am going to dispatch this");
-      formData["otp"]="";
-      dispatch(loginUser(formData["email"], formData["otp"],formData["password"] ));
 
     }
   };
-
+  const location = useLocation();
+  //
+  // const redirectUrl = location.state && location.state.from ? location.state.from.pathname : '/apps/dashboard';
+  const redirectUrl = location?.search?.slice(6) || "/apps/dashboard";
 
   return (
     <>
+      {(userLoggedIn || user) && <Navigate to={redirectUrl}></Navigate>}
       <AuthLayout
         helpText={t(
           "Enter your email address and password to get OTP on your email."
@@ -142,7 +156,7 @@ const Login = withSwal((props: any) => {
         <VerticalForm<UserData>
           onSubmit={onSubmit}
           resolver={schemaResolver}
-          defaultValues={{ email: "mohammadjunaed858@gmail.com", password: "password" }}
+          defaultValues={{ email: "konexix366@joeroc.com", password: "password" }}
         >
           <FormInput
             label={t("Email")}
