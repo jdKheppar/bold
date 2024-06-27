@@ -119,7 +119,7 @@ const ProductDetails = withSwal((props: any) => {
       throw error;
     }
   };
-  function createMarkup(text:any) { return {__html: text}; };
+  function createMarkup(text: any) { return { __html: text }; };
   useEffect(() => {
     getProductDetails();
     const storedCartItems = localStorage.getItem("cartItems");
@@ -260,7 +260,6 @@ const ProductDetails = withSwal((props: any) => {
                       )}
                     </h5>
 
-                    <p className="text-muted mb-4">{productDetails.details}</p>
                     <div dangerouslySetInnerHTML={createMarkup(productDetails.details)} />
 
 
