@@ -119,7 +119,7 @@ const ProductDetails = withSwal((props: any) => {
       throw error;
     }
   };
-
+  function createMarkup(text:any) { return {__html: text}; };
   useEffect(() => {
     getProductDetails();
     const storedCartItems = localStorage.getItem("cartItems");
@@ -231,7 +231,7 @@ const ProductDetails = withSwal((props: any) => {
 
                     <h5 className="mb-4">
                       <Badge bg="success" className="me-1">
-                        {productDetails.details}
+                        {productDetails.short_description}
                       </Badge>
                       {productDetails.is_favourite && (
                         <Badge bg="danger" className="me-1">
@@ -260,7 +260,9 @@ const ProductDetails = withSwal((props: any) => {
                       )}
                     </h5>
 
-                    <p className="text-muted mb-4">{productDetails.description}</p>
+                    <p className="text-muted mb-4">{productDetails.details}</p>
+                    <div dangerouslySetInnerHTML={createMarkup(productDetails.details)} />
+
 
                     <Row>
                       <Col md={6}>

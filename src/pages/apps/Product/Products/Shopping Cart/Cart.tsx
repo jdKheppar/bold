@@ -40,6 +40,8 @@ const Cart: React.FC = withSwal((props: any) => {
 
     const storedCartItems = JSON.parse(localStorage.getItem("cartItems") || "[]");
     const updatedCartItems = storedCartItems.filter((id: number) => id !== productId);
+    const [totalPrice, setTotalPrice] = useState(0);
+  const [totalCustomPrice, setTotalCustomPrice] = useState(0);
     localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
   };
 
@@ -54,20 +56,28 @@ const Cart: React.FC = withSwal((props: any) => {
 
   const onQuantityChange = (e: React.ChangeEvent<HTMLInputElement>, productId: number) => {
     const newQuantity = parseInt(e.target.value, 10);
-    setProducts((prevProducts) =>
-      prevProducts.map((product) =>
+    setProducts((prevProducts) => {
+      const updatedProducts = prevProducts.map((product) =>
         product.id === productId ? { ...product, current_stock: newQuantity } : product
-      )
-    );
+      );
+  
+      // Recalculate totals
+      setTotalPrice(calculateTotalPrice(updatedProducts));
+      setTotalCustomPrice(calculateTotalCustomPrice(updatedProducts));
+  
+      return updatedProducts;
+    });
   };
-
+  
   const calculateTotalPrice = () => {
-    return products.reduce((total, product) => total + product.price, 0);
+    return products.reduce((total, product) => total + (Number(product.price) * product.current_stock), 0);
   };
-
+  
   const calculateTotalCustomPrice = () => {
-    return products.reduce((total, product) => total + product.custom_price, 0);
+    return products.reduce((total, product) => total + (Number(product.custom_price) * product.current_stock), 0);
   };
+  
+  
 
   const getProducts = async () => {
     const fullUrl = "https://reseller.whitexdigital.com/api/products";
