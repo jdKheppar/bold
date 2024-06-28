@@ -38,7 +38,8 @@ const ProfileDropdown = (props: ProfileDropdownProps) => {
           { show: dropdownOpen }
         )}
       >
-        <img src={profilePic!} className="rounded-circle" alt="" />
+        {/* <img src={profilePic!} className="rounded-circle" alt="" /> */}
+        <i className="bi bi-person-fill"></i>
         <span className="pro-user-name ms-1">
           {props["username"]} <i className="mdi mdi-chevron-down"></i>
         </span>

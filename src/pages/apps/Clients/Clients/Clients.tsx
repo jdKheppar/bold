@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Row, Col, Card, Button, Modal, Table } from "react-bootstrap";
+import { Row, Col, Card, Button, Modal, Table, Dropdown } from "react-bootstrap";
 import classNames from "classnames";
 import { withSwal } from "react-sweetalert2";
 
 import PageTitle from "../../../../components/PageTitle";
 import axios from "axios";
 import { ClientDTO } from "../../../../DTOs/ClientDTO";
+import { CountriesDTO } from "../../../../DTOs/CountriesDTO";
 
 // Reusable ClientForm Component
 interface ClientFormProps {
@@ -24,6 +25,66 @@ const ClientForm: React.FC<ClientFormProps> = ({
   modalType,
   closeModal,
 }) => {
+  const [countries, setCountries] = useState<CountriesDTO[]>([]);
+  const [states, setStates] = useState<CountriesDTO[]>([]);
+  const [cities, setCities] = useState<CountriesDTO[]>([]);
+  const [selectedCountryId, setSelectedCountryId] = useState<number | null>(null);
+  const [selectedStateId, setSelectedStateId] = useState<number | null>(null);
+  const [selectedCityId, setSelectedCityId] = useState<number | null>(null);
+  const handleCountrySelect = (countryId: number) => {
+    setSelectedCountryId(countryId);
+    client.country = countryId;
+    fetchStates(countryId);
+  };
+  const handleStateSelect = (stateId: number) => {
+    setSelectedStateId(stateId);
+    client.state = stateId;
+    fetchCities(stateId);
+  };
+  const handleCitySelect = (cityId: number) => {
+    setSelectedCityId(cityId);
+    client.city = cityId;
+  };
+  const fetchCountries = async () => {
+    const fullUrl = "https://reseller.whitexdigital.com/countries";
+    try {
+      const response = await axios.get(fullUrl);
+      setCountries(response.data.data);
+    } catch (error) {
+      console.error("API call error:", error);
+      throw error;
+    }
+  };
+  const fetchStates = async (id: any) => {
+    id=Number(id);
+    const fullUrl = `https://reseller.whitexdigital.com/states/${id}`;
+    try {
+      const response = await axios.get(fullUrl);
+      setStates(response.data.data);
+    } catch (error) {
+      console.error("API call error:", error);
+      throw error;
+    }
+  };
+  const fetchCities = async (id: any) => {
+    id=Number(id);
+    const fullUrl = `https://reseller.whitexdigital.com/cities/${id}`;
+    try {
+      const response = await axios.get(fullUrl);
+      setCities(response.data.data);
+    } catch (error) {
+      console.error("API call error:", error);
+      throw error;
+    }
+  };
+  useEffect(() => {
+    fetchCountries();
+  }, []);
+  useEffect(() => {
+    if(selectedStateId){
+      fetchCities(selectedStateId);
+    }
+  }, [selectedStateId]);
   return (
     <>
       <Modal.Header closeButton>
@@ -66,7 +127,7 @@ const ClientForm: React.FC<ClientFormProps> = ({
         </div>
         <div className="row">
           <div className="col-md-12">
-            <div className="">
+            <div className="mb-3">
               <label htmlFor="contact" className="form-label">
                 Contact
               </label>
@@ -79,6 +140,102 @@ const ClientForm: React.FC<ClientFormProps> = ({
                 value={client.contact}
                 onChange={handleInputChange}
               ></input>
+            </div>
+          </div>
+        </div>
+
+        <div className="row">
+          <div className="col-md-6">
+            <div className="mb-3">
+              <label htmlFor="name" className="form-label">
+                Country
+              </label>
+              <Dropdown>
+                <Dropdown.Toggle variant="danger" id="dropdown-basic">
+                  {selectedCountryId
+                    ? countries.find((country) => country.id === selectedCountryId)?.name
+                    : "Select Country"}{" "}
+                  <i className="mdi mdi-chevron-down"></i>
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  {countries.map((country) => (
+                    <Dropdown.Item
+                      key={country.id}
+                      onClick={() => handleCountrySelect(country.id)}
+                    >
+                      {country.name}
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Menu>
+              </Dropdown>
+            </div>
+          </div>
+          <div className="col-md-6">
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label">
+                State
+              </label>
+              <Dropdown>
+                <Dropdown.Toggle variant="danger" id="dropdown-basic">
+                  {selectedStateId
+                    ? states.find((state) => state.id === selectedStateId)?.name
+                    : "Select State"}{" "}
+                  <i className="mdi mdi-chevron-down"></i>
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  {countries.map((state) => (
+                    <Dropdown.Item
+                      key={state.id}
+                      onClick={() => handleStateSelect(state.id)}
+                    >
+                      {state.name}
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Menu>
+              </Dropdown>
+            </div>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-6">
+            <div className="mb-3">
+            <label htmlFor="email" className="form-label">
+                City
+              </label>
+              <Dropdown>
+                <Dropdown.Toggle variant="danger" id="dropdown-basic">
+                  {selectedCityId
+                    ? cities.find((city) => city.id === selectedCityId)?.name
+                    : "Select City"}{" "}
+                  <i className="mdi mdi-chevron-down"></i>
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  {cities.map((city) => (
+                    <Dropdown.Item
+                      key={city.id}
+                      onClick={() => handleCountrySelect(city.id)}
+                    >
+                      {city.name}
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Menu>
+              </Dropdown>
+            </div>
+          </div>
+          <div className="col-md-6">
+            <div className="mb-3">
+              <label htmlFor="address" className="form-label">
+                Postal Code
+              </label>
+              <input
+                type="number"
+                className="form-control"
+                id="address"
+                placeholder="Address"
+                required
+                value={client.postal_code}
+                onChange={handleInputChange}
+              />
             </div>
           </div>
         </div>
@@ -130,6 +287,10 @@ const Clients = withSwal((props: any) => {
     email: "",
     contact: "",
     address: "",
+    country: 0,
+    state: 0,
+    city: 0,
+    postal_code: 0,
   });
   const [responsiveModal, setResponsiveModal] = useState<boolean>(false);
   const [editClientModal, setEditClientModal] = useState<boolean>(false);
@@ -151,6 +312,10 @@ const Clients = withSwal((props: any) => {
       email: "",
       contact: "",
       address: "",
+      country: 0,
+      state: 0,
+      city: 0,
+      postal_code: 0,
     });
   };
 
@@ -177,6 +342,12 @@ const Clients = withSwal((props: any) => {
       email: client.email,
       contact: client.contact,
       address: client.address,
+      country: String(client.country),
+      state: String(client.state),
+      city: String(client.city),
+      postal_code: String(client.postal_code)
+
+
     };
     const params = new URLSearchParams(newObj).toString();
 

@@ -4,4 +4,8 @@ export interface ClientDTO {
     email: string;
     contact: string;
     address: string;
+    country: number;
+    state: number;
+    city: number;
+    postal_code: number;
 }
