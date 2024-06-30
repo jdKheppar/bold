@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Row, Col, Card, Button, Table } from "react-bootstrap";
+import { Row, Col, Card, Button } from "react-bootstrap";
 import classNames from "classnames";
 
 // components
@@ -8,20 +8,21 @@ import classNames from "classnames";
 import axios from "axios";
 import { CommissionDTO } from "../../../DTOs/Commission";
 import PageTitle from "../../../components/PageTitle";
+import Table from "../../../components/Table";
 
 // get all columns
 const columns = [
   {
     Header: "Order ID",
-    accessor: "id",
+    accessor: "order_id",
   },
   {
-    Header: "Customer Name",
-    accessor: "customer_name",
+    Header: "Sale Amount",
+    accessor: "sale_amount",
   },
   {
-    Header: "Total Amount",
-    accessor: "total_amount",
+    Header: "Commission Amount",
+    accessor: "commission_amount",
   },
   {
     Header: "Order Date",
@@ -30,6 +31,21 @@ const columns = [
 
 ];
 
+// get pagelist to display
+const sizePerPageList = [
+  {
+    text: "10",
+    value: 10,
+  },
+  {
+    text: "20",
+    value: 20,
+  },
+  {
+    text: "50",
+    value: 50,
+  },
+];
 
 
 // main component
@@ -75,27 +91,19 @@ const Commissions = () => {
                 <Card>
                   <Card.Body>
                     <h4 className="header-title mt-0 mb-1">Commission</h4>
-                    <Table hover responsive className={classNames("table-centered", "table-nowrap", "mb-0")}>
-                      <thead>
-                        <tr>
-                          <th>Order ID</th>
-                          <th>Sale Amount</th>
-                          <th>Total Amount</th>
-                          <th>Order Date</th>
+                    <Table
+                      columns={columns}
+                      data={commissions}
+                      isSearchable={true}
+                      pageSize={10}
+                      sizePerPageList={sizePerPageList}
+                      isSortable={true}
+                      pagination={true}
+                      isSelectable={false}
+                      theadClass="table-light"
+                      searchBoxClass="mb-2"
+                    />
 
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {commissions.map((record, index) => (
-                          <tr key={index}>
-                            <th scope="row">{record.order_id}</th>
-                            <td>{record.sale_amount}</td>
-                            <td>{record.commission_amount}</td>
-                            <td>{record.order_date}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </Table>
 
 
                   </Card.Body>

@@ -156,7 +156,7 @@ const Login = withSwal((props: any) => {
         <VerticalForm<UserData>
           onSubmit={onSubmit}
           resolver={schemaResolver}
-          defaultValues={{ email: "mohammadjunaed858@gmail.com", password: "password" }}
+          defaultValues={{ email: "copis87602@luravel.com", password: "password" }}
         >
           <FormInput
             label={t("Email")}

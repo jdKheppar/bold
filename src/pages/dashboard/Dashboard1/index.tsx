@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Row, Col } from "react-bootstrap";
-import Statistics from "./Statistics";
 
 
 import RecentProducts from "./RecentProducts";
 import RecentOrders from "./RecentOrders";
+import RevenueChart from "./RevenueChart";
+import PerformanceChart from "./PerformanceChart";
+import Statistics from "./Statistics";
 
 const Dashboard1 = () => {
 
@@ -20,12 +22,21 @@ const Dashboard1 = () => {
       </Row>
 
       <Statistics />
+
+      <Row>
+        <Col xl={6}>
+          <RevenueChart />
+        </Col>
+        <Col xl={6}>
+          <PerformanceChart />
+        </Col>
+      </Row>
       <Row>
         <Col xl={6}>
           <RecentProducts />
         </Col>
         <Col xl={6}>
-          <RecentOrders/>
+          <RecentOrders />
         </Col>
       </Row>
     </>

@@ -107,7 +107,8 @@ const ProductDetails = withSwal((props: any) => {
       text: "Product added successfully to the cart!",
       icon: "success",
     });
-    navigate("/apps/shoppingcart");
+    // navigate("/apps/shoppingcart");
+    return;
   };
 
 

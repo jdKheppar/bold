@@ -1,15 +1,60 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Row, Col, Card, Button, Table, Form } from "react-bootstrap";
+import { Row, Col, Card, Button, Form } from "react-bootstrap";
 import classNames from "classnames";
 import axios from "axios";
 import PageTitle from "../../../components/PageTitle";
 import { PayoutDTO } from "../../../DTOs/Payout";
 import { withSwal } from "react-sweetalert2";
+import Table from "../../../components/Table";
+
+
+// get all columns
+const columns = [
+    {
+        Header: "Payout ID",
+        accessor: "id",
+    },
+    {
+        Header: "Amount Requested",
+        accessor: "amount_requested",
+    },
+    {
+        Header: "Date",
+        accessor: "date",
+    },
+    {
+        Header: "Message",
+        accessor: "message",
+    },
+    {
+        Header: "Status",
+        accessor: "status",
+    },
+
+];
+
+// get pagelist to display
+const sizePerPageList = [
+    {
+        text: "10",
+        value: 10,
+    },
+    {
+        text: "20",
+        value: 20,
+    },
+    {
+        text: "50",
+        value: 50,
+    },
+];
+
+
 
 
 // main component
-const Orders = withSwal((props: any) => {
+const Payouts = withSwal((props: any) => {
     const { swal } = props;
     const [payouts, setPayouts] = useState<PayoutDTO[]>([]);
     const [total, setTotal] = useState<number>(-1);
@@ -100,28 +145,18 @@ const Orders = withSwal((props: any) => {
                                 <Card className="mt-4">
                                     <Card.Body>
                                         <h4 className="header-title mt-0 mb-1">Payouts</h4>
-                                        <Table hover responsive className={classNames("table-centered", "table-nowrap", "mb-0")}>
-                                            <thead>
-                                                <tr>
-                                                    <th>ID</th>
-                                                    <th>Amount Requested</th>
-                                                    <th>Date</th>
-                                                    <th>Message</th>
-                                                    <th>Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {payouts.map((record, index) => (
-                                                    <tr key={index}>
-                                                        <th scope="row">{record.id}</th>
-                                                        <td>{record.amount_requested}</td>
-                                                        <td>{record.date}</td>
-                                                        <th>{record.message}</th>
-                                                        <td>{record.status}</td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </Table>
+                                        <Table
+                                            columns={columns}
+                                            data={payouts}
+                                            isSearchable={true}
+                                            pageSize={10}
+                                            sizePerPageList={sizePerPageList}
+                                            isSortable={true}
+                                            pagination={true}
+                                            isSelectable={false}
+                                            theadClass="table-light"
+                                            searchBoxClass="mb-2"
+                                        />
                                     </Card.Body>
                                 </Card>
                             }
@@ -133,4 +168,4 @@ const Orders = withSwal((props: any) => {
     );
 });
 
-export default Orders;
+export default Payouts;

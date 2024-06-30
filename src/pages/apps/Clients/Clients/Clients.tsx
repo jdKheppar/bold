@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { Row, Col, Card, Button, Modal, Table, Dropdown } from "react-bootstrap";
-import classNames from "classnames";
-import { withSwal } from "react-sweetalert2";
-
-import PageTitle from "../../../../components/PageTitle";
+import { useNavigate } from "react-router-dom";
+import { Row, Col, Card, Button, Modal } from "react-bootstrap";
 import axios from "axios";
+
+import { withSwal } from "react-sweetalert2";
+import PageTitle from "../../../../components/PageTitle";
+import Table from "../../../../components/Table";
+
+import React, { useEffect, useState } from "react";
+
 import { ClientDTO } from "../../../../DTOs/ClientDTO";
 import { CountriesDTO } from "../../../../DTOs/CountriesDTO";
 import { Typeahead } from "react-bootstrap-typeahead";
@@ -26,11 +28,7 @@ const ClientForm: React.FC<ClientFormProps> = ({
   modalType,
   closeModal,
 }) => {
-  // const C_options: Array<CountriesDTO> = [
-  //   { id: 1, name: "Chocolate" },
-  //   { id: 2, name: "Strawberry" },
-  //   { id: 3, name: "Vanilla" },
-  // ];
+
   const [countries, setCountries] = useState<CountriesDTO[]>([]);
   const [states, setStates] = useState<CountriesDTO[]>([]);
   const [cities, setCities] = useState<CountriesDTO[]>([]);
@@ -279,9 +277,34 @@ const ClientForm: React.FC<ClientFormProps> = ({
   );
 };
 
-// Main Clients Component
+
+
+
+
+
+
+
+// get pagelist to display
+const sizePerPageList = [
+  {
+    text: "10",
+    value: 10,
+  },
+  {
+    text: "20",
+    value: 20,
+  },
+  {
+    text: "50",
+    value: 50,
+  },
+];
+
+// main component
 const Clients = withSwal((props: any) => {
+
   const { swal } = props;
+  const navigate = useNavigate();
   const [clients, setClients] = useState<ClientDTO[]>([]);
   const [client, setClient] = useState<ClientDTO>({
     id: 0,
@@ -442,12 +465,57 @@ const Clients = withSwal((props: any) => {
     fetchClients();
   }, []);
 
+  /* action column render */
+  const ActionColumn = ({ row }: { row: any }) => {
+
+    return (
+      <>
+
+        <div className="action-icon" onClick={() => openEditClientModal(row.original)}>
+          {" "}
+          <i className="mdi mdi-square-edit-outline"></i>
+        </div>
+        <div className="action-icon" onClick={() => deleteClient(row.original.id)}>
+          {" "}
+          <i className="mdi mdi-delete"></i>
+        </div>
+      </>
+    );
+  };
+  // get all columns
+  const columns = [
+    {
+      Header: "Client ID",
+      accessor: "id",
+    },
+    {
+      Header: "Name",
+      accessor: "name",
+    },
+    {
+      Header: "Email",
+      accessor: "email",
+    },
+    {
+      Header: "Address",
+      accessor: "address",
+    },
+    {
+      Header: "Contact",
+      accessor: "contact",
+    },
+    {
+      Header: "Action",
+      accessor: "action",
+      Cell: ActionColumn,
+    },
+  ];
   return (
     <>
       <PageTitle
         breadCrumbItems={[
-          { label: "Clients", path: "/apps/clients" },
-          { label: "Clients", path: "/apps/clients", active: true },
+          { label: "Ecommerce", path: "/apps/ecommerce/clients" },
+          { label: "Orders", path: "/apps/ecommerce/clients", active: true },
         ]}
         title={"Clients"}
       />
@@ -456,13 +524,19 @@ const Clients = withSwal((props: any) => {
         <Col>
           <Card>
             <Card.Body>
-              <Row>
-                <Col sm={12}>
-                  <div className="button-list">
-                    <Button variant="danger" className="mb-2" onClick={toggleResponsiveModal}>
-                      <i className="mdi mdi-plus-circle me-2"></i> Add Client
+              <Row className="align-items-center">
+                <Col lg={8}>
+
+                </Col>
+
+                <Col lg={4}>
+                  <div className="text-lg-end mt-xl-0 mt-2">
+                    <Button className="btn btn-danger mb-2 me-2" onClick={toggleResponsiveModal}>
+                      <i className="mdi mdi-basket me-1"></i> Add New Client
                     </Button>
+                    <Button className="btn btn-light mb-2">Export</Button>
                   </div>
+
 
                   <Modal show={responsiveModal} onHide={toggleResponsiveModal}>
                     <ClientForm
@@ -476,55 +550,27 @@ const Clients = withSwal((props: any) => {
                 </Col>
               </Row>
 
-              <Card>
-                <Card.Body>
-                  <h4 className="header-title mt-0 mb-1">Clients</h4>
-                  <Table hover responsive className={classNames("table-centered", "table-nowrap", "mb-0")}>
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Address</th>
-                        <th>Contact</th>
-                        <th>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {clients.map((record, index) => (
-                        <tr key={index}>
-                          <th scope="row">{record.id}</th>
-                          <td>{record.name}</td>
-                          <td>{record.email}</td>
-                          <td>{record.address}</td>
-                          <td>{record.contact}</td>
-                          <td>
-                            <i
-                              className="bi bi-trash ms-2 cursor-pointer"
-                              id="sa-warning"
-                              onClick={() => deleteClient(record.id)}
-                            ></i>
-                            <i
-                              className="bi bi-pencil-square ms-2 cursor-pointer"
-                              onClick={() => openEditClientModal(record)}
-                            ></i>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-
-                  <Modal show={editClientModal} onHide={closeEditClientModal}>
-                    <ClientForm
-                      client={client}
-                      handleInputChange={handleInputChange}
-                      handleSubmit={editClient}
-                      modalType="Edit"
-                      closeModal={closeEditClientModal}
-                    />
-                  </Modal>
-                </Card.Body>
-              </Card>
+              <Table
+                columns={columns}
+                data={clients}
+                isSearchable={true}
+                pageSize={10}
+                sizePerPageList={sizePerPageList}
+                isSortable={true}
+                pagination={true}
+                isSelectable={false}
+                theadClass="table-light"
+                searchBoxClass="mb-2"
+              />
+              <Modal show={editClientModal} onHide={closeEditClientModal}>
+                <ClientForm
+                  client={client}
+                  handleInputChange={handleInputChange}
+                  handleSubmit={editClient}
+                  modalType="Edit"
+                  closeModal={closeEditClientModal}
+                />
+              </Modal>
             </Card.Body>
           </Card>
         </Col>
