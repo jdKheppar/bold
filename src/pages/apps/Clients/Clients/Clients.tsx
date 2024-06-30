@@ -8,6 +8,7 @@ import PageTitle from "../../../../components/PageTitle";
 import axios from "axios";
 import { ClientDTO } from "../../../../DTOs/ClientDTO";
 import { CountriesDTO } from "../../../../DTOs/CountriesDTO";
+import { Typeahead } from "react-bootstrap-typeahead";
 
 // Reusable ClientForm Component
 interface ClientFormProps {
@@ -25,53 +26,81 @@ const ClientForm: React.FC<ClientFormProps> = ({
   modalType,
   closeModal,
 }) => {
+  // const C_options: Array<CountriesDTO> = [
+  //   { id: 1, name: "Chocolate" },
+  //   { id: 2, name: "Strawberry" },
+  //   { id: 3, name: "Vanilla" },
+  // ];
   const [countries, setCountries] = useState<CountriesDTO[]>([]);
   const [states, setStates] = useState<CountriesDTO[]>([]);
   const [cities, setCities] = useState<CountriesDTO[]>([]);
-  const [selectedCountryId, setSelectedCountryId] = useState<number | null>(null);
-  const [selectedStateId, setSelectedStateId] = useState<number | null>(null);
-  const [selectedCityId, setSelectedCityId] = useState<number | null>(null);
-  const handleCountrySelect = (countryId: number) => {
-    setSelectedCountryId(countryId);
-    client.country = countryId;
-    fetchStates(countryId);
+  const [countrySelections, setCountrySelections] = useState<CountriesDTO[]>([]);
+  const [stateSelections, setStateSelections] = useState<CountriesDTO[]>([]);
+  const [citySelections, setCitySelections] = useState<CountriesDTO[]>([]);
+
+
+
+  const onChangeCountrySelection = (selected: CountriesDTO[]) => {
+    setCountrySelections(selected);
+    if (selected && selected[0]) {
+      console.log(selected[0].id);
+      client.country = selected[0].id;
+      fetchStates(selected[0].id);
+    }
+
   };
-  const handleStateSelect = (stateId: number) => {
-    setSelectedStateId(stateId);
-    client.state = stateId;
-    fetchCities(stateId);
+  const onChangeStateSelection = (selected: CountriesDTO[]) => {
+    setStateSelections(selected);
+    if (selected && selected[0]) {
+      client.state = selected[0].id;
+      fetchCities(selected[0].id);
+    }
+    else {
+      setStates([]);
+    }
+
   };
-  const handleCitySelect = (cityId: number) => {
-    setSelectedCityId(cityId);
-    client.city = cityId;
+
+  const onChangeCitySelection = (selected: CountriesDTO[]) => {
+    setCitySelections(selected);
+    if (selected && selected[0]) {
+      client.city = selected[0].id;
+    }
+    else {
+      setCities([]);
+    }
+
   };
+
   const fetchCountries = async () => {
-    const fullUrl = "https://reseller.whitexdigital.com/countries";
+    const fullUrl = "https://reseller.whitexdigital.com/api/countries";
     try {
       const response = await axios.get(fullUrl);
-      setCountries(response.data.data);
+      console.log(response.data);
+      setCountries(response.data);
     } catch (error) {
       console.error("API call error:", error);
       throw error;
     }
   };
   const fetchStates = async (id: any) => {
-    id=Number(id);
-    const fullUrl = `https://reseller.whitexdigital.com/states/${id}`;
+    id = Number(id);
+    const fullUrl = `https://reseller.whitexdigital.com/api/states/${id}`;
     try {
       const response = await axios.get(fullUrl);
-      setStates(response.data.data);
+      setStates(response.data);
     } catch (error) {
       console.error("API call error:", error);
       throw error;
     }
   };
   const fetchCities = async (id: any) => {
-    id=Number(id);
-    const fullUrl = `https://reseller.whitexdigital.com/cities/${id}`;
+    id = Number(id);
+    const fullUrl = `https://reseller.whitexdigital.com/api/cities/${id}`;
     try {
       const response = await axios.get(fullUrl);
-      setCities(response.data.data);
+
+      setCities(response.data);
     } catch (error) {
       console.error("API call error:", error);
       throw error;
@@ -80,11 +109,11 @@ const ClientForm: React.FC<ClientFormProps> = ({
   useEffect(() => {
     fetchCountries();
   }, []);
-  useEffect(() => {
-    if(selectedStateId){
-      fetchCities(selectedStateId);
-    }
-  }, [selectedStateId]);
+  // useEffect(() => {
+  //   if (selectedStateId) {
+  //     fetchCities(selectedStateId);
+  //   }
+  // }, [selectedStateId]);
   return (
     <>
       <Modal.Header closeButton>
@@ -150,24 +179,15 @@ const ClientForm: React.FC<ClientFormProps> = ({
               <label htmlFor="name" className="form-label">
                 Country
               </label>
-              <Dropdown>
-                <Dropdown.Toggle variant="danger" id="dropdown-basic">
-                  {selectedCountryId
-                    ? countries.find((country) => country.id === selectedCountryId)?.name
-                    : "Select Country"}{" "}
-                  <i className="mdi mdi-chevron-down"></i>
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  {countries.map((country) => (
-                    <Dropdown.Item
-                      key={country.id}
-                      onClick={() => handleCountrySelect(country.id)}
-                    >
-                      {country.name}
-                    </Dropdown.Item>
-                  ))}
-                </Dropdown.Menu>
-              </Dropdown>
+              <Typeahead
+                id="select1"
+                labelKey={"name"}
+                multiple={false}
+                onChange={onChangeCountrySelection}
+                options={countries}
+                placeholder="Select a country ..."
+                selected={countrySelections}
+              />
             </div>
           </div>
           <div className="col-md-6">
@@ -175,51 +195,33 @@ const ClientForm: React.FC<ClientFormProps> = ({
               <label htmlFor="email" className="form-label">
                 State
               </label>
-              <Dropdown>
-                <Dropdown.Toggle variant="danger" id="dropdown-basic">
-                  {selectedStateId
-                    ? states.find((state) => state.id === selectedStateId)?.name
-                    : "Select State"}{" "}
-                  <i className="mdi mdi-chevron-down"></i>
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  {countries.map((state) => (
-                    <Dropdown.Item
-                      key={state.id}
-                      onClick={() => handleStateSelect(state.id)}
-                    >
-                      {state.name}
-                    </Dropdown.Item>
-                  ))}
-                </Dropdown.Menu>
-              </Dropdown>
+              <Typeahead
+                id="select2"
+                labelKey={"name"}
+                multiple={false}
+                onChange={onChangeStateSelection}
+                options={states}
+                placeholder="Select a state..."
+                selected={stateSelections}
+              />
             </div>
           </div>
         </div>
         <div className="row">
           <div className="col-md-6">
             <div className="mb-3">
-            <label htmlFor="email" className="form-label">
+              <label htmlFor="email" className="form-label">
                 City
               </label>
-              <Dropdown>
-                <Dropdown.Toggle variant="danger" id="dropdown-basic">
-                  {selectedCityId
-                    ? cities.find((city) => city.id === selectedCityId)?.name
-                    : "Select City"}{" "}
-                  <i className="mdi mdi-chevron-down"></i>
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  {cities.map((city) => (
-                    <Dropdown.Item
-                      key={city.id}
-                      onClick={() => handleCountrySelect(city.id)}
-                    >
-                      {city.name}
-                    </Dropdown.Item>
-                  ))}
-                </Dropdown.Menu>
-              </Dropdown>
+              <Typeahead
+                id="select3"
+                labelKey={"name"}
+                multiple={false}
+                onChange={onChangeCitySelection}
+                options={cities}
+                placeholder="Select a city..."
+                selected={citySelections}
+              />
             </div>
           </div>
           <div className="col-md-6">
@@ -230,8 +232,8 @@ const ClientForm: React.FC<ClientFormProps> = ({
               <input
                 type="number"
                 className="form-control"
-                id="address"
-                placeholder="Address"
+                id="postal_code"
+                placeholder="Postal Code"
                 required
                 value={client.postal_code}
                 onChange={handleInputChange}
@@ -323,7 +325,6 @@ const Clients = withSwal((props: any) => {
     const fullUrl = "https://reseller.whitexdigital.com/api/client";
     try {
       const response = await axios.get(fullUrl);
-      console.log(response);
       setClients(response.data.data);
     } catch (error) {
       console.error("API call error:", error);
@@ -419,7 +420,7 @@ const Clients = withSwal((props: any) => {
         if (result.value) {
           try {
             await axios.delete(fullUrl);
-            swal.fire("Deleted!", "Your file has been deleted.", "success");
+            swal.fire("Deleted!", "Client has been deleted.", "success");
             fetchClients();
           } catch (error) {
             console.log(error);

@@ -6,6 +6,7 @@ import PageTitle from "../../../../../components/PageTitle";
 import { withSwal } from "react-sweetalert2";
 import { ProductItemTypes } from "../../../../../DTOs/ProductItemTypes";
 import { ClientDTO } from "../../../../../DTOs/ClientDTO";
+import { Typeahead } from "react-bootstrap-typeahead";
 
 
 const Cart: React.FC = withSwal((props: any) => {
@@ -14,15 +15,26 @@ const Cart: React.FC = withSwal((props: any) => {
 
   let exchangeOrderItem = localStorage.getItem("ExchangeOrderID");
 
+  // const C_options: Array<ClientDTO> = [
+  //   { id: 1, name: "Chocolate", email: "", contact: "", address: "", country: 0, state: 0, city: 0, postal_code: 0 },
+  //   { id: 2, name: "Strawberry", email: "", contact: "", address: "", country: 0, state: 0, city: 0, postal_code: 0 },
+  //   { id: 3, name: "Vanilla", email: "", contact: "", address: "", country: 0, state: 0, city: 0, postal_code: 0 },
+  // ];
+
   const [titleText, setTitleText] = useState("");
   const [products, setProducts] = useState<ProductItemTypes[]>([]);
   const [clients, setClients] = useState<ClientDTO[]>([]);
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
   const [totalPrice, setTotalPrice] = useState(0);
   const [totalCustomPrice, setTotalCustomPrice] = useState(0);
+  const [clientSelections, setClientSelections] = useState<ClientDTO[]>([]);
 
-  const handleSelect = (clientId: number) => {
-    setSelectedClientId(clientId);
+  const onChangeClientSelection = (selected: ClientDTO[]) => {
+    setClientSelections(selected);
+    if (selected && selected[0]) {
+      setSelectedClientId(selected[0].id);
+    }
+
   };
   let exchangeOrderItme = localStorage.getItem("ExchangeOrderID");
   const fetchClients = async () => {
@@ -86,9 +98,12 @@ const Cart: React.FC = withSwal((props: any) => {
       const response = await axios.get(fullUrl);
       const allProducts = response.data.data;
       const storedCartItems = JSON.parse(localStorage.getItem("cartItems") || "[]");
-      const filteredProducts = allProducts.filter((product: ProductItemTypes) =>
-        storedCartItems.includes(product.id)
-      );
+      const filteredProducts = allProducts
+        .filter((product: ProductItemTypes) => storedCartItems.includes(product.id))
+        .map((product: ProductItemTypes) => ({
+          ...product,
+          custom_price: product.price, // Set custom_price to price
+        }));
       setProducts(filteredProducts);
     } catch (error) {
       console.error("API call error:", error);
@@ -113,12 +128,12 @@ const Cart: React.FC = withSwal((props: any) => {
       return;
     }
 
-    let prev_order_id = exchangeOrderItem ? exchangeOrderItem : "";
+    let prev_order_id = exchangeOrderItem ? exchangeOrderItem : null;
     const orderData = {
       products: products.map((product) => ({
         id: product.id,
         quantity: product.current_stock,
-        custom_price: product.custom_price,
+        custom_price: Number(product.custom_price),
       })),
       clientID: selectedClientId,
       prev_OrderID: prev_order_id
@@ -189,6 +204,7 @@ const Cart: React.FC = withSwal((props: any) => {
                             <th>Price</th>
                             <th>Custom Price</th>
                             <th>Quantity</th>
+                            <th>Total Price</th>
                             <th style={{ width: "50px" }}></th>
                           </tr>
                         </thead>
@@ -215,6 +231,7 @@ const Cart: React.FC = withSwal((props: any) => {
                               </td>
                               <td>${item.price}</td>
                               <td>
+
                                 <input
                                   type="number"
                                   min="1"
@@ -235,6 +252,9 @@ const Cart: React.FC = withSwal((props: any) => {
                                   style={{ width: "90px" }}
                                   onChange={(e) => onQuantityChange(e, item.id)}
                                 />
+                              </td>
+                              <td>
+                                {item.current_stock * item.price}
                               </td>
                               <td>
                                 <Link
@@ -268,24 +288,18 @@ const Cart: React.FC = withSwal((props: any) => {
                         </tbody>
                       </table>
                     </div>
-                    <Dropdown className="mt-4">
-                      <Dropdown.Toggle variant="danger" id="dropdown-basic">
-                        {selectedClientId
-                          ? clients.find((client) => client.id === selectedClientId)?.name
-                          : "Select Client"}{" "}
-                        <i className="mdi mdi-chevron-down"></i>
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        {clients.map((client) => (
-                          <Dropdown.Item
-                            key={client.id}
-                            onClick={() => handleSelect(client.id)}
-                          >
-                            {client.name}
-                          </Dropdown.Item>
-                        ))}
-                      </Dropdown.Menu>
-                    </Dropdown>
+                    <label htmlFor="client" className="form-label mt-4">
+                      Client:
+                    </label>
+                    <Typeahead
+                      id="select4"
+                      labelKey={"name"}
+                      multiple={false}
+                      onChange={onChangeClientSelection}
+                      options={clients}
+                      placeholder="Select a client..."
+                      selected={clientSelections}
+                    />
                   </div>
                 </Col>
               </Row>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { Row, Col, Card, Tab, Nav, Badge } from "react-bootstrap";
 import axios from "axios";
 import { withSwal } from "react-sweetalert2";
@@ -64,6 +64,7 @@ interface Product {
 const ProductDetails = withSwal((props: any) => {
   const { swal } = props;
   const { id } = useParams();
+  const navigate = useNavigate();
   let exchangeOrderItem = localStorage.getItem("ExchangeOrderID");
 
   const [titleText, setTitleText] = useState("");
@@ -89,6 +90,7 @@ const ProductDetails = withSwal((props: any) => {
         text: "Product is already in the cart.",
         icon: "error",
       });
+
       return; // Exit function if product ID is already in cart
     }
 
@@ -105,6 +107,7 @@ const ProductDetails = withSwal((props: any) => {
       text: "Product added successfully to the cart!",
       icon: "success",
     });
+    navigate("/apps/shoppingcart");
   };
 
 
