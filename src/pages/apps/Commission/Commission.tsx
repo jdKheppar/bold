@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Row, Col, Card, Button } from "react-bootstrap";
+import { Row, Col, Card, Button , Form} from "react-bootstrap";
 import classNames from "classnames";
+import { withSwal } from "react-sweetalert2";
 
 // components
 
@@ -49,9 +50,48 @@ const sizePerPageList = [
 
 
 // main component
-const Commissions = () => {
+const Commissions = withSwal((props: any) => {
   const [commissions, setCommissions] = useState<CommissionDTO[]>([]);
+  const [payoutAmount, setPayoutAmount] = useState<number>(0);
+  const [note, setNote] = useState<string>("");
 
+  const [total, setTotal] = useState<number>(-1);
+
+  const { swal } = props;
+
+  const fetchPayouts = async () => {
+    const fullUrl = "https://reseller.whitexdigital.com/api/payouts";
+    try {
+        const response = await axios.get(fullUrl);
+        setTotal(response.data.total);
+    } catch (error) {
+        swal.fire({
+            title: "Error!",
+            text: "Something Went Wrong!",
+            icon: "error",
+        });
+        console.error("API call error:", error);
+    }
+};
+  const orderPayout = async (amount: number) => {
+    const fullUrl = `https://reseller.whitexdigital.com/api/request_payouts?amount=${amount}`;
+    try {
+        const response = await axios.post(fullUrl);
+
+        swal.fire({
+            title: "Success!",
+            text: "Payout requested successfully!",
+            icon: "success",
+        });
+    } catch (error) {
+        console.error("API call error:", error);
+        swal.fire({
+            title: "Error!",
+            text: "Something Went Wrong!",
+            icon: "error",
+        });
+    }
+}
 
   function exchangeOrder(id: Number) {
     alert("We can't exchange right now");
@@ -68,8 +108,17 @@ const Commissions = () => {
 
   useEffect(() => {
     fetchOrders();
+    fetchPayouts();
   }, []);
 
+
+  const handlePayoutRequest = () => {
+    if (payoutAmount > 0 && payoutAmount < total + 1) {
+        orderPayout(payoutAmount);
+    } else {
+        alert("Please enter a valid amount.");
+    }
+};
 
   return (
     <>
@@ -85,12 +134,36 @@ const Commissions = () => {
         <Col>
           <Card>
             <Card.Body>
-
+                              <Row className="align-items-center">
+                                <Col lg={12}>
+                                    <Form>
+                                        <Form.Group controlId="payoutAmount">
+                                            <Form.Label>Enter Payout Amount</Form.Label>
+                                            <Form.Control
+                                                type="number"
+                                                placeholder="Enter amount"
+                                                value={payoutAmount}
+                                                onChange={(e) => setPayoutAmount(Number(e.target.value))}
+                                            />
+                                            <Form.Label className="mt-2">Enter Note</Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                placeholder="Enter any note..."
+                                                value={note}
+                                                onChange={(e) => setNote(e.target.value)}
+                                            />
+                                        </Form.Group>
+                                        <Button variant="danger" onClick={handlePayoutRequest} className="mt-2 mb-2">
+                                            Request Payout
+                                        </Button>
+                                    </Form>
+                                </Col>
+                            </Row>
               {
                 commissions &&
                 <Card>
                   <Card.Body>
-                    <h4 className="header-title mt-0 mb-1">Commission</h4>
+                    <h4 className="header-title mt-0 mb-1">Commissions</h4>
                     <Table
                       columns={columns}
                       data={commissions}
@@ -116,7 +189,7 @@ const Commissions = () => {
       </Row>
     </>
   );
-};
+});
 
 export default Commissions;
 

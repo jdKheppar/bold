@@ -116,25 +116,11 @@ const ProductsList = () => {
                         <Col key={index} md={6} xl={3}>
                             <Card className="product-box">
                                 <Card.Body>
-                                    <div className="product-action">
-                                        <Link
-                                            to="#"
-                                            className="btn btn-success btn-xs waves-effect waves-light me-1"
-                                        >
-                                            <i className="mdi mdi-pencil"></i>
-                                        </Link>
-                                        <Link
-                                            to="#"
-                                            className="btn btn-danger btn-xs waves-effect waves-light"
-                                        >
-                                            <i className="mdi mdi-close"></i>
-                                        </Link>
-                                    </div>
 
                                     <div className="bg-light product-image-container">
                                         <img src={product.image} alt="" className="product-image" />
                                     </div>
-
+                                    
                                     <div className="product-info">
                                         <div className="row align-items-center">
                                             <div className="col">
