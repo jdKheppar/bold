@@ -11,6 +11,11 @@ import { CommissionDTO } from "../../../DTOs/Commission";
 import PageTitle from "../../../components/PageTitle";
 import Table from "../../../components/Table";
 
+interface ReqPayoutDTO {
+  amount: number;
+  note: string;
+}
+
 // get all columns
 const columns = [
   {
@@ -52,9 +57,10 @@ const sizePerPageList = [
 // main component
 const Commissions = withSwal((props: any) => {
   const [commissions, setCommissions] = useState<CommissionDTO[]>([]);
-  const [payoutAmount, setPayoutAmount] = useState<number>(0);
-  const [note, setNote] = useState<string>("");
-
+  const [reqObj, setReqObj] = useState<ReqPayoutDTO>({
+    amount:0,
+    note:""
+  });
   const [total, setTotal] = useState<number>(-1);
 
   const { swal } = props;
@@ -74,6 +80,11 @@ const Commissions = withSwal((props: any) => {
     }
 };
   const orderPayout = async (amount: number) => {
+    let reqObj = {
+      amount: amount.toString,
+      note
+    }
+    const params = new URLSearchParams(reqObj).toString();
     const fullUrl = `https://reseller.whitexdigital.com/api/request_payouts?amount=${amount}`;
     try {
         const response = await axios.post(fullUrl);
@@ -142,15 +153,15 @@ const Commissions = withSwal((props: any) => {
                                             <Form.Control
                                                 type="number"
                                                 placeholder="Enter amount"
-                                                value={payoutAmount}
-                                                onChange={(e) => setPayoutAmount(Number(e.target.value))}
+                                                value={reqObj.amount}
+                                                onChange={(e) => setReqObj((prevObj)=>Number(e.target.value))}
                                             />
                                             <Form.Label className="mt-2">Enter Note</Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 placeholder="Enter any note..."
-                                                value={note}
-                                                onChange={(e) => setNote(e.target.value)}
+                                                value={reqObj.note}
+                                                onChange={(e) => setReqObj(e.target.value)}
                                             />
                                         </Form.Group>
                                         <Button variant="danger" onClick={handlePayoutRequest} className="mt-2 mb-2">
