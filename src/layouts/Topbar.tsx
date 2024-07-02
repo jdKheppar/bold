@@ -1,4 +1,4 @@
-import React,{useEffect,useState} from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 // import classNames from 'classnames';
@@ -196,13 +196,11 @@ const Topbar = ({
     dispatch(showRightSidebar());
   };
   const AUTH_SESSION_KEY = "ubold_user";
-  useEffect(()=>{
+  useEffect(() => {
     let userInfo = sessionStorage.getItem(AUTH_SESSION_KEY);
     if (userInfo) {
       const { username } = JSON.parse(userInfo);
-      console.log(userInfo);
       setProfileUser(username);
-      
     }
   })
   /**

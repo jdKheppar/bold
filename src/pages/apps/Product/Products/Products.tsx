@@ -9,6 +9,7 @@ import PageTitle from "../../../../components/PageTitle";
 
 interface ProductItemTypes {
     id: number;
+    slug: string;
     title: string;
     image: string;
     rating: number;
@@ -120,13 +121,13 @@ const ProductsList = () => {
                                     <div className="bg-light product-image-container">
                                         <img src={product.image} alt="" className="product-image" />
                                     </div>
-                                    
+
                                     <div className="product-info">
                                         <div className="row align-items-center">
                                             <div className="col">
                                                 <h5 className="font-16 mt-0 sp-line-1">
                                                     <Link
-                                                        to={`/apps/products/${product.id}`}
+                                                        to={`/apps/products/${product.slug}`}
                                                         className="text-dark"
                                                     >
                                                         {product.title}

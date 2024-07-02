@@ -125,7 +125,7 @@ const productAppRoutes: RoutesProps = {
 };
 
 const productDetailsAppRoutes = {
-  path: "/apps/products/:id",
+  path: "/apps/products/:slug",
   name: "Product Details",
   route: PrivateRoute,
   roles: ["Admin"],

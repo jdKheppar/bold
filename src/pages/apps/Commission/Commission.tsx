@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Row, Col, Card, Button , Form} from "react-bootstrap";
+import { Row, Col, Card, Button, Form } from "react-bootstrap";
 import classNames from "classnames";
 import { withSwal } from "react-sweetalert2";
 
@@ -58,8 +58,8 @@ const sizePerPageList = [
 const Commissions = withSwal((props: any) => {
   const [commissions, setCommissions] = useState<CommissionDTO[]>([]);
   const [reqObj, setReqObj] = useState<ReqPayoutDTO>({
-    amount:0,
-    note:""
+    amount: 0,
+    note: ""
   });
   const [total, setTotal] = useState<number>(-1);
 
@@ -68,17 +68,17 @@ const Commissions = withSwal((props: any) => {
   const fetchPayouts = async () => {
     const fullUrl = "https://reseller.whitexdigital.com/api/payouts";
     try {
-        const response = await axios.get(fullUrl);
-        setTotal(response.data.total);
+      const response = await axios.get(fullUrl);
+      setTotal(response.data.total);
     } catch (error) {
-        swal.fire({
-            title: "Error!",
-            text: "Something Went Wrong!",
-            icon: "error",
-        });
-        console.error("API call error:", error);
+      swal.fire({
+        title: "Error!",
+        text: "Something Went Wrong!",
+        icon: "error",
+      });
+      console.error("API call error:", error);
     }
-};
+  };
   const orderPayout = async () => {
     let reqObjParams = {
       amount: reqObj.amount.toString(),
@@ -87,22 +87,22 @@ const Commissions = withSwal((props: any) => {
     const params = new URLSearchParams(reqObjParams).toString();
     const fullUrl = `https://reseller.whitexdigital.com/api/request_payouts?amount=${params}`;
     try {
-        const response = await axios.post(fullUrl);
+      const response = await axios.post(fullUrl);
 
-        swal.fire({
-            title: "Success!",
-            text: "Payout requested successfully!",
-            icon: "success",
-        });
+      swal.fire({
+        title: "Success!",
+        text: "Payout requested successfully!",
+        icon: "success",
+      });
     } catch (error) {
-        console.error("API call error:", error);
-        swal.fire({
-            title: "Error!",
-            text: "Something Went Wrong!",
-            icon: "error",
-        });
+      console.error("API call error:", error);
+      swal.fire({
+        title: "Error!",
+        text: "Something Went Wrong!",
+        icon: "error",
+      });
     }
-}
+  }
 
   function exchangeOrder(id: Number) {
     alert("We can't exchange right now");
@@ -125,11 +125,11 @@ const Commissions = withSwal((props: any) => {
 
   const handlePayoutRequest = () => {
     if (reqObj.amount > 0 && reqObj.amount < total + 1) {
-        orderPayout();
+      orderPayout();
     } else {
-        alert("Please enter a valid amount.");
+      alert("Please enter a valid amount.");
     }
-};
+  };
 
   return (
     <>
@@ -145,41 +145,41 @@ const Commissions = withSwal((props: any) => {
         <Col>
           <Card>
             <Card.Body>
-                              <Row className="align-items-center">
-                                <Col lg={12}>
-                                    <Form>
-                                        <Form.Group controlId="payoutAmount">
-                                            <Form.Label>Enter Payout Amount</Form.Label>
-                                            <Form.Control
-                                                type="number"
-                                                placeholder="Enter amount"
-                                                value={reqObj.amount}
-                                                onChange={(e) =>
-                                                  setReqObj((prevObj) => ({
-                                                    ...prevObj,
-                                                    amount: Number(e.target.value),
-                                                  }))
-                                                }
-                                            />
-                                            <Form.Label className="mt-2">Enter Note</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Enter any note..."
-                                                value={reqObj.note}
-                                                onChange={(e) =>
-                                                  setReqObj((prevObj) => ({
-                                                    ...prevObj,
-                                                    note: e.target.value,
-                                                  }))
-                                                }
-                                            />
-                                        </Form.Group>
-                                        <Button variant="danger" onClick={handlePayoutRequest} className="mt-2 mb-2">
-                                            Request Payout
-                                        </Button>
-                                    </Form>
-                                </Col>
-                            </Row>
+              <Row className="align-items-center">
+                <Col lg={12}>
+                  <Form>
+                    <Form.Group controlId="payoutAmount">
+                      <Form.Label>Enter Payout Amount</Form.Label>
+                      <Form.Control
+                        type="number"
+                        placeholder="Enter amount"
+                        value={reqObj.amount}
+                        onChange={(e) =>
+                          setReqObj((prevObj) => ({
+                            ...prevObj,
+                            amount: Number(e.target.value),
+                          }))
+                        }
+                      />
+                      <Form.Label className="mt-2">Enter Note</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Enter note..."
+                        value={reqObj.note}
+                        onChange={(e) =>
+                          setReqObj((prevObj) => ({
+                            ...prevObj,
+                            note: e.target.value,
+                          }))
+                        }
+                      />
+                    </Form.Group>
+                    <Button variant="danger" onClick={handlePayoutRequest} className="mt-2 mb-2">
+                      Request Payout
+                    </Button>
+                  </Form>
+                </Col>
+              </Row>
               {
                 commissions &&
                 <Card>
