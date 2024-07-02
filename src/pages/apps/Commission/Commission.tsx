@@ -79,13 +79,13 @@ const Commissions = withSwal((props: any) => {
         console.error("API call error:", error);
     }
 };
-  const orderPayout = async (amount: number) => {
-    let reqObj = {
-      amount: amount.toString,
-      note
+  const orderPayout = async () => {
+    let reqObjParams = {
+      amount: reqObj.amount.toString(),
+      note: reqObj.note
     }
-    const params = new URLSearchParams(reqObj).toString();
-    const fullUrl = `https://reseller.whitexdigital.com/api/request_payouts?amount=${amount}`;
+    const params = new URLSearchParams(reqObjParams).toString();
+    const fullUrl = `https://reseller.whitexdigital.com/api/request_payouts?amount=${params}`;
     try {
         const response = await axios.post(fullUrl);
 
@@ -124,8 +124,8 @@ const Commissions = withSwal((props: any) => {
 
 
   const handlePayoutRequest = () => {
-    if (payoutAmount > 0 && payoutAmount < total + 1) {
-        orderPayout(payoutAmount);
+    if (reqObj.amount > 0 && reqObj.amount < total + 1) {
+        orderPayout();
     } else {
         alert("Please enter a valid amount.");
     }
@@ -154,14 +154,24 @@ const Commissions = withSwal((props: any) => {
                                                 type="number"
                                                 placeholder="Enter amount"
                                                 value={reqObj.amount}
-                                                onChange={(e) => setReqObj((prevObj)=>Number(e.target.value))}
+                                                onChange={(e) =>
+                                                  setReqObj((prevObj) => ({
+                                                    ...prevObj,
+                                                    amount: Number(e.target.value),
+                                                  }))
+                                                }
                                             />
                                             <Form.Label className="mt-2">Enter Note</Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 placeholder="Enter any note..."
                                                 value={reqObj.note}
-                                                onChange={(e) => setReqObj(e.target.value)}
+                                                onChange={(e) =>
+                                                  setReqObj((prevObj) => ({
+                                                    ...prevObj,
+                                                    note: e.target.value,
+                                                  }))
+                                                }
                                             />
                                         </Form.Group>
                                         <Button variant="danger" onClick={handlePayoutRequest} className="mt-2 mb-2">
