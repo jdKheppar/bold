@@ -224,8 +224,14 @@ const ProductDetails: React.FC = () => {
                       </p>
                     )}
                     <h4 className="mb-4">
-                      Price: <b>${product?.price} BDT</b>
+                      Price :{" "}
+                      <span className="text-muted me-2">
+                        <del>{product?.price} BDT</del>
+                      </span>{" "}
+                      <b>{product?.price} BDT</b>
+
                     </h4>
+
                     {product?.current_stock !== undefined && (
                       <h4>
                         <span className={`badge bg-soft-${current_stockClass} text-${current_stockClass} mb-4`}>
