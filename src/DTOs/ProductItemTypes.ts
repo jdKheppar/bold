@@ -1,5 +1,6 @@
 export interface ProductItemTypes {
     id: number;
+    slug: string;
     title: string;
     image: string;
     rating: number;

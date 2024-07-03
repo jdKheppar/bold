@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+/*import React, { useEffect, useState } from "react";
 import { Row, Col, Card, Dropdown, Button } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -14,12 +14,6 @@ const Cart: React.FC = withSwal((props: any) => {
   const navigate = useNavigate();
 
   let exchangeOrderItem = localStorage.getItem("ExchangeOrderID");
-
-  // const C_options: Array<ClientDTO> = [
-  //   { id: 1, name: "Chocolate", email: "", contact: "", address: "", country: 0, state: 0, city: 0, postal_code: 0 },
-  //   { id: 2, name: "Strawberry", email: "", contact: "", address: "", country: 0, state: 0, city: 0, postal_code: 0 },
-  //   { id: 3, name: "Vanilla", email: "", contact: "", address: "", country: 0, state: 0, city: 0, postal_code: 0 },
-  // ];
 
   const [titleText, setTitleText] = useState("");
   const [products, setProducts] = useState<ProductItemTypes[]>([]);
@@ -99,7 +93,7 @@ const Cart: React.FC = withSwal((props: any) => {
       const allProducts = response.data.data;
       const storedCartItems = JSON.parse(localStorage.getItem("cartItems") || "[]");
       const filteredProducts = allProducts
-        .filter((product: ProductItemTypes) => storedCartItems.includes(product.id))
+        .filter((product: ProductItemTypes) => storedCartItems.includes(product.slug))
         .map((product: ProductItemTypes) => ({
           ...product,
           custom_price: product.price, // Set custom_price to price
@@ -330,27 +324,35 @@ const Cart: React.FC = withSwal((props: any) => {
 });
 
 export default Cart;
-
+*/
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-import React, { useState } from "react";
+
+import React, { useEffect, useState } from "react";
 import { Row, Col, Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import PageTitle from "../../../../../components/PageTitle";
+import { ProductItemTypes } from "../../../../../DTOs/ProductItemTypes";
+import axios from "axios";
 
-// components
-import PageTitle from "../../../components/PageTitle";
-
-import { cartItems, CartItemTypes } from "./data";
 
 interface CartSummaryTypes {
   gross_total?: number;
+  custom_total?: number;
   discount?: number;
-  shipping_charge?: number;
-  tax?: number;
   net_total?: number;
+}
+interface CartItemTypes {
+  id: number;
+  image: string;
+  title: string;
+  price: number;
+  custom_price: number;
+  current_stock: number;
+  total: number;
+  discount_price: number;
 }
 
 // summary
@@ -367,44 +369,22 @@ const CartSummary = (props: { summary: CartSummaryTypes }) => {
             <tbody>
               <tr>
                 <td>Grand Total :</td>
-                <td>${summary.gross_total!.toFixed(2)}</td>
+                <td>${summary.gross_total!}</td>
               </tr>
               <tr>
                 <td>Discount : </td>
-                <td>-${summary.discount!.toFixed(2)}</td>
+                <td>-${summary.discount!}</td>
               </tr>
               <tr>
-                <td>Shipping Charge :</td>
-                <td>${summary.shipping_charge!.toFixed(2)}</td>
-              </tr>
-              <tr>
-                <td>Estimated Tax : </td>
-                <td>${summary.tax!.toFixed(2)}</td>
+                <td>Custom Total :</td>
+                <td>${summary.custom_total!}</td>
               </tr>
               <tr>
                 <th>Total :</th>
-                <th>${summary.net_total!.toFixed(2)}</th>
+                <th>${summary.net_total!}</th>
               </tr>
             </tbody>
           </table>
-        </div>
-      </div>
-
-      <div className="alert alert-warning mt-3" role="alert">
-        Use coupon code <strong>UBTF25</strong> and get 25% discount!
-      </div>
-
-      <div className="input-group mt-3">
-        <input
-          type="text"
-          className="form-control form-control-light"
-          placeholder="Coupon code"
-          aria-label="Recipient's username"
-        />
-        <div className="input-group-append">
-          <button className="btn btn-light" type="button">
-            Apply
-          </button>
         </div>
       </div>
     </>
@@ -413,14 +393,14 @@ const CartSummary = (props: { summary: CartSummaryTypes }) => {
 
 // Cart
 const Cart = () => {
-  const [items, setItems] = useState<CartItemTypes[]>(cartItems);
+  const [items, setItems] = useState<CartItemTypes[]>([]);
+  const [products, setProducts] = useState<ProductItemTypes[]>([]);
 
   const [summary, setSummary] = useState<CartSummaryTypes>({
-    gross_total: 1571.19,
-    discount: 157.11,
-    shipping_charge: 25,
-    tax: 19.22,
-    net_total: 1458.3,
+    gross_total: 0,
+    discount: 0,
+    custom_total: 0,
+    net_total: 0,
   });
 
   
@@ -429,9 +409,17 @@ const onQtyChange = (e: any, item: CartItemTypes) => {
   var idx = localItems.findIndex((i) => i.id === item.id);
   var newQty = e.target.value;
   var newTotal = localItems[idx].price * newQty;
-  localItems[idx] = { ...item, qty: newQty, total: newTotal };
+  localItems[idx] = { ...item, current_stock: newQty, total: newTotal };
   _adjustCart(localItems);
 };
+const onCustomPChange = (e: any, item: CartItemTypes) => {
+  var localItems = [...items];
+  var idx = localItems.findIndex((i) => i.id === item.id);
+  
+  localItems[idx] = { ...item, custom_price: e.target.value };
+  _adjustCart(localItems);
+};
+
 
 
 const removeItem = (e: any, item: CartItemTypes) => {
@@ -442,23 +430,64 @@ const removeItem = (e: any, item: CartItemTypes) => {
 
 
 const _adjustCart = (localItems: CartItemTypes[]) => {
-  // calculate gross and other total
-  var newGrossTotal = 0;
+  // calculate total discount
+  let totalDiscount = 0;
+  for (let i = 0; i < localItems.length; i++) {
+    totalDiscount += localItems[i].discount_price;
+  }
+
+  // calculate gross total
+  let newGrossTotal = 0;
   for (const item of localItems) {
     newGrossTotal += item.total;
   }
-  var newNetTotel =
-    newGrossTotal -
-    summary.discount! +
-    summary.shipping_charge! +
-    summary.tax!;
+
+  // calculate net total
+  let newNetTotal = newGrossTotal - totalDiscount;
+
+  // update items and summary
   setItems(localItems);
   setSummary({
     ...summary,
     gross_total: newGrossTotal,
-    net_total: newNetTotel,
+    discount: totalDiscount,
+    net_total: newNetTotal,
   });
 };
+
+
+const getProducts = async () => {
+  const fullUrl = "https://reseller.whitexdigital.com/api/products";
+  try {
+    const response = await axios.get(fullUrl);
+    const allProducts = response.data.data;
+    const storedCartItems = JSON.parse(localStorage.getItem("cartItems") || "[]");
+    const filteredProducts = allProducts
+      .filter((product: ProductItemTypes) => storedCartItems.includes(product.slug))
+      .map((product: ProductItemTypes) => ({
+        ...product,
+        custom_price: product.price, // Set custom_price to price
+      }));
+    setItems(filteredProducts);
+    setProducts(filteredProducts);
+  } catch (error) {
+    console.error("API call error:", error);
+    throw error;
+  }
+};
+
+useEffect(() => {
+  getProducts();
+  // fetchClients();
+
+  // if (exchangeOrderItem) {
+  //   setTitleText(`Shopping Cart (Place Exchange Order)`);
+  // }
+  // else {
+  //   setTitleText("Shopping Cart");
+  // }
+}, []);
+
 
 return (
   <>
@@ -486,6 +515,7 @@ return (
                       <tr>
                         <th>Product</th>
                         <th>Price</th>
+                        <th>Custom Price</th>
                         <th>Quantity</th>
                         <th>Total</th>
                         <th style={{ width: "50px" }}></th>
@@ -498,7 +528,7 @@ return (
                             <td>
                               <img
                                 src={item.image}
-                                alt={item.name}
+                                alt={item.title}
                                 title="contact-img"
                                 className="rounded me-3"
                                 height="48"
@@ -509,23 +539,36 @@ return (
                                   to="/apps/ecommerce/product-details"
                                   className="text-body"
                                 >
-                                  {item.name}
+                                  {item.title}
                                 </Link>
-                                <br />
+                                {/* <br />
                                 <small className="me-2">
                                   <b>Size:</b> {item.size}{" "}
                                 </small>
                                 <small>
                                   <b>Color:</b> {item.color}{" "}
-                                </small>
+                                </small> */}
                               </p>
                             </td>
-                            <td>${item.price.toFixed(2)}</td>
+                            <td>${item.price}</td>
                             <td>
                               <input
                                 type="number"
                                 min="1"
-                                value={item.qty}
+                                value={item.custom_price}
+                                className="form-control"
+                                placeholder="Custom Price"
+                                style={{ width: "90px" }}
+                                onChange={(e: any) => {
+                                  onCustomPChange(e, item);
+                                }}
+                              />
+                            </td>
+                            <td>
+                              <input
+                                type="number"
+                                min="1"
+                                value={item.current_stock}
                                 className="form-control"
                                 placeholder="Qty"
                                 style={{ width: "90px" }}
@@ -534,7 +577,7 @@ return (
                                 }}
                               />
                             </td>
-                            <td>${item.total.toFixed(2)}</td>
+                            <td>${item.total}</td>
                             <td>
                               <Link
                                 to="#"
@@ -601,4 +644,3 @@ return (
 };
 
 export default Cart;
-*/
