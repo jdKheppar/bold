@@ -4,6 +4,9 @@ import { Row, Col, Card, ProgressBar, Tab, Nav } from "react-bootstrap";
 import axios from "axios";
 import PageTitle from "../../../../../components/PageTitle";
 import Rating from "../../../../../components/Rating";
+import { FormInput } from "../../../../../components";
+import { withSwal } from "react-sweetalert2";
+
 
 interface Product {
   name: string;
@@ -56,32 +59,58 @@ interface CartItems {
   quantity: number;
 }
 
-const ProductDetails: React.FC = () => {
+const ProductDetails: React.FC = withSwal((props: any) => {
   const [product, setProduct] = useState<Product | null>(null);
   const { slug } = useParams<{ slug: string }>();
-
+  const { swal } = props;
   const [cartItems, setCartItems] = useState<CartItems[]>([]);
+  const [titleText, setTitleText] = useState("");
+  let exchangeOrderItem = localStorage.getItem("ExchangeOrderID");
+
   const [currentItem, setCurrentItem] = useState<CartItems>({
     slug: slug || "",
-    quantity: 1,
+    quantity: 0,
   });
 
   const addToCart = () => {
+
     if (!slug) {
-      console.error("Invalid product slug:", slug);
+      swal.fire({
+        title: "Error!",
+        text: "Invalid Product Slug",
+        icon: "error",
+      });
+      return;
+    }
+    if (currentItem.quantity === 0) {
+      swal.fire({
+        title: "Error!",
+        text: "Quantity cannot be zero",
+        icon: "error",
+      });
       return;
     }
 
-    const isInCart = cartItems.some(item => item.slug === slug);
+    const isInCart = cartItems.some(item => item.slug === slug);//we can add size here instead of the quantity && item.quantity === currentItem.quantity
+
 
     if (isInCart) {
-      // Handle item already in cart (e.g., show a message)
+      swal.fire({
+        title: "Error!",
+        text: "Product is already in the cart.",
+        icon: "waring",
+      });
       return;
     }
 
     const updatedCart = [...cartItems, { slug, quantity: currentItem.quantity }];
     setCartItems(updatedCart);
     localStorage.setItem("cartItems", JSON.stringify(updatedCart));
+    swal.fire({
+      title: "Success!",
+      text: "Product added successfully.",
+      icon: "success",
+    });
   };
 
   const getProductDetails = async () => {
@@ -100,8 +129,24 @@ const ProductDetails: React.FC = () => {
 
   useEffect(() => {
     getProductDetails();
+    const storedCartItems = localStorage.getItem("cartItems");
+    if (storedCartItems) {
+      setCartItems(JSON.parse(storedCartItems));
+    }
   }, [slug]);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    addToCart();
+  };
 
+  useEffect(() => {
+    if (exchangeOrderItem) {
+      setTitleText(`Product Details (Exchange Order)`);
+    }
+    else {
+      setTitleText("Product Details");
+    }
+  })
   return (
     <>
       <PageTitle
@@ -109,7 +154,7 @@ const ProductDetails: React.FC = () => {
           { label: "Ecommerce", path: "/apps/ecommerce/details" },
           { label: "Product Detail", path: "/apps/ecommerce/details", active: true },
         ]}
-        title="Product Detail"
+        title={titleText}
       />
 
       <Row>
@@ -205,6 +250,7 @@ const ProductDetails: React.FC = () => {
                       )}
                     </Nav>
                   </Tab.Container>
+
                 </Col>
 
                 <Col lg={7}>
@@ -223,6 +269,9 @@ const ProductDetails: React.FC = () => {
                         </Link>
                       </p>
                     )}
+                    <h6 className="text-danger text-uppercase" >
+                      Discount Price: {product?.price}
+                    </h6>
                     <h4 className="mb-4">
                       Price :{" "}
                       <span className="text-muted me-2">
@@ -240,51 +289,70 @@ const ProductDetails: React.FC = () => {
                       </h4>
                     )}
                     <p className="text-muted mb-4">{product?.short_description}</p>
-                    <form className="d-flex flex-wrap align-items-center mb-4">
-                      <label className="my-1 me-2" htmlFor="quantityinput">
+                    <form className=" mb-4" onSubmit={handleSubmit}>
+                      {/* <label className="my-1 me-2" htmlFor="quantityinput">
                         Quantity
-                      </label>
-                      <div className="me-3">
-                        <select
-                          className="form-select my-1"
-                          id="quantityinput"
-                          value={currentItem.quantity}
-                          onChange={(e) => setCurrentItem({ ...currentItem, quantity: Number(e.target.value) })}
+                      </label> */}
+                      <div className="d-flex flex-wrap align-items-center">
+                        <div className="me-3">
+                          <FormInput
+                            label="Quantity"
+                            type="number"
+                            name="number"
+                            min={0}
+                            max={product?.current_stock}
+                            placeholder="Enter stocks for the product"
+                            containerClass={"mb-3"}
+                            id="quantityinput"
+                            value={currentItem.quantity}
+                            onChange={(e) => setCurrentItem({ ...currentItem, quantity: Number(e.target.value) })}
+                            key="number"
+                            disabled={!product?.current_stock}
+
+                          />
+
+                        </div>
+                        <label className="my-1 me-2" htmlFor="sizeinput">
+                          Size
+                        </label>
+                        <div className="me-sm-3">
+                          <select className="form-select my-1" id="sizeinput">
+                            <option defaultValue="0">Small</option>
+                            <option value="1">Medium</option>
+                            <option value="2">Large</option>
+                            <option value="3">X-large</option>
+                          </select>
+                        </div>
+                      </div>
+
+
+                      <div>
+                        <button
+                          className="btn btn-success waves-effect waves-light"
+                          type="submit"
+                          disabled={!product?.current_stock}
                         >
-                          <option value="1">1</option>
-                          <option value="2">2</option>
-                          <option value="3">3</option>
-                          <option value="4">4</option>
-                          <option value="5">5</option>
-                          <option value="6">6</option>
-                          <option value="7">7</option>
-                        </select>
+                          <span className="btn-label">
+                            <i className="mdi mdi-cart"></i>
+                          </span>
+                          Add to cart
+                        </button>
                       </div>
                     </form>
-                    <div>
-                      <button
-                        type="button"
-                        className="btn btn-success waves-effect waves-light"
-                        onClick={addToCart}
-                      >
-                        <span className="btn-label">
-                          <i className="mdi mdi-cart"></i>
-                        </span>
-                        Add to cart
-                      </button>
-                    </div>
-                    <div className="text-muted mb-4 mt-4">
-                      <div dangerouslySetInnerHTML={createMarkup(product?.long_description || "")} />
-                    </div>
+
+
                   </div>
                 </Col>
+                <div className="text-muted mb-4 mt-4">
+                  <div dangerouslySetInnerHTML={createMarkup(product?.long_description || "")} />
+                </div>
               </Row>
             </Card.Body>
           </Card>
         </Col>
-      </Row>
+      </Row >
     </>
   );
-};
+});
 
 export default ProductDetails;

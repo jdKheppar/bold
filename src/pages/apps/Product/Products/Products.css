@@ -1,6 +1,6 @@
 .product-image-container {
   width: 100%;
-  padding-top: 100%; /* This creates a square container based on width */
+  padding-top: 100%;
   position: relative;
   overflow: hidden;
 }

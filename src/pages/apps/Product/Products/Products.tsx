@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Row, Col, Card, Button } from "react-bootstrap";
 import axios from "axios";
 import "./Products.css";
+import { withSwal } from "react-sweetalert2";
 // components
 import PageTitle from "../../../../components/PageTitle";
 
@@ -63,7 +64,7 @@ const ProductsList = () => {
             <PageTitle
                 breadCrumbItems={[
                     { label: "Products", path: "" },
-                    { label: "Products", path: "/apps/orders", active: true },
+                    { label: "Products", path: "/apps/products", active: true },
                 ]}
                 title={titleText}
             />

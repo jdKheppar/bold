@@ -8,4 +8,5 @@ export interface ProductItemTypes {
     wholesale_price: number;
     current_stock: number;
     custom_price: number;
+    quantity: number;
 }
