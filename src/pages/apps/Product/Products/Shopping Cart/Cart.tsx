@@ -938,6 +938,46 @@ const Cart = withSwal((props: any) => {
             <Card.Body>
               <Row>
                 <Col lg={8}>
+                <Row className="mt-4">
+                    <Col sm={6}>
+                        <div className="mb-3">
+                          <label htmlFor="name" className="form-label">
+                            Client
+                          </label>
+                          <Typeahead
+                            id="select3"
+                            labelKey={"name"}
+                            multiple={false}
+                            onChange={onChangeClientSelection}
+                            options={clients}
+                            placeholder="Select a client..."
+                            selected={clientSelections}
+                          />
+                        </div>
+                    </Col>
+                    <Col sm={6}>
+                      <div className="mb-3 mt-3">
+                        <div >
+                          <Button className="btn btn-danger mb-2 me-2" style={{ width: "100%" , marginTop: "5px"}} onClick={toggleResponsiveModal}>
+                            Add New Client
+                          </Button>
+                        </div>
+
+
+                        <Modal show={responsiveModal} onHide={toggleResponsiveModal}>
+                          <ClientForm
+                            client={client}
+
+                            handleInputChange={handleInputChange}
+                            handleSubmit={addClient}
+                            modalType="Add"
+                            closeModal={toggleResponsiveModal}
+                          />
+                        </Modal>
+                      </div>
+
+                    </Col>
+                  </Row>
                   <div className="table-responsive">
                     <table className="table table-borderless table-centered mb-0">
                       <thead className="table-light">
@@ -1036,48 +1076,6 @@ const Cart = withSwal((props: any) => {
                   </div>
 
 
-                  <Row className="mt-4">
-                    <Col sm={6}>
-                      <div className="col-md-6">
-                        <div className="mb-3">
-                          <label htmlFor="name" className="form-label">
-                            Client
-                          </label>
-                          <Typeahead
-                            id="select3"
-                            labelKey={"name"}
-                            multiple={false}
-                            onChange={onChangeClientSelection}
-                            options={clients}
-                            placeholder="Select a client..."
-                            selected={clientSelections}
-                          />
-                        </div>
-                      </div>
-                    </Col>
-                    <Col sm={6}>
-                      <div className="mb-3 mt-3">
-                        <div >
-                          <Button className="btn btn-danger mb-2 me-2" onClick={toggleResponsiveModal}>
-                            Add New Client
-                          </Button>
-                        </div>
-
-
-                        <Modal show={responsiveModal} onHide={toggleResponsiveModal}>
-                          <ClientForm
-                            client={client}
-
-                            handleInputChange={handleInputChange}
-                            handleSubmit={addClient}
-                            modalType="Add"
-                            closeModal={toggleResponsiveModal}
-                          />
-                        </Modal>
-                      </div>
-
-                    </Col>
-                  </Row>
                   <div className="mt-3">
                     <label className="form-label" htmlFor="example-textarea">
                       Add a Note:
