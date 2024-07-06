@@ -824,6 +824,11 @@ const Cart = withSwal((props: any) => {
     const fullUrl = `https://reseller.whitexdigital.com/api/client?${params}`;
     try {
       const response = await axios.post(fullUrl);
+      console.log(response);
+      if (response.data) {
+        setSelectedClientId(response.data.data.id);
+      }
+
       // closeEditClientModal();
       swal.fire({
         title: "Success!",
@@ -938,27 +943,27 @@ const Cart = withSwal((props: any) => {
             <Card.Body>
               <Row>
                 <Col lg={8}>
-                <Row className="mt-4">
+                  <Row className="mt-4">
                     <Col sm={6}>
-                        <div className="mb-3">
-                          <label htmlFor="name" className="form-label">
-                            Client
-                          </label>
-                          <Typeahead
-                            id="select3"
-                            labelKey={"name"}
-                            multiple={false}
-                            onChange={onChangeClientSelection}
-                            options={clients}
-                            placeholder="Select a client..."
-                            selected={clientSelections}
-                          />
-                        </div>
+                      <div className="mb-3">
+                        <label htmlFor="name" className="form-label">
+                          Client
+                        </label>
+                        <Typeahead
+                          id="select3"
+                          labelKey={"name"}
+                          multiple={false}
+                          onChange={onChangeClientSelection}
+                          options={clients}
+                          placeholder="Select a client..."
+                          selected={clientSelections}
+                        />
+                      </div>
                     </Col>
                     <Col sm={6}>
                       <div className="mb-3 mt-3">
                         <div >
-                          <Button className="btn btn-danger mb-2 me-2" style={{ width: "100%" , marginTop: "5px"}} onClick={toggleResponsiveModal}>
+                          <Button className="btn btn-danger mb-2 me-2" style={{ width: "100%", marginTop: "5px" }} onClick={toggleResponsiveModal}>
                             Add New Client
                           </Button>
                         </div>
