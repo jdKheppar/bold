@@ -42,7 +42,8 @@ const ClientForm: React.FC<ClientFormProps> = ({
     setCountrySelections(selected);
     if (selected && selected[0]) {
       console.log(selected[0].id);
-      client.country = selected[0].id;
+      client.country_id = selected[0].id;
+      client.country_name = selected[0].name;
       fetchStates(selected[0].id);
     }
 
@@ -50,7 +51,8 @@ const ClientForm: React.FC<ClientFormProps> = ({
   const onChangeStateSelection = (selected: CountriesDTO[]) => {
     setStateSelections(selected);
     if (selected && selected[0]) {
-      client.state = selected[0].id;
+      client.state_id = selected[0].id;
+      client.state_name = selected[0].name;
       fetchCities(selected[0].id);
     }
     else {
@@ -62,7 +64,8 @@ const ClientForm: React.FC<ClientFormProps> = ({
   const onChangeCitySelection = (selected: CountriesDTO[]) => {
     setCitySelections(selected);
     if (selected && selected[0]) {
-      client.city = selected[0].id;
+      client.city_id = selected[0].id;
+      client.city_name = selected[0].name;
     }
     else {
       setCities([]);
@@ -107,11 +110,7 @@ const ClientForm: React.FC<ClientFormProps> = ({
   useEffect(() => {
     fetchCountries();
   }, []);
-  // useEffect(() => {
-  //   if (selectedStateId) {
-  //     fetchCities(selectedStateId);
-  //   }
-  // }, [selectedStateId]);
+ 
   return (
     <>
       <Modal.Header closeButton>
@@ -312,9 +311,12 @@ const Clients = withSwal((props: any) => {
     email: "",
     contact: "",
     address: "",
-    country: 0,
-    state: 0,
-    city: 0,
+    country_name: "",
+    state_name: "",
+    city_name: "",
+    country_id: 0,
+    state_id: 0,
+    city_id: 0,
     postal_code: 0,
   });
   const [responsiveModal, setResponsiveModal] = useState<boolean>(false);
@@ -333,14 +335,17 @@ const Clients = withSwal((props: any) => {
     setEditClientModal(false);
     setClient({
       id: 0,
-      name: "",
-      email: "",
-      contact: "",
-      address: "",
-      country: 0,
-      state: 0,
-      city: 0,
-      postal_code: 0,
+    name: "",
+    email: "",
+    contact: "",
+    address: "",
+    country_name: "",
+    state_name: "",
+    city_name: "",
+    country_id: 0,
+    state_id: 0,
+    city_id: 0,
+    postal_code: 0,
     });
   };
 
@@ -366,9 +371,12 @@ const Clients = withSwal((props: any) => {
       email: client.email,
       contact: client.contact,
       address: client.address,
-      country: String(client.country),
-      state: String(client.state),
-      city: String(client.city),
+      country_id: String(client.country_id),
+      state_id: String(client.state_id),
+      city_id: String(client.city_id),
+      country_name: String(client.country_name),
+      state_name: String(client.state_name),
+      city_name: String(client.city_name),
       postal_code: String(client.postal_code)
 
 
@@ -402,6 +410,13 @@ const Clients = withSwal((props: any) => {
       email: client.email,
       contact: client.contact,
       address: client.address,
+      country_id: String(client.country_id),
+      state_id: String(client.state_id),
+      city_id: String(client.city_id),
+      country_name: String(client.country_name),
+      state_name: String(client.state_name),
+      city_name: String(client.city_name),
+      postal_code: String(client.postal_code)
     };
     const params = new URLSearchParams(newObj).toString();
 

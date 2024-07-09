@@ -52,6 +52,26 @@ interface Product {
     small: string[]
   };
   category_name: string;
+  variations: {
+    current_stock: string,
+    id: number,
+    image: string,
+    name: string,
+    product_id: number,
+    sku: string,
+    suggested_retail_price: number,
+    variant_ids: string
+  };
+  product_colors: {
+    id: number,
+    code: string,
+    name: string
+  }[];
+}
+interface Color {
+  id: number;
+  code: string;
+  name: string;
 }
 
 interface CartItems {
@@ -65,7 +85,9 @@ const ProductDetails: React.FC = withSwal((props: any) => {
   const { swal } = props;
   const [cartItems, setCartItems] = useState<CartItems[]>([]);
   const [titleText, setTitleText] = useState("");
+  const [selectedColor, setSelectedColor] = useState<Color | null>(null);
   let exchangeOrderItem = localStorage.getItem("ExchangeOrderID");
+
 
   const [currentItem, setCurrentItem] = useState<CartItems>({
     slug: slug || "",
@@ -288,6 +310,24 @@ const ProductDetails: React.FC = withSwal((props: any) => {
                         </span>
                       </h4>
                     )}
+                    <div>
+                      <select onChange={(event) => {
+                          const selectedColor = product?.product_colors.find(color => color.id === Number(event.target.value));
+                          setSelectedColor(selectedColor || null);
+                        }} value={selectedColor?.id || ""}>
+                        <option value="">Select a color</option>
+                        {product?.product_colors.map((color, index) => (
+                          <option key={index} value={color.id} style={{ color: color.code }}>
+                            {color.name}
+                          </option>
+                        ))}
+                      </select>
+                      {selectedColor && (
+                        <div style={{ marginTop: '20px', color: selectedColor.code }}>
+                          Selected Color: {selectedColor.name}
+                        </div>
+                      )}
+                    </div>
                     <p className="text-muted mb-4">{product?.short_description}</p>
                     <form className=" mb-4" onSubmit={handleSubmit}>
                       {/* <label className="my-1 me-2" htmlFor="quantityinput">

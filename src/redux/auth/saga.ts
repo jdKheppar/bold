@@ -106,7 +106,9 @@ function* login({
               id: user.id,
               username: user.name,
               role: "Admin",
-              token: response.data.token
+              token: response.data.token,
+              business: response.data.business,
+              contact: response.data.contact
             }
             api.setLoggedInUser(newUser);
             setAuthorization(response.data.token);
@@ -135,7 +137,9 @@ function* login({
             id: user.id,
             username: user.name,
             role: "Admin",
-            token: response.data.token
+            token: response.data.token,
+            business: response.data.business,
+            contact: response.data.contact
           }
           api.setLoggedInUser(newUser);
           setAuthorization(response.data.token);

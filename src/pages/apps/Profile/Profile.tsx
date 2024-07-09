@@ -1,16 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Row, Col, Card, Form } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 
+interface UserData {
+  id: number;
+  username: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  token: string;
+  business: string;
+  contact: string;
+}
+
 // styles
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 
 // components
 import PageTitle from "../../../components/PageTitle";
-import FileUploader from "../../../components/FileUploader";
 import { FormInput } from "../../../components";
 
 const Profile = () => {
@@ -24,10 +35,6 @@ const Profile = () => {
       contactInfo: yup.string().required("Please enter Contact Number"),
       shippingAddress: yup.string().required("Please enter your shipping address"),
       BusinessDetails: yup.string().required("Please enter BusinessDetails"),
-      comment: yup.string().required("Please enter Project Name"),
-      metatitle: yup.string().required("Please enter Project Name"),
-      metakeywords: yup.string().required("Please enter Project Name"),
-      metadescription: yup.string().required("Please enter Project Name"),
     })
   );
 
@@ -42,7 +49,19 @@ const Profile = () => {
     formState: { errors },
   } = methods;
 
+function customHandleSubmit(){
 
+}
+
+
+  const AUTH_SESSION_KEY = "ubold_user";
+  useEffect(() => {
+    let userInfo = sessionStorage.getItem(AUTH_SESSION_KEY);
+    if (userInfo) {
+      const { username,business, contact } = JSON.parse(userInfo);
+      
+    }
+  })
   return (
     <>
       <PageTitle
@@ -57,7 +76,7 @@ const Profile = () => {
         title={"Update Profile"}
       />
 
-      <form onSubmit={handleSubmit(() => { })}>
+      <form onSubmit={customHandleSubmit}>
         <Row>
           <Col lg={8}>
             <Card>
@@ -71,37 +90,28 @@ const Profile = () => {
                   placeholder="Enter your name here"
                   containerClass={"mb-3"}
                   register={register}
-                  key="prevPass"
+                  key="name"
                   errors={errors}
                   control={control}
                 />
                 <FormInput
-                  name="contactInfo"
+                  name="contact"
                   label="Contact Information"
                   placeholder="Enter your contact number here"
                   containerClass={"mb-3"}
                   register={register}
-                  key="reference"
+                  key="contact"
                   errors={errors}
                   control={control}
                 />
+               
                 <FormInput
-                  name="shippingAddress"
-                  label="Shipping Address"
-                  placeholder="Enter your shipping address here"
+                  name="business"
+                  label="Business Address"
+                  placeholder="Enter your business address here"
                   containerClass={"mb-3"}
                   register={register}
-                  key="confirmNewPass"
-                  errors={errors}
-                  control={control}
-                />
-                <FormInput
-                  name="BusinessDetails"
-                  label="Shipping Address"
-                  placeholder="Enter your business details here"
-                  containerClass={"mb-3"}
-                  register={register}
-                  key="confirmNewPass"
+                  key="business"
                   errors={errors}
                   control={control}
                 />

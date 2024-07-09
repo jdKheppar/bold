@@ -22,6 +22,8 @@ interface UserData {
   lastName: string;
   role: string;
   token: string;
+  business: string;
+  contact: string;
 }
 
 // common success
