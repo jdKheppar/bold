@@ -66,6 +66,7 @@ const Profile = withSwal((props: any) => {
 
   const [financialtypeS, setFinancialTypeS] = useState<MobileFinancialType>();
   const [financialSelections, setFinancialSelections] = useState<MobileFinancialType[]>();
+  const [paymentdetails, setPaymentDetails] = useState<PaymentDetails>();
 
   const [paymentS, setPaymentS] = useState<PaymentDTO>();
   const [paymentSelections, setPaymentSelections] = useState<PaymentDTO[]>();
@@ -85,9 +86,9 @@ const Profile = withSwal((props: any) => {
   const onChangeFinancialSelection = (selected: MobileFinancialType[]) => {
     setFinancialSelections(selected);
     if (selected && selected[0]) {
-     
+
       setFinancialTypeS(selected[0]);
-      
+
     }
 
   };
@@ -95,20 +96,23 @@ const Profile = withSwal((props: any) => {
   const onChangePaymentSelection = (selected: PaymentDTO[]) => {
     setPaymentSelections(selected);
     if (selected && selected[0]) {
-     
+
       setPaymentS(selected[0]);
-      
+
     }
 
   };
+
+
 
 
   const fetchPaymentMethods = async () => {
     const fullUrl = "https://reseller.whitexdigital.com/api/payout_methord";
     try {
       const response = await axios.get(fullUrl);
-      console.log(response);
-      // setPaymentMethods(response.data.paymentMethods);
+      console.log(response.data.data);
+      setPaymentDetails(response.data.data);
+
     } catch (error) {
       swal.fire({
         title: "Error!",
@@ -132,7 +136,7 @@ const Profile = withSwal((props: any) => {
       setBusiness(parsedUserInfo.business);
       fetchPaymentMethods();
     }
-    else{
+    else {
       swal.fire({
         title: "Error!",
         text: "Error in fetchig user data!",
@@ -140,6 +144,64 @@ const Profile = withSwal((props: any) => {
       });
     }
   }, []);
+  useEffect(() => {
+    if (paymentdetails) {
+      setAccountHolderName(paymentdetails.account_holder_name);
+      setAccountNumber(paymentdetails.account_number.toString());
+      if (paymentdetails.type == "Bank") {
+        setPaymentS({
+          id: 2,
+          name: "Bank",
+        });
+        setPaymentSelections([
+          {
+            id: 2,
+            name: "Bank",
+          },
+        ]);
+        setBankName(paymentdetails.bank_name);
+        setBranchName(paymentdetails.branch_name);
+      }
+      else {
+        setPaymentS({
+          id: 1,
+          name: "Mobile Financial Services",
+        });
+        setPaymentSelections([
+          {
+            id: 1,
+            name: "Mobile Financial Services",
+          },
+        ]);
+        if (paymentdetails.mobile_finance_type == "Nagad") {
+          setFinancialTypeS({
+            id: 1,
+            name: paymentdetails.mobile_finance_type,
+          });
+          setFinancialSelections([
+            {
+              id: 1,
+              name: paymentdetails.mobile_finance_type,
+            },
+          ]);
+        }
+        else {
+          setFinancialTypeS({
+            id: 2,
+            name: paymentdetails.mobile_finance_type,
+          });
+          setFinancialSelections([
+            {
+              id: 2,
+              name: paymentdetails.mobile_finance_type,
+            },
+          ]);
+        }
+
+      }
+    }
+
+  }, [paymentdetails]);
 
   const handleSubmit = async () => {
     let params;
@@ -187,8 +249,8 @@ const Profile = withSwal((props: any) => {
 
   const updatePaymentDetails = async () => {
     let params;
-    let paymentType = paymentS?paymentS.name:"";
-    let mobileFinancialType = financialtypeS?financialtypeS.name:"";
+    let paymentType = paymentS ? paymentS.name : "";
+    let mobileFinancialType = financialtypeS ? financialtypeS.name : "";
     let newObj = {
       type: paymentType,
       mobile_finance_type: mobileFinancialType,
@@ -210,7 +272,7 @@ const Profile = withSwal((props: any) => {
           text: "Payment Updated Successfully!",
           icon: "success",
         });
-        
+
       } else {
         swal.fire({
           title: "Error!",
@@ -267,76 +329,76 @@ const Profile = withSwal((props: any) => {
               />
             </Card.Body>
             <button
-                type="button"
-                onClick={handleSubmit}
-                className="btn w-sm btn-success waves-effect waves-light p-2 mt-0 m-3 text-uppercase"
-              >
-                Update Profile
-              </button>
+              type="button"
+              onClick={handleSubmit}
+              className="btn w-sm btn-success waves-effect waves-light p-2 mt-0 m-3 text-uppercase"
+            >
+              Update Profile
+            </button>
           </Card>
         </Col>
         <Col lg={6}>
-        <Card>
-        <Card.Body>
-        <h5 className="text-uppercase bg-light p-2 mt-0 mb-3">
+          <Card>
+            <Card.Body>
+              <h5 className="text-uppercase bg-light p-2 mt-0 mb-3">
                 Update Payment Method
               </h5>
               <div className="mb-3">
-              <label htmlFor="payment" className="form-label">
-                Payment
-              </label>
-              <Typeahead
-                id="select3"
-                labelKey={"name"}
-               
-                multiple={false}
-                onChange={onChangePaymentSelection}
-                options={payments}
-                placeholder="Select a payment method..."
-                selected={paymentSelections}
-              />
-            </div>
-          {
-            paymentS?.id==2 &&
-            <>
-            <FormInput
-                name="bank name"
-                label="Bank Name"
-                placeholder="Enter your bank name here"
-                containerClass={"mb-3"}
-                value={bankname}
-                onChange={(e) => setBankName(e.target.value)}
-              />
-              <FormInput
-                name="branch name"
-                label="Branch Name"
-                placeholder="Enter your branch name here"
-                containerClass={"mb-3"}
-                value={branchname}
-                onChange={(e) => setBranchName(e.target.value)}
-              />
-            </>
-          }
-            {
-              paymentS?.id==1 &&
-              <div className="mb-3">
-               <label htmlFor="mobile" className="form-label">
-                Mobile Finance Type
-              </label>
-              <Typeahead
-                id="financetype"
-                labelKey={"name"}
-               
-                multiple={false}
-                onChange={onChangeFinancialSelection}
-                options={financialtypes}
-                placeholder="Select a mobile finance type here..."
-                selected={financialSelections}
-              />
-              
+                <label htmlFor="payment" className="form-label">
+                  Payment
+                </label>
+                <Typeahead
+                  id="select3"
+                  labelKey={"name"}
+
+                  multiple={false}
+                  onChange={onChangePaymentSelection}
+                  options={payments}
+                  placeholder="Select a payment method..."
+                  selected={paymentSelections}
+                />
               </div>
-            }
-              
+              {
+                paymentS?.id == 2 &&
+                <>
+                  <FormInput
+                    name="bank name"
+                    label="Bank Name"
+                    placeholder="Enter your bank name here"
+                    containerClass={"mb-3"}
+                    value={bankname}
+                    onChange={(e) => setBankName(e.target.value)}
+                  />
+                  <FormInput
+                    name="branch name"
+                    label="Branch Name"
+                    placeholder="Enter your branch name here"
+                    containerClass={"mb-3"}
+                    value={branchname}
+                    onChange={(e) => setBranchName(e.target.value)}
+                  />
+                </>
+              }
+              {
+                paymentS?.id == 1 &&
+                <div className="mb-3">
+                  <label htmlFor="mobile" className="form-label">
+                    Mobile Finance Type
+                  </label>
+                  <Typeahead
+                    id="financetype"
+                    labelKey={"name"}
+
+                    multiple={false}
+                    onChange={onChangeFinancialSelection}
+                    options={financialtypes}
+                    placeholder="Select a mobile finance type here..."
+                    selected={financialSelections}
+                  />
+
+                </div>
+              }
+
               <FormInput
                 name="account holder name"
                 label="Account Holder Name"
@@ -345,7 +407,7 @@ const Profile = withSwal((props: any) => {
                 value={accountholdername}
                 onChange={(e) => setAccountHolderName(e.target.value)}
               />
-               <FormInput
+              <FormInput
                 name="account number"
                 label="Account Number"
                 placeholder="Enter account number here"
@@ -361,9 +423,9 @@ const Profile = withSwal((props: any) => {
                 Update Payment Details
               </button>
 
-        </Card.Body>
-        </Card>
-        
+            </Card.Body>
+          </Card>
+
         </Col>
       </Row>
     </>
