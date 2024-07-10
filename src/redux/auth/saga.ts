@@ -107,8 +107,8 @@ function* login({
               username: user.name,
               role: "Admin",
               token: response.data.token,
-              business: response.data.business,
-              contact: response.data.contact
+              business: user.business,
+              contact: user.contact
             }
             api.setLoggedInUser(newUser);
             setAuthorization(response.data.token);

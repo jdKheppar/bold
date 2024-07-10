@@ -202,7 +202,7 @@ const Topbar = ({
       const { username } = JSON.parse(userInfo);
       setProfileUser(username);
     }
-  })
+  },[])
   /**
    * Toggles the left sidebar width
    */

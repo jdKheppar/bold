@@ -1,20 +1,14 @@
 import { useEffect, useState } from "react";
-import { Row, Col, Card, Form } from "react-bootstrap";
-import { useForm } from "react-hook-form";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { Row, Col, Card } from "react-bootstrap";
 import axios from "axios";
 import { withSwal } from "react-sweetalert2";
-
-
-
 // styles
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 
 // components
 import PageTitle from "../../../components/PageTitle";
 import { FormInput } from "../../../components";
-
+import { Typeahead } from "react-bootstrap-typeahead";
 
 interface UserData {
   id: number;
@@ -27,40 +21,95 @@ interface UserData {
   business: string;
   contact: string;
 }
+interface PaymentDTO {
+  id: number;
+  name: string;
+}
+
+interface MobileFinancialType {
+  id: number;
+  name: string;
+}
+interface PaymentDetails {
+  account_holder_name: string;
+  account_number: number;
+  bank_name: string;
+  branch_name: string;
+  mobile_finance_type: string;
+  type: string;
+}
 const Profile = withSwal((props: any) => {
   const { swal } = props;
-  /*
-   * form validation schema
-   */
-  const schemaResolver = yupResolver(
-    yup.object().shape({
-      name: yup.string().required("Please enter Project Name"),
-      contact: yup.string().required("Please enter Contact Number"),
-      business: yup.string().required("Please enter Business Address"),
-    })
-  );
 
-  /*
-   * form methods
-   */
-  const methods = useForm({ resolver: schemaResolver });
-  const {
-    handleSubmit,
-    register,
-    control,
-    setValue,
-    formState: { errors },
-  } = methods;
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [payments, setPayments] = useState<PaymentDTO[]>([
+    {
+      id: 1,
+      name: "Mobile Financial Services"
+    },
+    {
+      id: 2,
+      name: "Bank"
+    }
+  ]);
+  const [financialtypes, setFinancialTypes] = useState<MobileFinancialType[]>([
+    {
+      id: 1,
+      name: "Nagad"
+    },
+    {
+      id: 2,
+      name: "bKash"
+    }
+  ]);
+
+
+  const [financialtypeS, setFinancialTypeS] = useState<MobileFinancialType>();
+  const [financialSelections, setFinancialSelections] = useState<MobileFinancialType[]>();
+
+  const [paymentS, setPaymentS] = useState<PaymentDTO>();
+  const [paymentSelections, setPaymentSelections] = useState<PaymentDTO[]>();
+
+
+
+  const [name, setName] = useState("");
+  const [contact, setContact] = useState("");
+  const [business, setBusiness] = useState("");
+
+  const [bankname, setBankName] = useState("");
+  const [branchname, setBranchName] = useState("");
+  const [accountholdername, setAccountHolderName] = useState("");
+  const [accountnumber, setAccountNumber] = useState("");
+
+
+  const onChangeFinancialSelection = (selected: MobileFinancialType[]) => {
+    setFinancialSelections(selected);
+    if (selected && selected[0]) {
+     
+      setFinancialTypeS(selected[0]);
+      
+    }
+
+  };
+
+  const onChangePaymentSelection = (selected: PaymentDTO[]) => {
+    setPaymentSelections(selected);
+    if (selected && selected[0]) {
+     
+      setPaymentS(selected[0]);
+      
+    }
+
+  };
+
 
   const fetchPaymentMethods = async () => {
     const fullUrl = "https://reseller.whitexdigital.com/api/payout_methord";
     try {
       const response = await axios.get(fullUrl);
       console.log(response);
-      //setPaymentMethods(response.data.paymentMethods);
-
-    }
-    catch (error) {
+      // setPaymentMethods(response.data.paymentMethods);
+    } catch (error) {
       swal.fire({
         title: "Error!",
         text: "Something Went Wrong!",
@@ -68,34 +117,40 @@ const Profile = withSwal((props: any) => {
       });
       console.error("API call error:", error);
     }
+  };
 
-  }
   const AUTH_SESSION_KEY = "ubold_user";
-  const [userData, setUserData] = useState<UserData | null>(null);
 
   useEffect(() => {
-    const userInfo = localStorage.getItem(AUTH_SESSION_KEY);
+    const userInfo = sessionStorage.getItem(AUTH_SESSION_KEY);
     if (userInfo) {
       const parsedUserInfo = JSON.parse(userInfo);
+      console.log(parsedUserInfo);
       setUserData(parsedUserInfo);
-
-      // Set form values
-      setValue("name", parsedUserInfo.username);
-      setValue("contact", parsedUserInfo.contact);
-      setValue("business", parsedUserInfo.business);
-
+      setName(parsedUserInfo.username);
+      setContact(parsedUserInfo.contact);
+      setBusiness(parsedUserInfo.business);
+      fetchPaymentMethods();
     }
-  }, [setValue]);
-  useEffect(() => {
-    fetchPaymentMethods();
-  })
-  const onSubmit = async (data: any) => {
-    let newObj = {
-      name: data.name,
-      contact: data.contact,
-      business: data.business
+    else{
+      swal.fire({
+        title: "Error!",
+        text: "Error in fetchig user data!",
+        icon: "error",
+      });
     }
-    const params = new URLSearchParams(newObj).toString();
+  }, []);
+
+  const handleSubmit = async () => {
+    let params;
+    if (userData) {
+      let newObj = {
+        name: name,
+        contact: contact,
+        business: business,
+      };
+      params = new URLSearchParams(newObj).toString();
+    }
 
     const fullUrl = `https://reseller.whitexdigital.com/api/update_profile?${params}`;
     try {
@@ -108,6 +163,15 @@ const Profile = withSwal((props: any) => {
           text: "Profile Updated Successfully!",
           icon: "success",
         });
+        let updatedUser = {
+          id: userData?.id,
+          username: name,
+          role: "Admin",
+          token: userData?.token,
+          business: business,
+          contact: contact
+        }
+        sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(updatedUser));
       } else {
         swal.fire({
           title: "Error!",
@@ -121,6 +185,45 @@ const Profile = withSwal((props: any) => {
     }
   };
 
+  const updatePaymentDetails = async () => {
+    let params;
+    let paymentType = paymentS?paymentS.name:"";
+    let mobileFinancialType = financialtypeS?financialtypeS.name:"";
+    let newObj = {
+      type: paymentType,
+      mobile_finance_type: mobileFinancialType,
+      bank_name: bankname,
+      branch_name: branchname,
+      account_holder_name: accountholdername,
+      account_number: accountnumber
+    };
+    params = new URLSearchParams(newObj).toString();
+
+    const fullUrl = `https://reseller.whitexdigital.com/api/payout_methord?${params}`;
+    try {
+      const response = await axios.post(fullUrl);
+
+      // Handle success or failure
+      if (response.status === 200) {
+        swal.fire({
+          title: "Success",
+          text: "Payment Updated Successfully!",
+          icon: "success",
+        });
+        
+      } else {
+        swal.fire({
+          title: "Error!",
+          text: "Failed to update payment method!",
+          icon: "error",
+        });
+      }
+    } catch (error) {
+      console.error("There was an error updating the payment method!", error);
+      alert("An error occurred while updating the payment method.");
+    }
+  };
+
   return (
     <>
       <PageTitle
@@ -131,62 +234,138 @@ const Profile = withSwal((props: any) => {
         title={"Update Profile"}
       />
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Row>
-          <Col lg={6}>
-            <Card>
-              <Card.Body>
-                <h5 className="text-uppercase bg-light p-2 mt-0 mb-3">
-                  Update Profile
-                </h5>
-                <FormInput
-                  name="name"
-                  label="Name"
-                  placeholder="Enter your name here"
-                  containerClass={"mb-3"}
-                  register={register}
-                  key="name"
-                  errors={errors}
-                  control={control}
-                />
-                <FormInput
-                  name="contact"
-                  label="Contact Information"
-                  placeholder="Enter your contact number here"
-                  containerClass={"mb-3"}
-                  register={register}
-                  key="contact"
-                  errors={errors}
-                  control={control}
-                />
-                <FormInput
-                  name="business"
-                  label="Business Address"
-                  placeholder="Enter your business address here"
-                  containerClass={"mb-3"}
-                  register={register}
-                  key="business"
-                  errors={errors}
-                  control={control}
-                />
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col lg={8}>
-            <div className="text-right mb-3">
-              <button
-                type="submit"
-                className="btn w-sm btn-success waves-effect waves-light me-1"
+      <Row>
+        <Col lg={6}>
+          <Card>
+            <Card.Body>
+              <h5 className="text-uppercase bg-light p-2 mt-0 mb-3">
+                Update Profile Information
+              </h5>
+              <FormInput
+                name="name"
+                label="Name"
+                placeholder="Enter your name here"
+                containerClass={"mb-3"}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              <FormInput
+                name="contact"
+                label="Contact Information"
+                placeholder="Enter your contact number here"
+                containerClass={"mb-3"}
+                value={contact}
+                onChange={(e) => setContact(e.target.value)}
+              />
+              <FormInput
+                name="business"
+                label="Business Address"
+                placeholder="Enter your business address here"
+                containerClass={"mb-2"}
+                value={business}
+                onChange={(e) => setBusiness(e.target.value)}
+              />
+            </Card.Body>
+            <button
+                type="button"
+                onClick={handleSubmit}
+                className="btn w-sm btn-success waves-effect waves-light p-2 mt-0 m-3 text-uppercase"
               >
-                Update
+                Update Profile
               </button>
+          </Card>
+        </Col>
+        <Col lg={6}>
+        <Card>
+        <Card.Body>
+        <h5 className="text-uppercase bg-light p-2 mt-0 mb-3">
+                Update Payment Method
+              </h5>
+              <div className="mb-3">
+              <label htmlFor="payment" className="form-label">
+                Payment
+              </label>
+              <Typeahead
+                id="select3"
+                labelKey={"name"}
+               
+                multiple={false}
+                onChange={onChangePaymentSelection}
+                options={payments}
+                placeholder="Select a payment method..."
+                selected={paymentSelections}
+              />
             </div>
-          </Col>
-        </Row>
-      </form>
+          {
+            paymentS?.id==2 &&
+            <>
+            <FormInput
+                name="bank name"
+                label="Bank Name"
+                placeholder="Enter your bank name here"
+                containerClass={"mb-3"}
+                value={bankname}
+                onChange={(e) => setBankName(e.target.value)}
+              />
+              <FormInput
+                name="branch name"
+                label="Branch Name"
+                placeholder="Enter your branch name here"
+                containerClass={"mb-3"}
+                value={branchname}
+                onChange={(e) => setBranchName(e.target.value)}
+              />
+            </>
+          }
+            {
+              paymentS?.id==1 &&
+              <div className="mb-3">
+               <label htmlFor="mobile" className="form-label">
+                Mobile Finance Type
+              </label>
+              <Typeahead
+                id="financetype"
+                labelKey={"name"}
+               
+                multiple={false}
+                onChange={onChangeFinancialSelection}
+                options={financialtypes}
+                placeholder="Select a mobile finance type here..."
+                selected={financialSelections}
+              />
+              
+              </div>
+            }
+              
+              <FormInput
+                name="account holder name"
+                label="Account Holder Name"
+                placeholder="Enter account holder name here"
+                containerClass={"mb-2"}
+                value={accountholdername}
+                onChange={(e) => setAccountHolderName(e.target.value)}
+              />
+               <FormInput
+                name="account number"
+                label="Account Number"
+                placeholder="Enter account number here"
+                containerClass={"mb-2"}
+                value={accountnumber}
+                onChange={(e) => setAccountNumber(e.target.value)}
+              />
+              <button
+                type="button"
+                onClick={updatePaymentDetails}
+                className="btn w-sm btn-success waves-effect waves-light p-2 mt-0 text-uppercase"
+              >
+                Update Payment Details
+              </button>
+
+        </Card.Body>
+        </Card>
+        
+        </Col>
+      </Row>
     </>
   );
 });
