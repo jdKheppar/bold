@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
+import { withSwal } from "react-sweetalert2";
 
 
 
@@ -26,8 +27,8 @@ interface UserData {
   business: string;
   contact: string;
 }
-const Profile = () => {
-
+const Profile = withSwal((props: any) => {
+  const { swal } = props;
   /*
    * form validation schema
    */
@@ -51,6 +52,24 @@ const Profile = () => {
     formState: { errors },
   } = methods;
 
+  const fetchPaymentMethods = async () => {
+    const fullUrl = "https://reseller.whitexdigital.com/api/payout_methord";
+    try {
+      const response = await axios.get(fullUrl);
+      console.log(response);
+      //setPaymentMethods(response.data.paymentMethods);
+
+    }
+    catch (error) {
+      swal.fire({
+        title: "Error!",
+        text: "Something Went Wrong!",
+        icon: "error",
+      });
+      console.error("API call error:", error);
+    }
+
+  }
   const AUTH_SESSION_KEY = "ubold_user";
   const [userData, setUserData] = useState<UserData | null>(null);
 
@@ -67,7 +86,9 @@ const Profile = () => {
 
     }
   }, [setValue]);
-
+  useEffect(() => {
+    fetchPaymentMethods();
+  })
   const onSubmit = async (data: any) => {
     let newObj = {
       name: data.name,
@@ -82,9 +103,17 @@ const Profile = () => {
 
       // Handle success or failure
       if (response.status === 200) {
-        alert("Profile updated successfully!");
+        swal.fire({
+          title: "Success",
+          text: "Profile Updated Successfully!",
+          icon: "success",
+        });
       } else {
-        alert("Failed to update profile.");
+        swal.fire({
+          title: "Error!",
+          text: "Failed to update profile!",
+          icon: "error",
+        });
       }
     } catch (error) {
       console.error("There was an error updating the profile!", error);
@@ -104,7 +133,7 @@ const Profile = () => {
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <Row>
-          <Col lg={8}>
+          <Col lg={6}>
             <Card>
               <Card.Body>
                 <h5 className="text-uppercase bg-light p-2 mt-0 mb-3">
@@ -160,6 +189,6 @@ const Profile = () => {
       </form>
     </>
   );
-};
+});
 
 export default Profile;

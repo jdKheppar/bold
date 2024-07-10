@@ -58,7 +58,7 @@ const Payouts = withSwal((props: any) => {
     const { swal } = props;
     const [payouts, setPayouts] = useState<PayoutDTO[]>([]);
 
-    
+
 
     const fetchPayouts = async () => {
         const fullUrl = "https://reseller.whitexdigital.com/api/payouts";
@@ -75,11 +75,13 @@ const Payouts = withSwal((props: any) => {
         }
     };
 
+
+
     useEffect(() => {
         fetchPayouts();
     }, []);
 
-   
+
 
     return (
         <>
@@ -95,7 +97,7 @@ const Payouts = withSwal((props: any) => {
                 <Col>
                     <Card>
                         <Card.Body>
-                            
+
                             {
                                 payouts &&
                                 <Card className="mt-4">
