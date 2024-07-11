@@ -23,7 +23,7 @@ interface Product {
   total_images: number;
   images: string[];
   colors: string[];
-  attributes: string[];
+ 
   special_discount_start: string;
   special_discount_end: string;
   short_description: string;
@@ -66,6 +66,16 @@ interface Product {
     id: number,
     code: string,
     name: string
+  }[];
+  suggested_retail_price: string;
+  attributes: {
+    id: number;
+    title: string;
+    values: {
+      id: number;
+      attribute_id: number;
+      value: string;
+    }[];
   }[];
 }
 interface Color {
@@ -302,7 +312,13 @@ const ProductDetails: React.FC = withSwal((props: any) => {
                       <b>{product?.price} BDT</b>
 
                     </h4>
-
+                    {
+                      product?.suggested_retail_price && <h4>
+                        <span>
+                          product.suggested_retail_price
+                        </span>
+                      </h4>
+                    }
                     {product?.current_stock !== undefined && (
                       <h4>
                         <span className={`badge bg-soft-${current_stockClass} text-${current_stockClass} mb-4`}>
