@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Row, Col, Card, ProgressBar, Tab, Nav } from "react-bootstrap";
+import { Row, Col, Card, Tab, Nav } from "react-bootstrap";
 import axios from "axios";
 import PageTitle from "../../../../../components/PageTitle";
 import Rating from "../../../../../components/Rating";
 import { FormInput } from "../../../../../components";
 import { withSwal } from "react-sweetalert2";
-
 
 interface Product {
   name: string;
@@ -23,7 +22,6 @@ interface Product {
   total_images: number;
   images: string[];
   colors: string[];
- 
   special_discount_start: string;
   special_discount_end: string;
   short_description: string;
@@ -48,24 +46,24 @@ interface Product {
   classified_contact_info: any;
   catalog_external_link: string;
   gallery: {
-    large: string[],
-    small: string[]
+    large: string[];
+    small: string[];
   };
   category_name: string;
   variations: {
-    current_stock: string,
-    id: number,
-    image: string,
-    name: string,
-    product_id: number,
-    sku: string,
-    suggested_retail_price: number,
-    variant_ids: string
+    current_stock: string;
+    id: number;
+    image: string;
+    name: string;
+    product_id: number;
+    sku: string;
+    suggested_retail_price: number;
+    variant_ids: string;
   };
   product_colors: {
-    id: number,
-    code: string,
-    name: string
+    id: number;
+    code: string;
+    name: string;
   }[];
   suggested_retail_price: string;
   attributes: {
@@ -78,6 +76,7 @@ interface Product {
     }[];
   }[];
 }
+
 interface Color {
   id: number;
   code: string;
@@ -96,8 +95,8 @@ const ProductDetails: React.FC = withSwal((props: any) => {
   const [cartItems, setCartItems] = useState<CartItems[]>([]);
   const [titleText, setTitleText] = useState("");
   const [selectedColor, setSelectedColor] = useState<Color | null>(null);
+  const [selectedAttributes, setSelectedAttributes] = useState<{ [key: number]: string }>({});
   let exchangeOrderItem = localStorage.getItem("ExchangeOrderID");
-
 
   const [currentItem, setCurrentItem] = useState<CartItems>({
     slug: slug || "",
@@ -105,7 +104,6 @@ const ProductDetails: React.FC = withSwal((props: any) => {
   });
 
   const addToCart = () => {
-
     if (!slug) {
       swal.fire({
         title: "Error!",
@@ -123,14 +121,13 @@ const ProductDetails: React.FC = withSwal((props: any) => {
       return;
     }
 
-    const isInCart = cartItems.some(item => item.slug === slug);//we can add size here instead of the quantity && item.quantity === currentItem.quantity
-
+    const isInCart = cartItems.some((item) => item.slug === slug);
 
     if (isInCart) {
       swal.fire({
         title: "Error!",
         text: "Product is already in the cart.",
-        icon: "waring",
+        icon: "warning",
       });
       return;
     }
@@ -155,7 +152,8 @@ const ProductDetails: React.FC = withSwal((props: any) => {
     }
   };
 
-  const current_stockClass = product?.current_stock && product.current_stock > 0 ? "success" : "danger";
+  const current_stockClass =
+    product?.current_stock && product.current_stock > 0 ? "success" : "danger";
 
   const createMarkup = (text: string) => ({ __html: text });
 
@@ -166,6 +164,7 @@ const ProductDetails: React.FC = withSwal((props: any) => {
       setCartItems(JSON.parse(storedCartItems));
     }
   }, [slug]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     addToCart();
@@ -174,11 +173,18 @@ const ProductDetails: React.FC = withSwal((props: any) => {
   useEffect(() => {
     if (exchangeOrderItem) {
       setTitleText(`Product Details (Exchange Order)`);
-    }
-    else {
+    } else {
       setTitleText("Product Details");
     }
-  })
+  });
+
+  const handleAttributeChange = (attributeId: number, value: string) => {
+    setSelectedAttributes((prev) => ({
+      ...prev,
+      [attributeId]: value,
+    }));
+  };
+
   return (
     <>
       <PageTitle
@@ -282,7 +288,6 @@ const ProductDetails: React.FC = withSwal((props: any) => {
                       )}
                     </Nav>
                   </Tab.Container>
-
                 </Col>
 
                 <Col lg={7}>
@@ -301,24 +306,19 @@ const ProductDetails: React.FC = withSwal((props: any) => {
                         </Link>
                       </p>
                     )}
-                    <h6 className="text-danger text-uppercase" >
-                      Discount Price: {product?.price}
-                    </h6>
+                    <h6 className="text-danger text-uppercase">Discount Price: {product?.price}</h6>
                     <h4 className="mb-4">
                       Price :{" "}
                       <span className="text-muted me-2">
                         <del>{product?.price} BDT</del>
                       </span>{" "}
                       <b>{product?.price} BDT</b>
-
                     </h4>
-                    {
-                      product?.suggested_retail_price && <h4>
-                        <span>
-                          product.suggested_retail_price
-                        </span>
+                    {product?.suggested_retail_price && (
+                      <h4>
+                        <span>Suggested Retail Price:{product.suggested_retail_price} BDT</span>
                       </h4>
-                    }
+                    )}
                     {product?.current_stock !== undefined && (
                       <h4>
                         <span className={`badge bg-soft-${current_stockClass} text-${current_stockClass} mb-4`}>
@@ -327,10 +327,16 @@ const ProductDetails: React.FC = withSwal((props: any) => {
                       </h4>
                     )}
                     <div>
-                      <select onChange={(event) => {
-                          const selectedColor = product?.product_colors.find(color => color.id === Number(event.target.value));
+                      <select
+                        className="react-select react-select-container form-select"
+                        onChange={(event) => {
+                          const selectedColor = product?.product_colors.find(
+                            (color) => color.id === Number(event.target.value)
+                          );
                           setSelectedColor(selectedColor || null);
-                        }} value={selectedColor?.id || ""}>
+                        }}
+                        value={selectedColor?.id || ""}
+                      >
                         <option value="">Select a color</option>
                         {product?.product_colors.map((color, index) => (
                           <option key={index} value={color.id} style={{ color: color.code }}>
@@ -339,16 +345,49 @@ const ProductDetails: React.FC = withSwal((props: any) => {
                         ))}
                       </select>
                       {selectedColor && (
-                        <div style={{ marginTop: '20px', color: selectedColor.code }}>
-                          Selected Color: {selectedColor.name}
+                        <div
+                          style={{
+                            marginTop: "20px",
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: "20px",
+                              height: "20px",
+                              borderRadius: "50%",
+                              backgroundColor: selectedColor.code,
+                              marginRight: "10px",
+                            }}
+                          ></div>
+                          <span style={{ color: selectedColor.code }}>Selected Color: {selectedColor.name}</span>
                         </div>
                       )}
                     </div>
+                    {/* Add Dropdowns for each attribute */}
+                    {product?.attributes.map((attribute) => (
+                      <div key={attribute.id} className="mt-3">
+                        <label htmlFor={`attribute-${attribute.id}`} className="form-label">
+                          {attribute.title}
+                        </label>
+                        <select
+                          id={`attribute-${attribute.id}`}
+                          className="form-select"
+                          onChange={(e) => handleAttributeChange(attribute.id, e.target.value)}
+                          value={selectedAttributes[attribute.id] || ""}
+                        >
+                          <option value="">Select {attribute.title}</option>
+                          {Array.isArray(attribute.values) && attribute.values.map((value) => (
+                            <option key={value.id} value={value.value}>
+                              {value.value}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    ))}
                     <p className="text-muted mb-4">{product?.short_description}</p>
-                    <form className=" mb-4" onSubmit={handleSubmit}>
-                      {/* <label className="my-1 me-2" htmlFor="quantityinput">
-                        Quantity
-                      </label> */}
+                    <form className="mb-4" onSubmit={handleSubmit}>
                       <div className="d-flex flex-wrap align-items-center">
                         <div className="me-3">
                           <FormInput
@@ -361,33 +400,18 @@ const ProductDetails: React.FC = withSwal((props: any) => {
                             containerClass={"mb-3"}
                             id="quantityinput"
                             value={currentItem.quantity}
-                            onChange={(e) => setCurrentItem({ ...currentItem, quantity: Number(e.target.value) })}
+                            onChange={(e) =>
+                              setCurrentItem({ ...currentItem, quantity: Number(e.target.value) })
+                            }
                             key="number"
                             disabled={!product?.current_stock}
-
                           />
+                        </div>
 
-                        </div>
-                        <label className="my-1 me-2" htmlFor="sizeinput">
-                          Size
-                        </label>
-                        <div className="me-sm-3">
-                          <select className="form-select my-1" id="sizeinput">
-                            <option defaultValue="0">Small</option>
-                            <option value="1">Medium</option>
-                            <option value="2">Large</option>
-                            <option value="3">X-large</option>
-                          </select>
-                        </div>
                       </div>
 
-
                       <div>
-                        <button
-                          className="btn btn-success waves-effect waves-light"
-                          type="submit"
-                          disabled={!product?.current_stock}
-                        >
+                        <button className="btn btn-success waves-effect waves-light" type="submit" disabled={!product?.current_stock}>
                           <span className="btn-label">
                             <i className="mdi mdi-cart"></i>
                           </span>
@@ -395,8 +419,6 @@ const ProductDetails: React.FC = withSwal((props: any) => {
                         </button>
                       </div>
                     </form>
-
-
                   </div>
                 </Col>
                 <div className="text-muted mb-4 mt-4">
@@ -406,7 +428,7 @@ const ProductDetails: React.FC = withSwal((props: any) => {
             </Card.Body>
           </Card>
         </Col>
-      </Row >
+      </Row>
     </>
   );
 });
