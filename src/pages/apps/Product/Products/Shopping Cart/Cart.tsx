@@ -32,6 +32,8 @@ interface CartItemTypes {
   discount_price: number;
   color_id: number;
   attribute_values: number[];
+  variants_ids: string;
+  variants_name: string;
 }
 
 
@@ -401,11 +403,13 @@ const Cart = withSwal((props: any) => {
   };
 
   const onCustomPChange = (e: any, item: CartItemTypes) => {
-    var localItems = [...items];
-    var idx = localItems.findIndex((i) => i.id === item.id);
-
-    localItems[idx] = { ...item, custom_price: e.target.value };
-    _adjustCart(localItems);
+    const newCustomPrice = parseFloat(e.target.value) || 0;
+    const updatedItems = items.map((i) =>
+      i.id === item.id ? { ...i, custom_price: newCustomPrice } : i
+    );
+    setItems(updatedItems);
+    localStorage.setItem("cartItems", JSON.stringify(updatedItems));
+    _adjustCart(updatedItems);
   };
 
 
@@ -569,13 +573,14 @@ const Cart = withSwal((props: any) => {
     const orderData = {
       products: items.map((item) => ({
         id: item.id,
-        quantity: item.current_stock,
         color_id: item.color_id || 0,
-        custom_price: item.custom_price,
+        quantity: item.current_stock,
         attribute_values: item.attribute_values || [],
-        variants_name: "",
-        variants_ids: "",
-        carts: []
+        variants_ids: item.variants_ids||"",
+        price: item.price,
+        custom_price: item.custom_price,
+        variants_name: item.variants_name||[],
+       
       })),
       clientID: selectedClientId,
       note,

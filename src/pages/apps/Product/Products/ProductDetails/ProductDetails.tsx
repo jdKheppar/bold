@@ -100,6 +100,7 @@ const ProductDetails: React.FC = withSwal((props: any) => {
   });
   const [selectedAttributes, setSelectedAttributes] = useState<{ [key: number]: string }>({});
   const [selectedvariations, setSelectedVariations] = useState<string>("");
+  const [selectedvariationame, setSelectedVariationName] = useState<string>("");
   let exchangeOrderItem = localStorage.getItem("ExchangeOrderID");
 
   const [currentItem, setCurrentItem] = useState<CartItems>({
@@ -107,6 +108,10 @@ const ProductDetails: React.FC = withSwal((props: any) => {
     quantity: 0,
     color_id: 0,
     attribute_values: [],
+    variants_ids:"",
+    price: -1,
+    custom_price: -1,
+    variants_name: ""
   });
 
 
@@ -121,6 +126,7 @@ const ProductDetails: React.FC = withSwal((props: any) => {
   useEffect(() => {
     product?.variations.forEach((variation) => {
       if (variation.variant_ids === selectedvariations) {
+        setSelectedVariationName(variation.name)
         setProduct((prev) => prev ? ({
           ...prev,
           current_stock: parseInt(variation.current_stock, 10),
@@ -175,8 +181,13 @@ const ProductDetails: React.FC = withSwal((props: any) => {
         quantity: currentItem.quantity,
         color_id: selectedColor?.id || 0,
         attribute_values: attributesIDs,
+        variants_ids: selectedvariations,
+        variants_name: selectedvariationame,
+        price: currentItem.price,
+        custom_price: currentItem.custom_price
       },
-    ]; setCartItems(updatedCart);
+    ]; 
+    setCartItems(updatedCart);
     localStorage.setItem("cartItems", JSON.stringify(updatedCart));
     swal.fire({
       title: "Success!",
