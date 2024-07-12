@@ -17,6 +17,7 @@ interface CartSummaryTypes {
   custom_total?: number;
   discount?: number;
   net_total?: number;
+  shipping?: number;
 }
 
 interface CartItemTypes {
@@ -31,6 +32,7 @@ interface CartItemTypes {
   total: number;
   discount_price: number;
   color_id: number;
+  shipping: number;
   attribute_values: number[];
   variants_ids: string;
   variants_name: string;
@@ -334,6 +336,10 @@ const CartSummary = (props: { summary: CartSummaryTypes }) => {
                 <td>BDT {summary.custom_total!}</td>
               </tr>
               <tr>
+                <td>Shipping :</td>
+                <td>BDT {summary.shipping!}</td>
+              </tr>
+              <tr>
                 <th>Total :</th>
                 <th>BDT {summary.net_total!}</th>
               </tr>
@@ -355,7 +361,15 @@ const Cart = withSwal((props: any) => {
   const [storedItems, setStoredItems] = useState<CartItems[]>([])
   const [clients, setClients] = useState<ClientDTO[]>([]);
   const [titleText, setTitleText] = useState("");
-
+  const [shippinginfor, setShippingInfor] = useState("");
+  useEffect(() => {
+    let shipping_value: number = shippinginfor == "Inside Dhaka" ? 120 : 150;
+    setSummary({
+      ...summary,
+      shipping: shipping_value,
+      net_total: summary?.net_total! + shipping_value,
+    });
+  }, [shippinginfor]);
   const [client, setClient] = useState<ClientDTO>({
     id: 0,
     name: "",
@@ -377,6 +391,8 @@ const Cart = withSwal((props: any) => {
     discount: 0,
     custom_total: 0,
     net_total: 0,
+    shipping: 0
+
   });
   const [clientSelections, setClientSelections] = useState<ClientDTO[]>([]);
   const [selectedClientId, setSelectedClientId] = useState<Number>();
@@ -455,7 +471,7 @@ const Cart = withSwal((props: any) => {
     let newNetTotal = newGrossTotal - totalDiscount;
 
     // update items and summary
-    
+
     setSummary({
       ...summary,
       gross_total: newGrossTotal,
@@ -576,14 +592,15 @@ const Cart = withSwal((props: any) => {
         color_id: item.color_id || 0,
         quantity: item.current_stock,
         attribute_values: item.attribute_values || [],
-        variants_ids: item.variants_ids||"",
+        variants_ids: item.variants_ids || "",
         price: item.price,
         custom_price: item.custom_price,
-        variants_name: item.variants_name||[],
-       
+        variants_name: item.variants_name || [],
+
       })),
       clientID: selectedClientId,
       note,
+      shipping: shippinginfor,
       prev_OrderID: prev_order_id
     };
 
@@ -694,6 +711,7 @@ const Cart = withSwal((props: any) => {
 
                     </Col>
                   </Row>
+
                   <div className="table-responsive">
                     <table className="table table-borderless table-centered mb-0">
                       <thead className="table-light">
@@ -825,7 +843,36 @@ const Cart = withSwal((props: any) => {
                 </Col>
 
                 <Col lg={4}>
-                  <CartSummary summary={summary} />
+                  <Row className="mt-2 mb-4">
+                    <Col sm={12}
+                    >
+                      <div >
+                        <label htmlFor="shippinginfo" className="form-label">
+                          Select Delivery Charges
+                        </label>
+                        <select
+                          id="shipselect"
+                          className="form-select"
+                          onChange={(e) => setShippingInfor(e.target.value)}
+                        // value={selectedAttributes[attribute.id] || ""}
+                        >
+                          <option value="">Select</option>
+
+                          <option key="1" value="Inside Dhaka">
+                            Inside Dhaka
+                          </option>
+                          <option key="2" value="Outside Dhaka">
+                            Outside Dhaka
+                          </option>
+
+                        </select>
+                      </div>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col><CartSummary summary={summary} /></Col>
+                  </Row>
+
                 </Col>
               </Row>
 
