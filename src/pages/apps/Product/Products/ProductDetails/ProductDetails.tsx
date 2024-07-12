@@ -6,8 +6,10 @@ import PageTitle from "../../../../../components/PageTitle";
 import Rating from "../../../../../components/Rating";
 import { FormInput } from "../../../../../components";
 import { withSwal } from "react-sweetalert2";
+import { CartItems } from "../../../../../DTOs/CartDTO";
 
 interface Product {
+  id: number;
   name: string;
   special_discount_type: string;
   special_discount: number;
@@ -59,13 +61,14 @@ interface Product {
     sku: string;
     suggested_retail_price: number;
     variant_ids: string;
-  };
+    wholesale_price: number;
+  }[];
   product_colors: {
     id: number;
     code: string;
     name: string;
   }[];
-  suggested_retail_price: string;
+  suggested_retail_price: number;
   attributes: {
     id: number;
     title: string;
@@ -83,10 +86,6 @@ interface Color {
   name: string;
 }
 
-interface CartItems {
-  slug: string;
-  quantity: number;
-}
 
 const ProductDetails: React.FC = withSwal((props: any) => {
   const [product, setProduct] = useState<Product | null>(null);
@@ -94,14 +93,43 @@ const ProductDetails: React.FC = withSwal((props: any) => {
   const { swal } = props;
   const [cartItems, setCartItems] = useState<CartItems[]>([]);
   const [titleText, setTitleText] = useState("");
-  const [selectedColor, setSelectedColor] = useState<Color | null>(null);
+  const [selectedColor, setSelectedColor] = useState<Color | null>({
+    id: 0,
+    code: "",
+    name: ""
+  });
   const [selectedAttributes, setSelectedAttributes] = useState<{ [key: number]: string }>({});
+  const [selectedvariations, setSelectedVariations] = useState<string>("");
   let exchangeOrderItem = localStorage.getItem("ExchangeOrderID");
 
   const [currentItem, setCurrentItem] = useState<CartItems>({
-    slug: slug || "",
+    id: 0,
     quantity: 0,
+    color_id: 0,
+    attribute_values: [],
   });
+
+
+  useEffect(() => {
+    let rst = selectedColor?.id.toString() || "";
+    Object.values(selectedAttributes).forEach((attrId) => {
+      rst += `-${attrId}`;
+    });
+    setSelectedVariations(rst);
+  }, [selectedColor, selectedAttributes]);
+
+  useEffect(() => {
+    product?.variations.forEach((variation) => {
+      if (variation.variant_ids === selectedvariations) {
+        setProduct((prev) => prev ? ({
+          ...prev,
+          current_stock: parseInt(variation.current_stock, 10),
+          wholesale_price: variation.wholesale_price,
+          suggested_retail_price: variation.suggested_retail_price
+        }) : null);
+      }
+    });
+  }, [selectedvariations]);
 
   const addToCart = () => {
     if (!slug) {
@@ -112,7 +140,7 @@ const ProductDetails: React.FC = withSwal((props: any) => {
       });
       return;
     }
-    if (currentItem.quantity === 0) {
+    if (currentItem?.quantity === 0) {
       swal.fire({
         title: "Error!",
         text: "Quantity cannot be zero",
@@ -121,7 +149,7 @@ const ProductDetails: React.FC = withSwal((props: any) => {
       return;
     }
 
-    const isInCart = cartItems.some((item) => item.slug === slug);
+    const isInCart = cartItems.some((item) => item === currentItem);
 
     if (isInCart) {
       swal.fire({
@@ -131,9 +159,17 @@ const ProductDetails: React.FC = withSwal((props: any) => {
       });
       return;
     }
+    const attributesIDs = Object.values(selectedAttributes).map((attrId) => parseInt(attrId));
 
-    const updatedCart = [...cartItems, { slug, quantity: currentItem.quantity }];
-    setCartItems(updatedCart);
+    const updatedCart = [
+      ...cartItems,
+      {
+        id: product?.id || 0,
+        quantity: currentItem.quantity,
+        color_id: selectedColor?.id || 0,
+        attribute_values: attributesIDs,
+      },
+    ]; setCartItems(updatedCart);
     localStorage.setItem("cartItems", JSON.stringify(updatedCart));
     swal.fire({
       title: "Success!",
@@ -306,17 +342,22 @@ const ProductDetails: React.FC = withSwal((props: any) => {
                         </Link>
                       </p>
                     )}
-                    <h6 className="text-danger text-uppercase">Discount Price: {product?.price}</h6>
+                    {/* <h6 className="text-danger text-uppercase">Discount Price: {product?.price}</h6>
                     <h4 className="mb-4">
                       Price :{" "}
                       <span className="text-muted me-2">
                         <del>{product?.price} BDT</del>
                       </span>{" "}
                       <b>{product?.price} BDT</b>
-                    </h4>
+                    </h4> */}
                     {product?.suggested_retail_price && (
                       <h4>
                         <span>Suggested Retail Price:{product.suggested_retail_price} BDT</span>
+                      </h4>
+                    )}
+                    {product?.suggested_retail_price && (
+                      <h4>
+                        <span>Wholesale Price:{product.wholesale_price} BDT</span>
                       </h4>
                     )}
                     {product?.current_stock !== undefined && (
@@ -365,7 +406,7 @@ const ProductDetails: React.FC = withSwal((props: any) => {
                         </div>
                       )}
                     </div>
-                    {/* Add Dropdowns for each attribute */}
+                    {/* Dropdowns for each attribute */}
                     {product?.attributes.map((attribute) => (
                       <div key={attribute.id} className="mt-3">
                         <label htmlFor={`attribute-${attribute.id}`} className="form-label">
@@ -378,8 +419,8 @@ const ProductDetails: React.FC = withSwal((props: any) => {
                           value={selectedAttributes[attribute.id] || ""}
                         >
                           <option value="">Select {attribute.title}</option>
-                          {Array.isArray(attribute.values) && attribute.values.map((value) => (
-                            <option key={value.id} value={value.value}>
+                          {attribute.values.length > 0 && attribute.values.map((value) => (
+                            <option key={value.id} value={value.id}>
                               {value.value}
                             </option>
                           ))}

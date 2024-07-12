@@ -9,6 +9,7 @@ import { ClientDTO } from "../../../../../DTOs/ClientDTO";
 import { CountriesDTO } from "../../../../../DTOs/CountriesDTO";
 import { Typeahead } from "react-bootstrap-typeahead";
 import { withSwal } from "react-sweetalert2";
+import { CartItems } from "../../../../../DTOs/CartDTO";
 
 
 interface CartSummaryTypes {
@@ -17,13 +18,10 @@ interface CartSummaryTypes {
   discount?: number;
   net_total?: number;
 }
-interface StoredCart {
-  slug: string;
-  quantity: number;
-}
+
 interface CartItemTypes {
-  id: string;
-  slug: string;
+  id: number;
+
   image: string;
   title: string;
   price: number;
@@ -350,7 +348,7 @@ const Cart = withSwal((props: any) => {
   let exchangeOrderItem = localStorage.getItem("ExchangeOrderID");
 
   const [items, setItems] = useState<CartItemTypes[]>([]);
-  const [storedItems, setStoredItems] = useState<StoredCart[]>([])
+  const [storedItems, setStoredItems] = useState<CartItems[]>([])
   const [clients, setClients] = useState<ClientDTO[]>([]);
   const [titleText, setTitleText] = useState("");
 
@@ -392,7 +390,7 @@ const Cart = withSwal((props: any) => {
   };
   const onQtyChange = (e: any, item: CartItemTypes) => {
     var localItems = [...items];
-    var idx = localItems.findIndex((i) => i.slug === item.slug);
+    var idx = localItems.findIndex((i) => i.id === item.id);
     var newQty = e.target.value;
     var newTotal = localItems[idx].price * newQty;
     localItems[idx] = { ...item, quantity: newQty, total: newTotal };
@@ -400,7 +398,7 @@ const Cart = withSwal((props: any) => {
   };
   const onCustomPChange = (e: any, item: CartItemTypes) => {
     var localItems = [...items];
-    var idx = localItems.findIndex((i) => i.slug === item.slug);
+    var idx = localItems.findIndex((i) => i.id === item.id);
 
     localItems[idx] = { ...item, custom_price: e.target.value };
     _adjustCart(localItems);
@@ -410,8 +408,8 @@ const Cart = withSwal((props: any) => {
 
   const removeItem = (e: any, item: CartItemTypes) => {
     e.preventDefault();
-    var localItems = items.filter((i) => i.slug !== item.slug);
-    var storedItemsUpdated = storedItems.filter((i) => i.slug !== item.slug);
+    var localItems = items.filter((i) => i.id !== item.id);
+    var storedItemsUpdated = storedItems.filter((i) => i.id !== item.id);
 
     localStorage.setItem("cartItems", JSON.stringify(storedItemsUpdated));
 
@@ -454,9 +452,9 @@ const Cart = withSwal((props: any) => {
       const storedCartItems = JSON.parse(localStorage.getItem("cartItems") || "[]");
       setStoredItems(storedCartItems);
       const filteredProducts = allProducts
-        .filter((product: ProductItemTypes) => storedCartItems.some((item: any) => item.slug === product.slug))
+        .filter((product: ProductItemTypes) => storedCartItems.some((item: any) => item.id === product.id))
         .map((product: ProductItemTypes) => {
-          const matchedItem = storedCartItems.find((item: any) => item.slug === product.slug);
+          const matchedItem = storedCartItems.find((item: any) => item.id === product.id);
           return {
             ...product,
             custom_price: product.price,
@@ -697,7 +695,7 @@ const Cart = withSwal((props: any) => {
 
                                     <p className="m-0 d-inline-block align-middle font-16">
                                       <Link
-                                        to={`/apps/products/${item.slug}`}
+                                        to={`/apps/products/${item.id}`}
                                         className="text-body"
                                       >
                                         {item.title}
