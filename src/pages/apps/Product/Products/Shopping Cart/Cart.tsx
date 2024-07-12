@@ -21,7 +21,7 @@ interface CartSummaryTypes {
 
 interface CartItemTypes {
   id: number;
-
+  slug: string;
   image: string;
   title: string;
   price: number;
@@ -412,7 +412,20 @@ const Cart = withSwal((props: any) => {
 
   const removeItem = (e: any, item: CartItemTypes) => {
     e.preventDefault();
+
+    // Define a function to compare two cart items based on their unique attributes
+    const isSameItem = (a: CartItems, b: CartItemTypes) => {
+      return a.id === b.id &&
+        a.color_id === b.color_id &&
+        JSON.stringify(a.attribute_values) === JSON.stringify(b.attribute_values);
+    };
+    // Filter items in the cart excluding the item to be removed
+    //var localItems = items.filter((i) => !isSameItem(i, item));
+
+    // Filter stored items in the cart excluding the item to be removed
+    //var storedItemsUpdated = storedItems.filter((i) => !isSameItem(i, item));
     var localItems = items.filter((i) => i.id !== item.id);
+    setItems(localItems);
     var storedItemsUpdated = storedItems.filter((i) => i.id !== item.id);
 
     localStorage.setItem("cartItems", JSON.stringify(storedItemsUpdated));
@@ -438,7 +451,7 @@ const Cart = withSwal((props: any) => {
     let newNetTotal = newGrossTotal - totalDiscount;
 
     // update items and summary
-    // setItems(localItems);
+    
     setSummary({
       ...summary,
       gross_total: newGrossTotal,
@@ -557,9 +570,12 @@ const Cart = withSwal((props: any) => {
       products: items.map((item) => ({
         id: item.id,
         quantity: item.current_stock,
-        color_id: item.color_id,
+        color_id: item.color_id || 0,
         custom_price: item.custom_price,
-        attribute_values: item.attribute_values,
+        attribute_values: item.attribute_values || [],
+        variants_name: "",
+        variants_ids: "",
+        carts: []
       })),
       clientID: selectedClientId,
       note,
@@ -705,18 +721,12 @@ const Cart = withSwal((props: any) => {
 
                                     <p className="m-0 d-inline-block align-middle font-16">
                                       <Link
-                                        to={`/apps/products/${item.id}`}
+                                        to={`/apps/products/${item.slug}`}
                                         className="text-body"
                                       >
                                         {item.title}
                                       </Link>
-                                      {/* <br />
-                                <small className="me-2">
-                                  <b>Size:</b> {item.size}{" "}
-                                </small>
-                                <small>
-                                  <b>Color:</b> {item.color}{" "}
-                                </small> */}
+
                                     </p>
                                   </td>
                                   <td>{item.price}</td>

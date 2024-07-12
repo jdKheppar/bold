@@ -148,8 +148,15 @@ const ProductDetails: React.FC = withSwal((props: any) => {
       });
       return;
     }
-
-    const isInCart = cartItems.some((item) => item === currentItem);
+    const attributesIDs = Object.values(selectedAttributes).map((attrId) => parseInt(attrId));
+    const isInCart = cartItems.some(
+      (item) =>
+        
+        item.id == product?.id &&
+        item.color_id == selectedColor?.id &&
+        JSON.stringify(item.attribute_values) === JSON.stringify(attributesIDs)
+    );
+    
 
     if (isInCart) {
       swal.fire({
@@ -159,7 +166,7 @@ const ProductDetails: React.FC = withSwal((props: any) => {
       });
       return;
     }
-    const attributesIDs = Object.values(selectedAttributes).map((attrId) => parseInt(attrId));
+    
 
     const updatedCart = [
       ...cartItems,
