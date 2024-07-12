@@ -30,6 +30,8 @@ interface CartItemTypes {
   quantity: number;
   total: number;
   discount_price: number;
+  color_id: number;
+  attribute_values: number[];
 }
 
 
@@ -389,13 +391,15 @@ const Cart = withSwal((props: any) => {
 
   };
   const onQtyChange = (e: any, item: CartItemTypes) => {
-    var localItems = [...items];
-    var idx = localItems.findIndex((i) => i.id === item.id);
-    var newQty = e.target.value;
-    var newTotal = localItems[idx].price * newQty;
-    localItems[idx] = { ...item, quantity: newQty, total: newTotal };
-    _adjustCart(localItems);
+    const newQty = e.target.value;
+    const updatedItems = items.map((i) =>
+      i.id === item.id ? { ...i, quantity: newQty, total: i.price * newQty } : i
+    );
+    setItems(updatedItems);
+    localStorage.setItem("cartItems", JSON.stringify(updatedItems));
+    _adjustCart(updatedItems);
   };
+
   const onCustomPChange = (e: any, item: CartItemTypes) => {
     var localItems = [...items];
     var idx = localItems.findIndex((i) => i.id === item.id);
@@ -451,25 +455,29 @@ const Cart = withSwal((props: any) => {
       const allProducts = response.data.data;
       const storedCartItems = JSON.parse(localStorage.getItem("cartItems") || "[]");
       setStoredItems(storedCartItems);
-      const filteredProducts = allProducts
-        .filter((product: ProductItemTypes) => storedCartItems.some((item: any) => item.id === product.id))
-        .map((product: ProductItemTypes) => {
-          const matchedItem = storedCartItems.find((item: any) => item.id === product.id);
+
+      const filteredProducts = storedCartItems.map((cartItem: any) => {
+        const product = allProducts.find((product: ProductItemTypes) => product.id === cartItem.id);
+        if (product) {
           return {
             ...product,
             custom_price: product.price,
-            quantity: matchedItem.quantity,
-            total: product.price * product.current_stock,
+            quantity: cartItem.quantity,
+            total: product.price * cartItem.quantity,
             discount_price: 0, // Adjust based on your discount logic
-          };
-        });
-      setItems(filteredProducts);
 
+          };
+        }
+        return null;
+      }).filter(Boolean); // Remove null values
+
+      setItems(filteredProducts);
     } catch (error) {
       console.error("API call error:", error);
       throw error;
     }
   };
+
   const fetchClients = async () => {
     const fullUrl = "https://reseller.whitexdigital.com/api/client";
     try {
@@ -549,7 +557,9 @@ const Cart = withSwal((props: any) => {
       products: items.map((item) => ({
         id: item.id,
         quantity: item.current_stock,
-        custom_price: Number(item.custom_price),
+        color_id: item.color_id,
+        custom_price: item.custom_price,
+        attribute_values: item.attribute_values,
       })),
       clientID: selectedClientId,
       note,
