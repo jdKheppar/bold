@@ -7,6 +7,7 @@ import Rating from "../../../../../components/Rating";
 import { FormInput } from "../../../../../components";
 import { withSwal } from "react-sweetalert2";
 import { CartItems } from "../../../../../DTOs/CartDTO";
+import "./../Products.css";
 
 interface Product {
   id: number;
@@ -108,10 +109,14 @@ const ProductDetails: React.FC = withSwal((props: any) => {
     quantity: 0,
     color_id: 0,
     attribute_values: [],
-    variants_ids:"",
-    price: -1,
-    custom_price: -1,
-    variants_name: ""
+    variants_ids: "",
+    price: 0,
+    custom_price: 0,
+    variants_name: "",
+    image: "",
+    slug: "",
+    name: "",
+    total: 0
   });
 
 
@@ -146,24 +151,41 @@ const ProductDetails: React.FC = withSwal((props: any) => {
       });
       return;
     }
-    if (currentItem?.quantity === 0) {
+    console.log(currentItem?.quantity);
+    if (!currentItem?.quantity) {
       swal.fire({
         title: "Error!",
-        text: "Quantity cannot be zero",
+        text: "Enter a valid quantity",
         icon: "error",
       });
       return;
     }
-    const attributesIDs = Object.values(selectedAttributes).map((attrId) => parseInt(attrId));
+    let attributesIDs = Object.values(selectedAttributes).map((attrId) => parseInt(attrId));
+
     const isInCart = cartItems.some(
       (item) =>
-        
+
         item.id == product?.id &&
         item.color_id == selectedColor?.id &&
         JSON.stringify(item.attribute_values) === JSON.stringify(attributesIDs)
     );
-    
 
+    if (product?.product_colors.length! > 0 && !selectedColor?.id) {
+      swal.fire({
+        title: "Error!",
+        text: "Please select color.",
+        icon: "warning",
+      });
+      return;
+    }
+    if (product?.attributes.length! > 0 && Object.keys(selectedAttributes).length !== product?.attributes.length) {
+      swal.fire({
+        title: "Error!",
+        text: "Please select all attributes.",
+        icon: "warning",
+      });
+      return;
+    }
     if (isInCart) {
       swal.fire({
         title: "Error!",
@@ -172,21 +194,27 @@ const ProductDetails: React.FC = withSwal((props: any) => {
       });
       return;
     }
-    
+
 
     const updatedCart = [
       ...cartItems,
       {
         id: product?.id || 0,
-        quantity: currentItem.quantity,
+        quantity: Number(currentItem.quantity),
         color_id: selectedColor?.id || 0,
         attribute_values: attributesIDs,
         variants_ids: selectedvariations,
         variants_name: selectedvariationame,
-        price: currentItem.price,
-        custom_price: currentItem.custom_price
+        price: Number(product?.wholesale_price!) || 0,
+
+        custom_price: Number(product?.wholesale_price!) || 0,
+
+        slug: slug,
+        image: product?.gallery.small[0]!,
+        name: product?.name!,
+        total: Number(currentItem.quantity) * Number(product?.wholesale_price!)
       },
-    ]; 
+    ];
     setCartItems(updatedCart);
     localStorage.setItem("cartItems", JSON.stringify(updatedCart));
     swal.fire({
@@ -201,6 +229,7 @@ const ProductDetails: React.FC = withSwal((props: any) => {
     try {
       const response = await axios.get(fullUrl);
       setProduct(response.data);
+      setCurrentItem(response.data);
     } catch (error) {
       console.error("API call error:", error);
     }
@@ -360,17 +389,13 @@ const ProductDetails: React.FC = withSwal((props: any) => {
                         </Link>
                       </p>
                     )}
-                    {/* <h6 className="text-danger text-uppercase">Discount Price: {product?.price}</h6>
-                    <h4 className="mb-4">
-                      Price :{" "}
-                      <span className="text-muted me-2">
-                        <del>{product?.price} BDT</del>
-                      </span>{" "}
-                      <b>{product?.price} BDT</b>
-                    </h4> */}
+
                     {product?.suggested_retail_price && (
-                      <h4>
-                        <span>Suggested Retail Price:{product.suggested_retail_price} BDT</span>
+                      <h4 className="parentPrice">
+                        <span className="childPrice">
+                          Suggested Retail Price:{product.suggested_retail_price} BDT
+                        </span>
+
                       </h4>
                     )}
                     {product?.suggested_retail_price && (

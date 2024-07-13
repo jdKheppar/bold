@@ -2,6 +2,7 @@ import React from 'react'
 import Statistics from './Statistics'
 import { Row, Col } from "react-bootstrap";
 import Commissions from './Commission';
+import CommissionChart from './Graph';
 
 
 const Commission = () => {
@@ -14,6 +15,7 @@ const Commission = () => {
             </Row>
             <Statistics />
             <Commissions />
+            <CommissionChart />
 
         </>
     )

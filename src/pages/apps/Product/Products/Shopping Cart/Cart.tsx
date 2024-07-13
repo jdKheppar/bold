@@ -36,6 +36,7 @@ interface CartItemTypes {
   attribute_values: number[];
   variants_ids: string;
   variants_name: string;
+  name: string;
 }
 
 
@@ -138,11 +139,7 @@ const ClientForm: React.FC<ClientFormProps> = ({
   useEffect(() => {
     fetchCountries();
   }, []);
-  // useEffect(() => {
-  //   if (selectedStateId) {
-  //     fetchCities(selectedStateId);
-  //   }
-  // }, [selectedStateId]);
+
   return (
     <>
       <Modal.Header closeButton>
@@ -363,13 +360,22 @@ const Cart = withSwal((props: any) => {
   const [titleText, setTitleText] = useState("");
   const [shippinginfor, setShippingInfor] = useState("");
   useEffect(() => {
-    let shipping_value: number = shippinginfor == "Inside Dhaka" ? 120 : 150;
-    setSummary({
-      ...summary,
-      shipping: shipping_value,
-      net_total: summary?.net_total! + shipping_value,
-    });
+    let previousShipping = summary.shipping || 0;
+    let newShippingValue = 0;
+
+    if (shippinginfor === "Inside Dhaka") {
+      newShippingValue = 120;
+    } else if (shippinginfor === "Outside Dhaka") {
+      newShippingValue = 150;
+    }
+
+    setSummary(prevSummary => ({
+      ...prevSummary,
+      net_total: prevSummary?.net_total! - previousShipping + newShippingValue,
+      shipping: newShippingValue
+    }));
   }, [shippinginfor]);
+
   const [client, setClient] = useState<ClientDTO>({
     id: 0,
     name: "",
@@ -440,13 +446,13 @@ const Cart = withSwal((props: any) => {
         JSON.stringify(a.attribute_values) === JSON.stringify(b.attribute_values);
     };
     // Filter items in the cart excluding the item to be removed
-    //var localItems = items.filter((i) => !isSameItem(i, item));
-
-    // Filter stored items in the cart excluding the item to be removed
-    //var storedItemsUpdated = storedItems.filter((i) => !isSameItem(i, item));
-    var localItems = items.filter((i) => i.id !== item.id);
+    var localItems = items.filter((i) => !isSameItem(i, item));
     setItems(localItems);
-    var storedItemsUpdated = storedItems.filter((i) => i.id !== item.id);
+    // Filter stored items in the cart excluding the item to be removed
+    var storedItemsUpdated = storedItems.filter((i) => !isSameItem(i, item));
+    //var localItems = items.filter((i) => i.id !== item.id);
+
+    //var storedItemsUpdated = storedItems.filter((i) => i.id !== item.id);
 
     localStorage.setItem("cartItems", JSON.stringify(storedItemsUpdated));
 
@@ -468,48 +474,32 @@ const Cart = withSwal((props: any) => {
     }
 
     // calculate net total
-    let newNetTotal = newGrossTotal - totalDiscount;
+    let newNetTotal = newGrossTotal// - totalDiscount;
 
     // update items and summary
 
     setSummary({
       ...summary,
       gross_total: newGrossTotal,
-      discount: totalDiscount,
+      discount: 0,
       net_total: newNetTotal,
     });
   };
 
 
-  const getProducts = async () => {
-    const fullUrl = "https://reseller.whitexdigital.com/api/products";
+  const getProducts = () => {
     try {
-      const response = await axios.get(fullUrl);
-      const allProducts = response.data.data;
       const storedCartItems = JSON.parse(localStorage.getItem("cartItems") || "[]");
       setStoredItems(storedCartItems);
+      setItems(storedCartItems);
 
-      const filteredProducts = storedCartItems.map((cartItem: any) => {
-        const product = allProducts.find((product: ProductItemTypes) => product.id === cartItem.id);
-        if (product) {
-          return {
-            ...product,
-            custom_price: product.price,
-            quantity: cartItem.quantity,
-            total: product.price * cartItem.quantity,
-            discount_price: 0, // Adjust based on your discount logic
 
-          };
-        }
-        return null;
-      }).filter(Boolean); // Remove null values
-
-      setItems(filteredProducts);
     } catch (error) {
-      console.error("API call error:", error);
+      console.error("Error while getting products:", error);
       throw error;
     }
   };
+
 
   const fetchClients = async () => {
     const fullUrl = "https://reseller.whitexdigital.com/api/client";
@@ -590,11 +580,11 @@ const Cart = withSwal((props: any) => {
       products: items.map((item) => ({
         id: item.id,
         color_id: item.color_id || 0,
-        quantity: item.current_stock,
+        quantity: Number(item.quantity),
         attribute_values: item.attribute_values || [],
         variants_ids: item.variants_ids || "",
-        price: item.price,
-        custom_price: item.custom_price,
+        price: Number(item.price),
+        custom_price: Number(item.custom_price),
         variants_name: item.variants_name || [],
 
       })),
@@ -647,6 +637,8 @@ const Cart = withSwal((props: any) => {
     }
   }, []);
   useEffect(() => {
+    // Calculate total for each item
+    console.log(items);
     _adjustCart(items);
   }, [items])
 
@@ -734,7 +726,7 @@ const Cart = withSwal((props: any) => {
                                   <td>
                                     <img
                                       src={item.image}
-                                      alt={item.title}
+                                      alt={item.name}
 
                                       title="contact-img"
                                       className="rounded me-3"
@@ -747,7 +739,7 @@ const Cart = withSwal((props: any) => {
                                         to={`/apps/products/${item.slug}`}
                                         className="text-body"
                                       >
-                                        {item.title}
+                                        {item.name}
                                       </Link>
 
                                     </p>
@@ -770,6 +762,7 @@ const Cart = withSwal((props: any) => {
                                     <input
                                       type="number"
                                       min="1"
+                                      max={item.current_stock}
                                       value={item.quantity}
                                       className="form-control"
                                       placeholder="Qty"

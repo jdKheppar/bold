@@ -7,5 +7,8 @@ export interface CartItems {
     price: number;
     custom_price: number;
     variants_name: string;
-
+    image: string;
+    slug: string;
+    name: string;
+    total: number;
 }
