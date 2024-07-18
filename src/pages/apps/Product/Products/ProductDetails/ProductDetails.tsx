@@ -252,7 +252,37 @@ const ProductDetails: React.FC = withSwal((props: any) => {
     e.preventDefault();
     addToCart();
   };
-
+  const Notified= async()=>{
+    try {
+      if(product?.id){
+        const fullUrl = `https://reseller.whitexdigital.com/api/product/notify/${product.id}`;
+        const response = await axios.post(fullUrl);
+        if(response.status === 200){
+          swal.fire({
+            title: "Success!",
+            text: "You have subscribed this product successfully.",
+            icon: "success",
+          });
+        }
+        
+      }
+      else{
+        swal.fire({
+          title: "Error!",
+          text: "Invalid Product.",
+          icon: "error",
+        });
+      }
+      
+      
+    } catch (error) {
+      swal.fire({
+        title: "Error!",
+        text: "Something went wrong.",
+        icon: "error",
+      });
+    }
+  }
   useEffect(() => {
     if (exchangeOrderItem) {
       setTitleText(`Product Details (Exchange Order)`);
@@ -389,7 +419,12 @@ const ProductDetails: React.FC = withSwal((props: any) => {
                         </Link>
                       </p>
                     )}
-
+                    
+                     {product?.suggested_retail_price && (
+                      <h4>
+                        <span>Wholesale Price:{product.wholesale_price} BDT</span>
+                      </h4>
+                    )}
                     {product?.suggested_retail_price && (
                       <h4 className="parentPrice">
                         <span className="childPrice">
@@ -398,11 +433,7 @@ const ProductDetails: React.FC = withSwal((props: any) => {
 
                       </h4>
                     )}
-                    {product?.suggested_retail_price && (
-                      <h4>
-                        <span>Wholesale Price:{product.wholesale_price} BDT</span>
-                      </h4>
-                    )}
+                   
                     {product?.current_stock !== undefined && (
                       <h4>
                         <span className={`badge bg-soft-${current_stockClass} text-${current_stockClass} mb-4`}>
@@ -493,7 +524,12 @@ const ProductDetails: React.FC = withSwal((props: any) => {
                         </div>
 
                       </div>
-
+                      <div>
+                        <button className="btn btn-light waves-effect waves-light mb-2" type="button" onClick={Notified}>
+                          
+                          Allow Notifications
+                        </button>
+                      </div>
                       <div>
                         <button className="btn btn-success waves-effect waves-light" type="submit" disabled={!product?.current_stock}>
                           <span className="btn-label">

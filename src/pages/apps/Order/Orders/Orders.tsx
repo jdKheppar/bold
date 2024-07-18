@@ -7,21 +7,15 @@ import axios from "axios";
 import { withSwal } from "react-sweetalert2";
 
 // dummy data
-import { orders, OrdersItemTypes } from "./data";
 import PageTitle from "../../../../components/PageTitle";
 import Table from "../../../../components/Table";
 import { OrdersDTO } from "../../../../DTOs/OrderDTO";
-
-
-
 
 /* total amount column render */
 const TotalAmountColumn = ({ row }: { row: any }) => {
   return (
     <>
-      BDT
-      {" "}
-      {row.original.total_amount}
+      BDT {row.original.total_amount}
     </>
   );
 };
@@ -39,7 +33,6 @@ const ProductsColumn = ({ row }: { row: any }) => {
   );
 };
 
-
 /* orderdate column render */
 const OrderDateColumn = ({ row }: { row: any }) => {
   return (
@@ -49,41 +42,6 @@ const OrderDateColumn = ({ row }: { row: any }) => {
     </>
   );
 };
-
-/* payment column render */
-// const PaymentStatusColumn = ({ row }: { row: any }) => {
-//   return (
-//     <>
-//       <h5>
-//         <span
-//           className={classNames("badge", {
-//             "bg-soft-success text-success":
-//               row.original.payment_status === "Paid",
-//             "bg-soft-danger text-danger":
-//               row.original.payment_status === "Payment Failed",
-//             "bg-soft-info text-info": row.original.payment_status === "Unpaid",
-//             "bg-soft-warning text-warning":
-//               row.original.payment_status === "Awaiting Authorization",
-//           })}
-//         >
-//           {row.original.payment_status === "Paid" && (
-//             <i className="mdi mdi-bitcoin me-1"></i>
-//           )}
-//           {row.original.payment_status === "Payment Failed" && (
-//             <i className="mdi mdi-cancel me-1"></i>
-//           )}
-//           {row.original.payment_status === "Unpaid" && (
-//             <i className="mdi mdi-cash me-1"></i>
-//           )}
-//           {row.original.payment_status === "Awaiting Authorization" && (
-//             <i className="mdi mdi-timer-sand me-1"></i>
-//           )}
-//           {row.original.payment_status}
-//         </span>
-//       </h5>
-//     </>
-//   );
-// };
 
 /* status column render */
 const StatusColumn = ({ row }: { row: any }) => {
@@ -110,19 +68,32 @@ const ActionColumn = ({ row }: { row: any }) => {
   const navigate = useNavigate();
   const exchangeOrder = (id: Number) => {
     localStorage.setItem("ExchangeOrderID", id.toString());
-    alert("Place you updated order now");
+    alert("Place your updated order now");
     navigate("/apps/products");
   };
+
+  const returnOrder = async (id: Number) => {
+    const fullUrl = `https://reseller.whitexdigital.com/api/orders/returnorder/${id}`;
+    try {
+      const response = await axios.post(fullUrl);
+      if(response.status === 200){
+        alert("Operation Successful");
+      }
+    } catch (error) {
+      console.error("API call error:", error);
+      alert("Something Went Wrong");
+    }
+  };
+
   return (
     <>
-
-      <div className="action-icon" onClick={() => exchangeOrder(row.original.id)}>
+      <div className="action-icon " onClick={() => exchangeOrder(row.original.id)}>
         {" "}
-        <i className="mdi mdi-square-edit-outline"></i>
+        <i className="mdi mdi-square-edit-outline cursor-pointer"></i>
       </div>
-      <div className="action-icon">
+      <div className="action-icon " onClick={() => returnOrder(row.original.id)}>
         {" "}
-        <i className="mdi mdi-delete"></i>
+        <i className="mdi mdi-delete cursor-pointer"></i>
       </div>
     </>
   );
@@ -144,7 +115,6 @@ const columns = [
     accessor: "order_date",
     Cell: OrderDateColumn,
   },
-
   {
     Header: "Total",
     accessor: "total_amount",
@@ -162,20 +132,11 @@ const columns = [
   },
 ];
 
-// get pagelist to display
+// get page list to display
 const sizePerPageList = [
-  {
-    text: "10",
-    value: 10,
-  },
-  {
-    text: "20",
-    value: 20,
-  },
-  {
-    text: "50",
-    value: 50,
-  },
+  { text: "10", value: 10 },
+  { text: "20", value: 20 },
+  { text: "50", value: 50 },
 ];
 
 // main component
@@ -183,13 +144,22 @@ const Orders = withSwal((props: any) => {
   const { swal } = props;
   const navigate = useNavigate();
   const [orderList, setOrderList] = useState<OrdersDTO[]>([]);
-
+  const [orderStatuses, setOrderStatuses] = useState<string[]>([]);
+  const [orderDates, setOrderDates] = useState<string[]>([]);
+  const [fromDate, setFromDate] = useState<string>("All");
+  const [toDate, setToDate] = useState<string>("All");
 
   const fetchOrders = async () => {
     const fullUrl = "https://reseller.whitexdigital.com/api/orders";
     try {
-      const response = await axios.get(fullUrl);
+      const response = await axios.get<OrdersDTO[]>(fullUrl);
       setOrderList(response.data);
+
+      // Extract unique order statuses and order dates
+      const uniqueStatuses: string[] = Array.from(new Set(response.data.map((order: OrdersDTO) => order.status)));
+      const uniqueDates: string[] = Array.from(new Set(response.data.map((order: OrdersDTO) => order.order_date)));
+      setOrderStatuses(uniqueStatuses);
+      setOrderDates(uniqueDates);
     } catch (error) {
       console.error("API call error:", error);
       swal.fire({
@@ -205,15 +175,27 @@ const Orders = withSwal((props: any) => {
   }, []);
 
   // change order status group
-  const changeOrderStatusGroup = (OrderStatusGroup: string) => {
+  const changeOrderStatusGroup = (orderStatusGroup: string) => {
     let updatedData = [...orderList];
-    //  filter
     updatedData =
-      OrderStatusGroup === "All"
+      orderStatusGroup === "All"
         ? orderList
         : [...orderList].filter((o) =>
-          o.status?.includes(OrderStatusGroup)
-        );
+            o.status?.includes(orderStatusGroup)
+          );
+    setOrderList(updatedData);
+  };
+
+  // change order date range
+  const changeOrderDateRange = (fromDate: string, toDate: string) => {
+    let updatedData = [...orderList];
+
+    if (fromDate !== "All" && toDate !== "All") {
+      updatedData = updatedData.filter((o) => {
+        return o.order_date >= fromDate && o.order_date <= toDate;
+      });
+    }
+
     setOrderList(updatedData);
   };
 
@@ -242,17 +224,54 @@ const Orders = withSwal((props: any) => {
                         <select
                           className="form-select"
                           id="status-select"
-                          onChange={(e: any) =>
-                            changeOrderStatusGroup(e.target.value)
-                          }
+                          onChange={(e: any) => changeOrderStatusGroup(e.target.value)}
                         >
                           <option value="All">All</option>
-                          <option value="Paid">Paid</option>
-                          <option value="Authorization">
-                            Awaiting Authorization
-                          </option>
-                          <option value="Failed">Payment failed</option>
-                          <option value="Unpaid">Unpaid</option>
+                          {orderStatuses.map((status, index) => (
+                            <option key={index} value={status}>{status}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="col-auto">
+                      <div className="d-flex align-items-center w-auto">
+                        <label htmlFor="from-date-select" className="me-2">
+                          From Date
+                        </label>
+                        <select
+                          className="form-select"
+                          id="from-date-select"
+                          onChange={(e: any) => {
+                            setFromDate(e.target.value);
+                            changeOrderDateRange(e.target.value, toDate);
+                          }}
+                        >
+                          <option value="All">All</option>
+                          {orderDates.map((date, index) => (
+                            <option key={index} value={date}>{date}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="col-auto">
+                      <div className="d-flex align-items-center w-auto">
+                        <label htmlFor="to-date-select" className="me-2">
+                          To Date
+                        </label>
+                        <select
+                          className="form-select"
+                          id="to-date-select"
+                          onChange={(e: any) => {
+                            setToDate(e.target.value);
+                            changeOrderDateRange(fromDate, e.target.value);
+                          }}
+                        >
+                          <option value="All">All</option>
+                          {orderDates.map((date, index) => (
+                            <option key={index} value={date}>{date}</option>
+                          ))}
                         </select>
                       </div>
                     </div>

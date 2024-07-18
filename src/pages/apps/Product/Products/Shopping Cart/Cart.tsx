@@ -538,6 +538,23 @@ const Cart = withSwal((props: any) => {
       console.log(response);
       if (response.data) {
         setSelectedClientId(response.data.data.id);
+        let newClientSelection:ClientDTO[] = [
+          {
+            id: response.data.data.id,
+            name: client.name,
+            email: client.email,
+            contact: client.contact,
+            address: client.address,
+            country_id: (client.country_id),
+            state_id: (client.state_id),
+            city_id: (client.city_id),
+            country_name: (client.country_name),
+            state_name: String(client.state_name),
+            city_name: String(client.city_name),
+            postal_code: (client.postal_code)
+          }
+        ];
+        setClientSelections(newClientSelection);
       }
 
       // closeEditClientModal();
@@ -586,6 +603,7 @@ const Cart = withSwal((props: any) => {
         price: Number(item.price),
         custom_price: Number(item.custom_price),
         variants_name: item.variants_name || [],
+        slug: item.slug 
 
       })),
       clientID: selectedClientId,
