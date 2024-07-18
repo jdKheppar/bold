@@ -20,6 +20,8 @@ interface UserData {
   token: string;
   business: string;
   contact: string;
+  logo: string;
+  shippingaddress: string;
 }
 interface PaymentDTO {
   id: number;
@@ -76,6 +78,8 @@ const Profile = withSwal((props: any) => {
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
   const [business, setBusiness] = useState("");
+  const [logo, setLogo] = useState("");
+  const [shippingaddress, setShippingAddress] = useState("");
 
   const [bankname, setBankName] = useState("");
   const [branchname, setBranchName] = useState("");
@@ -134,6 +138,8 @@ const Profile = withSwal((props: any) => {
       setName(parsedUserInfo.username);
       setContact(parsedUserInfo.contact);
       setBusiness(parsedUserInfo.business);
+      setLogo(parsedUserInfo.logo);
+      setShippingAddress(parsedUserInfo.shippingaddress);
       fetchPaymentMethods();
     }
     else {
@@ -210,6 +216,8 @@ const Profile = withSwal((props: any) => {
         name: name,
         contact: contact,
         business: business,
+        logo: logo,
+        shipping: shippingaddress,
       };
       params = new URLSearchParams(newObj).toString();
     }
@@ -231,7 +239,10 @@ const Profile = withSwal((props: any) => {
           role: "Admin",
           token: userData?.token,
           business: business,
-          contact: contact
+          contact: contact,
+          logo: logo,
+          shipping: shippingaddress,
+
         }
         sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(updatedUser));
       } else {
@@ -326,6 +337,22 @@ const Profile = withSwal((props: any) => {
                 containerClass={"mb-2"}
                 value={business}
                 onChange={(e) => setBusiness(e.target.value)}
+              />
+              <FormInput
+                name="logo"
+                label="Logo"
+                placeholder="Enter your logo URL here"
+                containerClass={"mb-3"}
+                value={logo}
+                onChange={(e) => setLogo(e.target.value)}
+              />
+              <FormInput
+                name="shippingaddress"
+                label="Shipping Address"
+                placeholder="Enter your shipping address here"
+                containerClass={"mb-3"}
+                value={shippingaddress}
+                onChange={(e) => setShippingAddress(e.target.value)}
               />
             </Card.Body>
             <button
