@@ -12,4 +12,11 @@ export interface OrdersDTO {
     order_time: string;
     status: string; // order_status
     file: string;
+    pro_det: {
+        id: number;
+        slug: string;
+        quantity: number;
+        price: number;
+        image_ur: string;
+    }[];
 }

@@ -1,4 +1,5 @@
 // apicore
+import { UserData } from "../../DTOs/UserDataDTO";
 import { APICore } from "../../helpers/api/apiCore";
 
 // constants
@@ -11,25 +12,15 @@ const INIT_STATE = {
   loading: false,
 };
 
-interface UserData {
-  id: number;
-  username: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  role: string;
-  token: string;
-  business: string;
-  contact: string;
-}
+
 
 interface AuthActionType {
   type:
-    | AuthActionTypes.API_RESPONSE_SUCCESS
-    | AuthActionTypes.API_RESPONSE_ERROR
-    | AuthActionTypes.LOGIN_USER
-    | AuthActionTypes.LOGOUT_USER
-    | AuthActionTypes.RESET;
+  | AuthActionTypes.API_RESPONSE_SUCCESS
+  | AuthActionTypes.API_RESPONSE_ERROR
+  | AuthActionTypes.LOGIN_USER
+  | AuthActionTypes.LOGOUT_USER
+  | AuthActionTypes.RESET;
   payload: {
     actionType?: string;
     data?: UserData | {};

@@ -24,7 +24,7 @@ const TotalAmountColumn = ({ row }: { row: any }) => {
 const ProductsColumn = ({ row }: { row: any }) => {
   return (
     <>
-      {(row.original.products || []).map((product: { id: number; image_url: string }, index: number) => (
+      {(row.original.pro_det || []).map((product: { id: number; image_url: string }, index: number) => (
         <Link to={`/apps/ecommerce/productDetails${product.id}`} key={index}>
           <img src={product.image_url} alt="" height="32" />
         </Link>
@@ -76,7 +76,7 @@ const ActionColumn = ({ row }: { row: any }) => {
     const fullUrl = `https://reseller.whitexdigital.com/api/orders/returnorder/${id}`;
     try {
       const response = await axios.post(fullUrl);
-      if(response.status === 200){
+      if (response.status === 200) {
         alert("Operation Successful");
       }
     } catch (error) {
@@ -181,8 +181,8 @@ const Orders = withSwal((props: any) => {
       orderStatusGroup === "All"
         ? orderList
         : [...orderList].filter((o) =>
-            o.status?.includes(orderStatusGroup)
-          );
+          o.status?.includes(orderStatusGroup)
+        );
     setOrderList(updatedData);
   };
 

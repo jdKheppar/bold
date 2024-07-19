@@ -9,20 +9,9 @@ import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import PageTitle from "../../../components/PageTitle";
 import { FormInput } from "../../../components";
 import { Typeahead } from "react-bootstrap-typeahead";
+import { UserData } from "../../../DTOs/UserDataDTO";
 
-interface UserData {
-  id: number;
-  username: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  role: string;
-  token: string;
-  business: string;
-  contact: string;
-  logo: string;
-  shippingaddress: string;
-}
+
 interface PaymentDTO {
   id: number;
   name: string;
@@ -139,7 +128,7 @@ const Profile = withSwal((props: any) => {
       setContact(parsedUserInfo.contact);
       setBusiness(parsedUserInfo.business);
       setLogo(parsedUserInfo.logo);
-      setShippingAddress(parsedUserInfo.shippingaddress);
+      setShippingAddress(parsedUserInfo.shipping);
       fetchPaymentMethods();
     }
     else {

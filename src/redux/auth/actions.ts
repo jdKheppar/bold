@@ -1,4 +1,5 @@
 // constants
+import { UserData } from "../../DTOs/UserDataDTO";
 import { AuthActionTypes } from "./constants";
 
 export interface AuthActionType {
@@ -14,17 +15,7 @@ export interface AuthActionType {
   payload: {} | string;
 }
 
-interface UserData {
-  id: number;
-  username: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  role: string;
-  token: string;
-  business: string;
-  contact: string;
-}
+
 
 // common success
 export const authApiResponseSuccess = (
