@@ -4,6 +4,9 @@ export interface Product {
 }
 
 export interface OrdersDTO {
+    date: string;
+    order_id: number;
+    type: string;
     id: number;
     products: Array<Product>;
     customer_name: string;

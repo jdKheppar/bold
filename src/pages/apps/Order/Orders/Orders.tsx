@@ -279,7 +279,11 @@ const Orders = withSwal((props: any) => {
                 </Col>
 
                 <Col lg={4}>
+
                   <div className="text-lg-end mt-xl-0 mt-2">
+                    <Link to="/apps/orderrequests" className="btn btn-danger mb-2 me-2">
+                      Order Requests
+                    </Link>
                     <Link to="/apps/products" className="btn btn-danger mb-2 me-2">
                       <i className="mdi mdi-basket me-1"></i> Add New Order
                     </Link>

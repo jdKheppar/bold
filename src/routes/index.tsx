@@ -28,6 +28,7 @@ const Dashboard1 = React.lazy(() => import("../pages/dashboard/Dashboard1/"));
 
 // apps
 const AllOrders = React.lazy(() => import("../pages/apps/Order/index"));
+const OrderRequests = React.lazy(() => import("../pages/apps/Order/OrderReqs/OrderReqs"));
 const AllClients = React.lazy(() => import("../pages/apps/Clients/index"));
 
 const AllProducts = React.lazy(() => import("../pages/apps/Product/index"));
@@ -107,6 +108,16 @@ const orderAppRoutes: RoutesProps = {
   icon: "layers",
   element: <AllOrders />,
 };
+
+const orderreqAppRoutes: RoutesProps = {
+  path: "/apps/orderrequests",
+  name: "Order Requests",
+  route: PrivateRoute,
+  roles: ["Admin"],
+  icon: "layers",
+  element: <OrderRequests />,
+};
+
 const clientAppRoutes: RoutesProps = {
   path: "/apps/clients",
   name: "Clients",
@@ -194,6 +205,7 @@ const cartAppRoutes = {
 
 const appRoutes = [
   orderAppRoutes,
+  orderreqAppRoutes,
   productAppRoutes,
   commissionAppRoutes,
   payoutAppRoutes,
