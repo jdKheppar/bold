@@ -136,10 +136,11 @@ const OrderRequests = withSwal((props: any) => {
     const [orderList, setOrderList] = useState<OrdersDTO[]>([]);
 
 
-    const fetchOrders = async () => {
+    const fetchOrderRequests = async () => {
         const fullUrl = "https://reseller.whitexdigital.com/api/orders/request";
         try {
             const response = await axios.get<OrdersDTO[]>(fullUrl);
+            console.log(response);
             setOrderList(response.data);
 
 
@@ -154,7 +155,7 @@ const OrderRequests = withSwal((props: any) => {
     };
 
     useEffect(() => {
-        fetchOrders();
+        fetchOrderRequests();
     }, []);
 
 
